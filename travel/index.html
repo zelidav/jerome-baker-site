@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Jerome Baker Travel Guide. Start your trip here.</title>
+<meta name="description" content="The Jerome Baker Travel Guide. A psychedelic trip through one of one glass, est. 1991.">
+<meta name="theme-color" content="#0A0A0A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JB Trip">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="../assets/img/jb-mark.webp" type="image/webp">
+<link rel="apple-touch-icon" href="../assets/img/jb-mark.webp">
+<link rel="preload" as="image" href="../assets/img/kaleido-a.webp" type="image/webp">
+<link rel="preload" as="image" href="../assets/img/box.webp" type="image/webp">
+<link rel="preload" as="image" href="../assets/img/jb-mark.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,800;0,900;1,900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/site.css">
+<style>
+body{background:#0A0A0A;color:#fff}
+.trip{position:relative;height:100vh;height:100dvh;min-height:560px;overflow:hidden;display:flex;align-items:center;justify-content:center;contain:strict}
+.conic{position:absolute;left:50%;top:50%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;background:conic-gradient(from 0deg,#2A3B8E,#DA2342,#FDB514,#FFF100,#05B48F,#15B4E8,#262261,#EE342E,#2A3B8E);animation:spin 50s linear infinite reverse;will-change:transform}
+#kal{position:absolute;inset:0;width:100%;height:100%;display:block}
+.kwrap{position:absolute;left:50%;top:50%;width:0;height:0;will-change:transform;transition:transform .9s ease-out}
+.hue{animation:hue 16s linear infinite}
+@keyframes hue{to{filter:hue-rotate(360deg)}}
+.kal{position:absolute;border-radius:50%;overflow:hidden;will-change:transform}
+.kal .w{position:absolute;inset:0;clip-path:polygon(50% 50%,50% 0%,78.87% 0%)}
+.kal .tile{position:absolute;inset:-60%;background-repeat:repeat;animation:tile 28s linear infinite alternate;will-change:transform}
+@keyframes tile{from{transform:translate3d(0,0,0)}to{transform:translate3d(18%,12%,0)}}
+.k1{width:150vmax;height:150vmax;left:-75vmax;top:-75vmax;animation:spin 70s linear infinite;mix-blend-mode:hard-light}
+.k1 .tile{background-image:url(../assets/img/kaleido-a.webp);background-size:360px 360px}
+.k2{width:110vmax;height:110vmax;left:-55vmax;top:-55vmax;animation:spin 46s linear infinite reverse,breathe 11s ease-in-out infinite;mix-blend-mode:screen}
+.k2 .tile{background-image:url(../assets/img/kaleido-b.webp);background-size:300px 300px;animation-duration:19s;animation-direction:alternate-reverse}
+.k3{width:130vmax;height:130vmax;left:-65vmax;top:-65vmax;animation:spin 90s linear infinite,breathe 14s ease-in-out -5s infinite;mix-blend-mode:overlay}
+.k3 .tile{background-image:url(../assets/img/box.webp);background-size:900px auto;animation-duration:40s}
+@keyframes breathe{0%,100%{opacity:.18}50%{opacity:.9}}
+.drift{position:absolute;left:0;top:0;animation:drift 23s linear infinite;will-change:transform}
+.drift.r{animation:drift 31s linear infinite reverse}
+@keyframes drift{0%{transform:translate3d(-30vw,40vh,0) rotate(-30deg)}50%{transform:translate3d(50vw,-10vh,0) rotate(25deg)}100%{transform:translate3d(130vw,30vh,0) rotate(-15deg)}}
+.orbit{position:absolute;left:50%;top:50%;width:0;height:0;animation:spin 44s linear infinite;z-index:1}
+.orbit>span{position:absolute;display:block;animation:spin 44s linear infinite reverse}
+.orbit .sticker{position:static}
+.vignette{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(10,10,10,0) 30%,rgba(10,10,10,.6) 88%);pointer-events:none}
+.center{position:relative;z-index:3;padding:48px clamp(16px,4vw,48px);max-width:1180px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px}
+.center .logo img{width:clamp(170px,22vw,320px);height:auto;filter:drop-shadow(8px 10px 0 #0A0A0A)}
+.wob{animation:wob 4s ease-in-out infinite}.wob2{animation:wob 5.5s ease-in-out infinite reverse}
+@keyframes wob{0%,100%{rotate:-3deg;translate:0 0}50%{rotate:3deg;translate:0 -8px}}
+.eyebrow{margin:0;background:#0A0A0A;color:#FFF100;padding:8px 14px;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.2em}
+.ransom{margin:0;display:flex;flex-wrap:wrap;justify-content:center;gap:12px 18px;font-family:var(--display);font-weight:900;font-size:clamp(56px,11vw,176px);line-height:.9;letter-spacing:-.03em;text-shadow:6px 6px 0 #DA2342,12px 12px 0 #2A3B8E}
+.ransom span{padding:4px 20px}
+.passing{margin:0;border:3px solid #0A0A0A;box-shadow:6px 6px 0 #0A0A0A;padding:12px 22px;font-family:var(--display);font-weight:900;font-size:clamp(22px,2.6vw,34px);transition:background-color 1.4s ease,color 1.4s ease;background:#EE342E;color:#fff}
+.btns{display:flex;flex-wrap:wrap;justify-content:center;gap:16px}
+.controls{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));z-index:80;display:flex;gap:10px;transition:opacity .4s ease}
+.controls button,.controls a{min-width:48px;min-height:48px;padding:0 16px;border:3px solid #0A0A0A;background:#FFF100;color:#0A0A0A;font-family:var(--display);font-weight:800;font-size:15px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;box-shadow:4px 4px 0 #0A0A0A}
+body.idle .controls{opacity:0;pointer-events:none}
+body.idle{cursor:none}
+.intro{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.55);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);transition:opacity .5s ease}
+.intro.gone{opacity:0;pointer-events:none}
+.intro-card{background:#FFF100;color:#0A0A0A;border:4px solid #0A0A0A;box-shadow:12px 12px 0 #DA2342;padding:32px clamp(20px,4vw,48px);max-width:560px;margin:16px;text-align:center;rotate:-2deg}
+.intro-card img{width:180px;height:auto;margin:-90px auto 8px;filter:drop-shadow(6px 8px 0 #0A0A0A)}
+.intro-card h2{margin:0 0 10px;font-family:var(--display);font-weight:900;font-size:clamp(36px,6vw,56px);line-height:.95}
+.intro-card p{margin:0 0 22px;font-size:16px;line-height:1.5}
+.intro-card .link{background:none;border:0;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;margin-top:14px;padding:12px;color:#0A0A0A}
+.stops{padding-top:112px;padding-bottom:112px}
+.stops .dim{position:absolute;inset:0;background:rgba(10,10,10,.72);z-index:0}
+.stops .wrap{position:relative;z-index:1}
+.stops h2{margin:0 0 56px;font-size:clamp(48px,7vw,104px);line-height:.9;letter-spacing:-.03em}
+.stop-grid{display:flex;flex-wrap:wrap;gap:28px}
+.stop{flex:1 1 280px;min-width:0;min-height:320px;background:var(--bg);color:#0A0A0A;text-decoration:none;border:3px solid #0A0A0A;box-shadow:10px 10px 0 #fff;padding:28px;display:flex;flex-direction:column;justify-content:space-between;rotate:var(--tilt);transition:transform .15s ease}
+.stop:hover{transform:rotate(-2deg) scale(1.03)}
+.stop .num{font-family:var(--display);font-weight:900;font-size:88px;line-height:.8;color:var(--num)}
+.stop .t{display:block;font-family:var(--display);font-weight:900;font-size:34px;line-height:1;margin-bottom:10px}
+.stop .c{display:block;font-size:16px;line-height:22px;font-weight:600}
+body.calm .drift,body.calm .orbit,body.calm .orbit>span,body.calm .hue,body.calm .wob,body.calm .wob2,body.calm .spin{animation-play-state:paused!important}
+@media (max-width:700px){.hue{animation:none}.orbit{display:none}.ransom{text-shadow:4px 4px 0 #DA2342}}
+</style>
+</head>
+<body>
+<a class="skip" href="#stops">Skip to the stops</a>
+<main>
+<section class="trip" id="trip" aria-label="The Jerome Baker Travel Guide">
+<canvas id="kal" aria-hidden="true"></canvas>
+<div class="gl drift" aria-hidden="true" style="height:46vh;background-position:27.273% 0;opacity:.9"></div>
+<div class="gl drift r" aria-hidden="true" style="top:20vh;height:60vh;background-position:18.182% 0;opacity:.85"></div>
+<div class="gl drift" aria-hidden="true" style="top:45vh;height:38vh;background-position:0.000% 0;opacity:.9;animation-delay:-11s"></div>
+<div class="orbit" aria-hidden="true">
+<span style="left:-46vmin;top:-38vmin"><span class="sticker st s-alien" style="display:block;rotate:-8deg"></span></span>
+<span style="left:30vmin;top:-44vmin"><span class="sticker st s-devil" style="display:block;rotate:6deg"></span></span>
+<span style="left:34vmin;top:22vmin"><img class="sticker round" src="../assets/cut/porthole.webp" alt="" style="width:170px"></span>
+<span style="left:-54vmin;top:20vmin"><span class="sticker st s-pumpkin" style="display:block;rotate:5deg"></span></span>
+<span style="left:-8vmin;top:34vmin"><span class="sticker wt w-keyhole" style="display:block;rotate:-6deg"></span></span>
+<span style="left:-12vmin;top:-58vmin"><img class="sticker" src="../assets/cut/hypno.webp" alt="" style="width:260px;rotate:4deg"></span>
+<span style="left:44vmin;top:-8vmin"><img class="sticker" src="../assets/cut/mind.webp" alt="" style="width:110px;rotate:-6deg"></span>
+<span style="left:-66vmin;top:-12vmin"><img class="sticker" src="../assets/cut/oil.webp" alt="" style="width:150px;rotate:8deg"></span>
+</div>
+<span class="sticker st s-swirl round spin" aria-hidden="true" style="right:4%;top:6%;z-index:1;scale:1.4"></span>
+<span class="sticker wt w-opart round spinr" aria-hidden="true" style="left:4%;bottom:8%;z-index:1;scale:1.3"></span>
+<div class="vignette" aria-hidden="true"></div>
+<div class="center">
+<a class="logo wob2" href="../" aria-label="Jerome Baker home"><img class="hue" src="../assets/img/jb-mark.webp" alt="Jerome Baker" width="320" height="247"></a>
+<p class="eyebrow">THE JEROME BAKER TRAVEL GUIDE</p>
+<h1 class="ransom"><span class="wob" style="background:#FFF100;color:#0A0A0A">Start</span><span class="wob2" style="background:#fff;color:#2A3B8E;font-style:italic">your trip</span><span class="wob" style="background:#DA2342;color:#fff">here.</span></h1>
+<p class="passing" id="passing" aria-live="polite">Now passing: fumed</p>
+<div class="btns"><a class="btn btn-yellow" href="#stops">See the stops</a><a class="btn btn-ink" href="../#glass">Skip to the shop</a></div>
+</div>
+</section>
+
+<section id="stops" class="stops boxbg pad">
+<div class="dim" aria-hidden="true"></div>
+<div class="wrap">
+<h2 class="display">Four stops.<br><span id="nomap" style="color:#FDB514">No map.</span></h2>
+<div class="stop-grid">
+<a class="stop" href="../#glass" style="--bg:#EE342E;--num:#262261;--tilt:-2deg"><span class="num">1</span><span><span class="t">The glass wall</span><span class="c">One of one tubes. Color, fume, wig-wag crowns, critters at the joint.</span></span></a>
+<a class="stop" href="../#wear" style="--bg:#FDB514;--num:#292D5B;--tilt:1.5deg"><span class="num">2</span><span><span class="t">Ritual merch</span><span class="c">The OG mark and the pop art on high tops, hats and totes.</span></span></a>
+<a class="stop" href="../#booth" style="--bg:#05B48F;--num:#33336F;--tilt:-1deg"><span class="num">3</span><span><span class="t">The booth wall</span><span class="c">The lion on the torch, Baker Bots and the robots that need oil.</span></span></a>
+<a class="stop" href="https://jeromebaker.com/" target="_blank" rel="noopener" style="--bg:#FFF100;--num:#DA2342;--tilt:2deg"><span class="num">4</span><span><span class="t">Where to find it</span><span class="c">Shops that carry the glass. [DEALER LOCATOR]</span></span></a>
+</div>
+<p style="margin:56px 0 0;display:flex;flex-wrap:wrap;gap:16px"><a class="btn btn-yellow" href="#trip">Back on the trip</a><a class="btn btn-red" href="../">Jerome Baker home</a></p>
+<p style="margin:40px 0 0;color:#BDBDBD;font-size:14px">Adults 21+ only. Jerome Baker Designs, est. 1991.</p>
+</div>
+</section>
+</main>
+
+<div class="controls" id="controls">
+<a href="../" aria-label="Jerome Baker home">Home</a>
+<button type="button" id="calm" aria-pressed="false">Pause</button>
+<button type="button" id="fs">Full screen</button>
+</div>
+
+<div class="intro" id="intro" role="dialog" aria-modal="true" aria-labelledby="intro-title">
+<div class="intro-card">
+<img src="../assets/img/jb-mark.webp" alt="" width="180" height="139">
+<h2 id="intro-title">Start your trip here.</h2>
+<p id="intro-copy">Best in full screen with the sound of your own head. Press F any time to toggle full screen, Esc to come back.</p>
+<button type="button" class="btn btn-red" id="go-fs" style="width:100%">Go full screen</button><br>
+<button type="button" class="link" id="go-window">Stay in the window</button>
+</div>
+</div>
+<script src="../js/travel.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+/* Jerome Baker site concept. Tokens from the JB brand book. */
+:root{--blue:#2A3B8E;--red:#DA2342;--yellow:#FFF100;--ink:#0A0A0A;--gray:#F1F1F1;--white:#FFFFFF;--teal:#05B48F;--gold:#FDB514;
+--display:Nexa,"Montserrat",Helvetica,Arial,sans-serif;--body:"Montserrat",Helvetica,Arial,sans-serif;--mono:"JetBrains Mono",ui-monospace,monospace}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ink);color:var(--ink);font-family:var(--body);overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit}
+a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--yellow);color:var(--ink);padding:12px 16px;z-index:999}
+.skip:focus{left:8px;top:8px}
+.wrap{max-width:1344px;margin:0 auto}
+[id]{scroll-margin-top:110px}
+.pad{padding-left:clamp(16px,4vw,48px);padding-right:clamp(16px,4vw,48px)}
+.page{position:relative;overflow:hidden;overflow:clip}
+.display{font-family:var(--display);font-weight:900;letter-spacing:-.02em}
+
+/* motion helpers (transform/opacity only) */
+.bob{animation:bob 5s ease-in-out infinite}
+.bob2{animation:bob 6.5s ease-in-out infinite reverse}
+@keyframes bob{0%,100%{translate:0 0;rotate:0deg}50%{translate:0 -16px;rotate:2deg}}
+.spin{animation:spin 18s linear infinite}
+.spinr{animation:spin 48s linear infinite reverse}
+@keyframes spin{to{rotate:360deg}}
+.jig{animation:jig 3.2s steps(2) infinite}
+@keyframes jig{0%,100%{rotate:-2deg}50%{rotate:2deg}}
+.marq{display:flex;width:max-content;animation:marq 28s linear infinite}
+.marq.rev{animation-direction:reverse}
+@keyframes marq{to{transform:translateX(-50%)}}
+.paused *,.paused{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+
+/* box-art backdrop: oversized layer that drifts on the compositor */
+.boxbg{position:relative;isolation:isolate;overflow:hidden}
+.boxbg::before{content:"";position:absolute;inset:-260px;z-index:-1;background:url(../assets/img/box.webp) 0 0/1500px auto repeat;animation:boxdrift 80s linear infinite alternate;will-change:transform}
+.boxbg.still::before{animation:none;inset:0}
+@keyframes boxdrift{from{transform:translate3d(0,0,0)}to{transform:translate3d(-240px,-200px,0)}}
+.dots{background-image:radial-gradient(rgba(255,241,0,.22) 2px,transparent 2.5px);background-size:14px 14px}
+.dots-ink{background-image:radial-gradient(rgba(10,10,10,.12) 2px,transparent 2.5px);background-size:12px 12px}
+.torn{clip-path:polygon(0 3%,6% 0,13% 4%,21% 1%,30% 5%,41% 0,52% 4%,63% 1%,74% 5%,85% 0,93% 4%,100% 1%,100% 97%,92% 100%,83% 96%,71% 100%,60% 95%,48% 100%,37% 96%,25% 100%,14% 95%,5% 100%,0 96%)}
+.star{clip-path:polygon(50% 0,61% 22%,85% 10%,78% 36%,100% 50%,78% 64%,85% 90%,61% 78%,50% 100%,39% 78%,15% 90%,22% 64%,0 50%,22% 36%,15% 10%,39% 22%)}
+.strip{height:150px;margin:-30px -20px;position:relative;z-index:4;overflow:hidden;box-shadow:0 10px 0 rgba(10,10,10,.5)}
+.strip::before{animation-duration:120s}
+
+/* stickers */
+.sticker{position:absolute;display:block;border:6px solid var(--white);box-shadow:7px 9px 0 rgba(10,10,10,.65);background:var(--white)}
+.sticker.round{border-radius:50%}
+img.sticker{height:auto}
+.st{background-image:url(../assets/img/box-sprite.webp);background-size:800px 1455px;background-repeat:no-repeat}
+.s-reefer{width:300px;height:270px;background-position:-0px -0px}
+.s-mothership{width:380px;height:149px;background-position:-302px -0px}
+.s-devil{width:260px;height:209px;background-position:-0px -272px}
+.s-burning{width:400px;height:164px;background-position:-262px -272px}
+.s-narcotics{width:620px;height:37px;background-position:-0px -483px}
+.s-turtle{width:220px;height:204px;background-position:-0px -523px}
+.s-gorilla{width:300px;height:236px;background-position:-222px -523px}
+.s-jbd{width:190px;height:156px;background-position:-524px -523px}
+.s-fumed{width:220px;height:302px;background-position:-0px -761px}
+.s-pumpkin{width:240px;height:176px;background-position:-222px -761px}
+.s-alien{width:210px;height:280px;background-position:-464px -761px}
+.s-cobra{width:250px;height:250px;background-position:-0px -1065px}
+.s-enjoy{width:220px;height:70px;background-position:-252px -1065px}
+.s-rose{width:150px;height:135px;background-position:-474px -1065px}
+.s-swirl{width:150px;height:150px;background-position:-626px -1065px}
+.s-adults{width:200px;height:138px;background-position:-0px -1317px}
+.s-lips{width:190px;height:131px;background-position:-202px -1317px}
+.wt{background-image:url(../assets/img/wrap-sprite.webp);background-size:700px 887px;background-repeat:no-repeat}
+.w-jbdcloud{width:300px;height:250px;background-position:-0px -0px}
+.w-keyhole{width:170px;height:310px;background-position:-302px -0px}
+.w-pyramid{width:240px;height:210px;background-position:-0px -312px}
+.w-teeth{width:280px;height:155px;background-position:-242px -312px}
+.w-peace{width:420px;height:72px;background-position:-0px -524px}
+.w-opart{width:170px;height:162px;background-position:-422px -524px}
+.w-see{width:200px;height:102px;background-position:-0px -689px}
+.w-cyclops{width:220px;height:198px;background-position:-202px -689px}
+.gl{background-image:url(../assets/img/glass-sprite.webp);background-repeat:no-repeat;background-size:1200% 100%;aspect-ratio:300/760}
+.mark{position:absolute;height:auto;filter:drop-shadow(6px 8px 0 var(--ink))}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:14px 26px;border:0;font-family:var(--display);font-weight:800;font-size:18px;text-decoration:none;cursor:pointer;box-shadow:6px 6px 0 var(--ink);transition:transform .15s ease}
+.btn:hover{transform:rotate(-2deg) scale(1.04)}
+.btn:active{transform:scale(.97)}
+.btn-red{background:var(--red);color:var(--white)}
+.btn-yellow{background:var(--yellow);color:var(--ink)}
+.btn-ink{background:var(--ink);color:var(--yellow);box-shadow:6px 6px 0 var(--red)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,140%);background:var(--yellow);color:var(--ink);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:14px 20px;font-weight:800;z-index:1000;transition:transform .25s ease;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{transform:translate(-50%,0)}
+
+/* watermark */
+.watermark{position:absolute;inset:0;pointer-events:none;z-index:40;overflow:hidden}
+.watermark img{position:absolute;height:auto}
