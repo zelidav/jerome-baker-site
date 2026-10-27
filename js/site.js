@@ -36,6 +36,60 @@
     wm.appendChild(frag);
   }
 
+  // Travel guide teaser: say what it is, let the words fall apart, then just trip
+  const tt = document.getElementById('tt');
+  const ttSub = document.getElementById('tt-sub');
+  const teaser = document.getElementById('trip');
+  if (tt && teaser) {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const intro = [
+      'This is the Jerome Baker Travel Guide.',
+      "It's for when you're tripping.",
+      'Biggest screen you have. Full screen. Lie back.',
+      'It never plays the same way twice.',
+      'The longer it runs, the weirder it gets.'
+    ];
+    const trippy = ['fumed', 'melting', 'wig-wag', 'breathe in', 'dichroic', 'the walls are fine', 'reticello', 'one of one', 'breathe out', 'the crew is here', 'opal', 'colors have sounds', 'you are the glass', 'est. 1991', 'keep going'];
+    const cols = ['#FFF100', '#FFFFFF', '#FDB514', '#05B48F', '#FF7AB6', '#7FE7FF'];
+    const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+    const rnd = (a, b) => a + Math.random() * (b - a);
+    const show = async (text, color) => {
+      tt.textContent = '';
+      tt.style.color = color || '';
+      const chars = [];
+      text.split(' ').forEach((word, wi) => {
+        if (wi) tt.appendChild(document.createTextNode(' '));
+        const w = document.createElement('span'); w.style.whiteSpace = 'nowrap'; w.style.display = 'inline-block';
+        [...word].forEach((c) => { const s = document.createElement('span'); s.className = 'ch pre'; s.textContent = c; w.appendChild(s); chars.push(s); });
+        tt.appendChild(w);
+      });
+      await wait(30);
+      for (let i = 0; i < chars.length; i++) { chars[i].classList.remove('pre'); if (i % 2) await wait(18); }
+      return chars;
+    };
+    const scatter = async (chars) => {
+      chars.forEach((s) => { s.style.setProperty('--dx', rnd(-140, 140) + 'px'); s.style.setProperty('--dy', rnd(-120, 80) + 'px'); s.style.setProperty('--rr', rnd(-90, 90) + 'deg'); });
+      for (let i = 0; i < chars.length; i++) { chars[i].classList.add('out'); if (i % 3 === 0) await wait(14); }
+      await wait(900);
+    };
+    let started = false;
+    const run = async () => {
+      if (started) return; started = true;
+      for (const line of intro) { const c = await show(line); await wait(2300); await scatter(c); }
+      ttSub.style.opacity = '.0';
+      teaser.classList.add('tripping');
+      for (let k = 0; ; k++) {
+        const c = await show(trippy[k % trippy.length], cols[k % cols.length]);
+        await wait(1600 + Math.random() * 900);
+        await scatter(c);
+        if (k % trippy.length === trippy.length - 1) { ttSub.style.opacity = '1'; await wait(4000); ttSub.style.opacity = '0'; }
+      }
+    };
+    if (!reduce && 'IntersectionObserver' in window) {
+      new IntersectionObserver(([e]) => { if (e.isIntersecting) run(); }, { threshold: 0.4 }).observe(teaser);
+    }
+  }
+
   // Pause animation work in anything that's off screen
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver((entries) => {

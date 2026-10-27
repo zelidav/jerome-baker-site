@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-base="../">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,6 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,800;0,900;1,900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/site.css">
+<link rel="stylesheet" href="../css/crew.css">
 <style>
 body{background:#0A0A0A;color:#fff}
 .trip{position:relative;height:100vh;height:100dvh;min-height:560px;overflow:hidden;display:flex;align-items:center;justify-content:center;contain:strict}
@@ -61,6 +62,7 @@ body.idle .controls{opacity:0;pointer-events:none}
 body.idle{cursor:none}
 .intro{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;background:rgba(10,10,10,.55);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);transition:opacity .5s ease}
 .intro.gone{opacity:0;pointer-events:none}
+.intro[hidden]{display:none}
 .intro-card{background:#FFF100;color:#0A0A0A;border:4px solid #0A0A0A;box-shadow:12px 12px 0 #DA2342;padding:32px clamp(20px,4vw,48px);max-width:560px;margin:16px;text-align:center;rotate:-2deg}
 .intro-card img{width:180px;height:auto;margin:-90px auto 8px;filter:drop-shadow(6px 8px 0 #0A0A0A)}
 .intro-card h2{margin:0 0 10px;font-family:var(--display);font-weight:900;font-size:clamp(36px,6vw,56px);line-height:.95}
@@ -77,10 +79,31 @@ body.idle{cursor:none}
 .stop .t{display:block;font-family:var(--display);font-weight:900;font-size:34px;line-height:1;margin-bottom:10px}
 .stop .c{display:block;font-size:16px;line-height:22px;font-weight:600}
 body.calm .drift,body.calm .orbit,body.calm .orbit>span,body.calm .hue,body.calm .wob,body.calm .wob2,body.calm .spin{animation-play-state:paused!important}
+.center{transition:opacity 2.4s ease,filter 2.4s ease,transform 2.4s ease}
+.center.intro-mode .ransom,.center.intro-mode .passing,.center.intro-mode .btns{opacity:0;transition:opacity 1s}
+.center.intro-mode{transform:translateY(-26vh)}
+.center.gone{opacity:0;filter:blur(18px);transform:scale(1.3);pointer-events:none}
+.tripsay{position:absolute;left:0;right:0;top:50%;translate:0 -50%;z-index:4;text-align:center;padding:0 clamp(16px,5vw,64px);font-family:var(--display);font-weight:900;font-size:clamp(34px,6vw,84px);line-height:1;letter-spacing:-.02em;text-shadow:5px 5px 0 #0A0A0A,10px 10px 0 rgba(218,35,66,.7);pointer-events:none}
+.tripsay .ch{display:inline-block;transition:opacity .8s ease,filter .8s ease,translate 1.1s ease,rotate 1.1s ease}
+.tripsay .ch.pre{opacity:0;filter:blur(12px);translate:0 40px}
+.tripsay .ch.out{opacity:0;filter:blur(10px);translate:var(--dx) var(--dy);rotate:var(--rr)}
+.fx{position:absolute;inset:0;z-index:2;pointer-events:none}
+.mandala{position:absolute;left:50%;top:50%;width:0;height:0;animation:spin 60s linear infinite}
+.mandala img{position:absolute;left:0;top:0;height:auto;margin:-45px 0 0 -45px;transform-origin:45px 45px;filter:drop-shadow(4px 5px 0 rgba(10,10,10,.6))}
+.crew-layer{opacity:0;transition:opacity 4s ease}
+body.crew-in .crew-layer{opacity:1}
+body.breathing .trip{animation:breathe-in 9s ease-in-out infinite}
+@keyframes breathe-in{0%,100%{scale:1}50%{scale:1.06}}
+body.melting .fx,body.melting .orbit{filter:url(#melt)}
+body.inverting #kal{animation:inv 26s ease-in-out infinite alternate}
+@keyframes inv{0%,60%{filter:none}100%{filter:invert(1) hue-rotate(180deg)}}
+.hue{animation-duration:var(--hue-speed,16s)}
+body.idle .crew-toggle{opacity:0;pointer-events:none}
+.crew-toggle{transition:opacity .4s ease}
 @media (max-width:700px){.hue{animation:none}.orbit{display:none}.ransom{text-shadow:4px 4px 0 #DA2342}}
 </style>
 </head>
-<body>
+<body data-crew-count="7">
 <a class="skip" href="#stops">Skip to the stops</a>
 <main>
 <section class="trip" id="trip" aria-label="The Jerome Baker Travel Guide">
@@ -100,8 +123,11 @@ body.calm .drift,body.calm .orbit,body.calm .orbit>span,body.calm .hue,body.calm
 </div>
 <span class="sticker st s-swirl round spin" aria-hidden="true" style="right:4%;top:6%;z-index:1;scale:1.4"></span>
 <span class="sticker wt w-opart round spinr" aria-hidden="true" style="left:4%;bottom:8%;z-index:1;scale:1.3"></span>
+<div class="fx" id="fx" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
-<div class="center">
+<p class="tripsay" id="say" aria-live="polite"></p>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="melt"><feTurbulence type="fractalNoise" baseFrequency="0.008 0.03" numOctaves="2" seed="7"><animate attributeName="baseFrequency" dur="18s" values="0.008 0.03;0.014 0.05;0.008 0.03" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" scale="40"/></filter></svg>
+<div class="center intro-mode" id="center">
 <a class="logo wob2" href="../" aria-label="Jerome Baker home"><img class="hue" src="../assets/img/jb-mark.webp" alt="Jerome Baker" width="320" height="247"></a>
 <p class="eyebrow">THE JEROME BAKER TRAVEL GUIDE</p>
 <h1 class="ransom"><span class="wob" style="background:#FFF100;color:#0A0A0A">Start</span><span class="wob2" style="background:#fff;color:#2A3B8E;font-style:italic">your trip</span><span class="wob" style="background:#DA2342;color:#fff">here.</span></h1>
@@ -116,8 +142,8 @@ body.calm .drift,body.calm .orbit,body.calm .orbit>span,body.calm .hue,body.calm
 <h2 class="display">Four stops.<br><span id="nomap" style="color:#FDB514">No map.</span></h2>
 <div class="stop-grid">
 <a class="stop" href="../#glass" style="--bg:#EE342E;--num:#262261;--tilt:-2deg"><span class="num">1</span><span><span class="t">The glass wall</span><span class="c">One of one tubes. Color, fume, wig-wag crowns, critters at the joint.</span></span></a>
-<a class="stop" href="../#wear" style="--bg:#FDB514;--num:#292D5B;--tilt:1.5deg"><span class="num">2</span><span><span class="t">Ritual merch</span><span class="c">The OG mark and the pop art on high tops, hats and totes.</span></span></a>
-<a class="stop" href="../#booth" style="--bg:#05B48F;--num:#33336F;--tilt:-1deg"><span class="num">3</span><span><span class="t">The booth wall</span><span class="c">The lion on the torch, Baker Bots and the robots that need oil.</span></span></a>
+<a class="stop" href="../#wear" style="--bg:#FDB514;--num:#292D5B;--tilt:1.5deg"><span class="num">2</span><span><span class="t">Wear the ritual</span><span class="c">Signature hoodies, Crossed Bongs polos and the NY Drop 1 pop art on high tops and buckets.</span></span></a>
+<a class="stop" href="../crew/" style="--bg:#05B48F;--num:#33336F;--tilt:-1deg"><span class="num">3</span><span><span class="t">The JB Crew</span><span class="c">Twenty characters off the wall, in real merch, doing weird things. Each one has a page.</span></span></a>
 <a class="stop" href="https://jeromebaker.com/" target="_blank" rel="noopener" style="--bg:#FFF100;--num:#DA2342;--tilt:2deg"><span class="num">4</span><span><span class="t">Where to find it</span><span class="c">Shops that carry the glass. [DEALER LOCATOR]</span></span></a>
 </div>
 <p style="margin:56px 0 0;display:flex;flex-wrap:wrap;gap:16px"><a class="btn btn-yellow" href="#trip">Back on the trip</a><a class="btn btn-red" href="../">Jerome Baker home</a></p>
@@ -136,11 +162,14 @@ body.calm .drift,body.calm .orbit,body.calm .orbit>span,body.calm .hue,body.calm
 <div class="intro-card">
 <img src="../assets/img/jb-mark.webp" alt="" width="180" height="139">
 <h2 id="intro-title">Start your trip here.</h2>
-<p id="intro-copy">Best in full screen with the sound of your own head. Press F any time to toggle full screen, Esc to come back.</p>
+<p id="intro-copy">A trip companion for when you&rsquo;re tripping. It starts gentle and keeps evolving, and it never plays the same way twice. Best in full screen. Press F to toggle, Space to pause.</p>
 <button type="button" class="btn btn-red" id="go-fs" style="width:100%">Go full screen</button><br>
 <button type="button" class="link" id="go-window">Stay in the window</button>
 </div>
 </div>
+<script src="../js/crew-data.js"></script>
+<script src="../js/crew.js" defer></script>
 <script src="../js/travel.js" defer></script>
+<script src="../js/evolve.js" defer></script>
 </body>
 </html>

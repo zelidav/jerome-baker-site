@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-base="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Torch. The JB Crew</title>
+<meta name="description" content="Torch: Pulling a glass bubble off a blowpipe. On a skateboard. Wearing real Jerome Baker merch.">
+<meta name="theme-color" content="#2A3B8E">
+<link rel="icon" href="../../assets/img/jb-mark.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/crew.css">
+</head>
+<body data-weird="flame" data-crew-self="torch" data-crew-count="5">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+<header class="topbar pad"><a href="../../" aria-label="Jerome Baker home"><img src="../../assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a><nav aria-label="Main"><a href="../../#glass">Glass</a> <a href="../../#wear">Streetwear</a> <a href="../../crew/">The JB Crew</a> <a href="../../travel/" style="color:#FFF100">Travel guide</a></nav></header>
+<main id="main">
+<section class="cp-hero pad dots" style="--cc:#DA2342">
+<div class="art"><img class="bob" src="../../assets/crew/lion.webp" alt="Torch: Pulling a glass bubble off a blowpipe. On a skateboard." width="560" height="560"></div>
+<div class="copy">
+<p class="cp-title">The JB Crew · No. 01</p>
+<h1 class="cp-name"><span style="--r:-3deg">Torch</span></h1>
+<p class="cp-title" style="background:#FFF100;color:#0A0A0A">The lion on the torch</p>
+<p class="cp-bio">Torch has been in the little window on the booth wall since the first show, flame up, hat on. He blows glass on a skateboard because standing still is for vases. Hood stays down. Fire code.</p>
+<div class="say"><span class="line" id="line">Hold still. I&#x27;m pulling a bubble.</span><button type="button" class="btn btn-ink" id="more">Say more</button></div>
+</div>
+</section>
+<section class="sheet pad">
+<div class="wrap grid">
+<div class="rap"><h2>Rap sheet</h2><dl>
+<dt>Name</dt><dd>Torch</dd>
+<dt>Currently</dt><dd>Pulling a glass bubble off a blowpipe. On a skateboard.</dd>
+<dt>Known for</dt><dd>Never once letting the flame go out</dd>
+<dt>Weakness</dt><dd>Bubbles that are too round</dd>
+<dt>Wearing</dt><dd>Signature hoodie, green script</dd>
+</dl></div>
+<figure class="before"><img src="../../assets/cut/lion.webp" alt="Torch before the merch, on the original Jerome Baker art" loading="lazy"><p>BEFORE THE MERCH</p></figure>
+</div>
+</section>
+<section class="wearing pad"><div class="wrap">
+<h2 class="display">What Torch<br>is wearing.</h2>
+<div class="merch-grid"><a class="mcard" href="https://jeromebakerny.com/product/unisex-midweight-hoodie/" target="_blank" rel="noopener" style="--bg:#FFF100;--tilt:-3deg"><span class="pic"><img src="../../assets/merch/824.webp" alt="Signature hoodie, green script" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Signature hoodie, green script</h3><span class="go">SHOP IT →</span></span><span class="pr">$53</span></span></a></div>
+<p style="margin:32px 0 0;font-weight:700">Real gear, shipping now from <a href="https://jeromebakerny.com/" target="_blank" rel="noopener">jeromebakerny.com</a>.</p>
+</div></section>
+<section class="talk pad"><div class="wrap">
+<h2 class="display" style="margin:0;font-size:clamp(36px,5vw,64px)">Talk to Torch.</h2>
+<p style="margin:10px 0 0;color:#BDBDBD">They only know a few lines right now. They're working on it.</p>
+<form id="talk"><input id="msg" type="text" maxlength="200" placeholder="Say something to Torch" aria-label="Your message" autocomplete="off"><button class="btn btn-yellow" type="submit">Send</button></form>
+<div class="log" id="log" aria-live="polite"></div>
+</div></section>
+<nav class="crew-nav pad" aria-label="More crew">
+<a href="../the-grin/"><img src="../../assets/crew/grin.webp" alt="" loading="lazy">← The Grin</a>
+<a href="../">The whole crew</a>
+<a href="../major-tom-tom/">Major Tom-Tom →<img src="../../assets/crew/chimp.webp" alt="" loading="lazy"></a>
+</nav>
+</main>
+<footer class="pad" style="background:#0A0A0A;color:#BDBDBD;padding-top:40px;padding-bottom:calc(80px + env(safe-area-inset-bottom));font-size:14px">© 2026 Jerome Baker Designs. Adults 21+ only. The crew is fictional. The merch is real.</footer>
+</div>
+<script src="../../js/crew-data.js"></script>
+<script src="../../js/crew.js" defer></script>
+<script src="../../js/weird.js" defer></script>
+<script>
+(() => {
+  const me = window.JB_CREW.find((x) => x.slug === "torch");
+  const line = document.getElementById('line');
+  let k = 0;
+  document.getElementById('more').addEventListener('click', () => { k = (k + 1) % me.lines.length; line.textContent = me.lines[k]; });
+  const log = document.getElementById('log'), msg = document.getElementById('msg');
+  const add = (t, who) => { const p = document.createElement('p'); p.textContent = t; if (who) p.className = 'them'; log.appendChild(p); };
+  document.getElementById('talk').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const said = msg.value.trim(); if (!said) return;
+    add(said); msg.value = '';
+    const brain = (window.JBCrew && window.JBCrew.brain) || (async () => me.lines[Math.floor(Math.random() * me.lines.length)]);
+    add(me.name + ': ' + await brain(me, { kind: 'chat', said, page: location.pathname }), true);
+  });
+})();
+</script>
+</body>
+</html>

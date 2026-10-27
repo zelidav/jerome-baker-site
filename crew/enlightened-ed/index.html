@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-base="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Enlightened Ed. The JB Crew</title>
+<meta name="description" content="Enlightened Ed: Dancing at the beach, yelling ENLIGHTEN ALL HUMANS. Wearing real Jerome Baker merch.">
+<meta name="theme-color" content="#2A3B8E">
+<link rel="icon" href="../../assets/img/jb-mark.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/crew.css">
+</head>
+<body data-weird="wobble" data-crew-self="enlightened-ed" data-crew-count="5">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+<header class="topbar pad"><a href="../../" aria-label="Jerome Baker home"><img src="../../assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a><nav aria-label="Main"><a href="../../#glass">Glass</a> <a href="../../#wear">Streetwear</a> <a href="../../crew/">The JB Crew</a> <a href="../../travel/" style="color:#FFF100">Travel guide</a></nav></header>
+<main id="main">
+<section class="cp-hero pad dots" style="--cc:#FDB514">
+<div class="art"><img class="bob" src="../../assets/crew/octo.webp" alt="Enlightened Ed: Dancing at the beach, yelling ENLIGHTEN ALL HUMANS." width="560" height="560"></div>
+<div class="copy">
+<p class="cp-title">The JB Crew · No. 04</p>
+<h1 class="cp-name"><span style="--r:-3deg">Enlightened</span><span style="--r:2deg">Ed</span></h1>
+<p class="cp-title" style="background:#FFF100;color:#0A0A0A">Eight arms, four flip-flops</p>
+<p class="cp-bio">Ed has eight arms and owns four flip-flops, which he says is the correct ratio. Mostly dances. Occasionally shouts the poster at strangers. The strangers usually feel better.</p>
+<div class="say"><span class="line" id="line">ENLIGHTEN ALL HUMANS.</span><button type="button" class="btn btn-ink" id="more">Say more</button></div>
+</div>
+</section>
+<section class="sheet pad">
+<div class="wrap grid">
+<div class="rap"><h2>Rap sheet</h2><dl>
+<dt>Name</dt><dd>Enlightened Ed</dd>
+<dt>Currently</dt><dd>Dancing at the beach, yelling ENLIGHTEN ALL HUMANS.</dd>
+<dt>Known for</dt><dd>Shouting it at the beach</dd>
+<dt>Weakness</dt><dd>Socks</dd>
+<dt>Wearing</dt><dd>Pop-art flip flops, Sativa</dd>
+</dl></div>
+<figure class="before"><img src="../../assets/cut/enlighten.webp" alt="Enlightened Ed before the merch, on the original Jerome Baker art" loading="lazy"><p>BEFORE THE MERCH</p></figure>
+</div>
+</section>
+<section class="wearing pad"><div class="wrap">
+<h2 class="display">What Enlightened Ed<br>is wearing.</h2>
+<div class="merch-grid"><a class="mcard" href="https://jeromebakerny.com/product/jb-sativa-flip-flops-pop-art/" target="_blank" rel="noopener" style="--bg:#FFF100;--tilt:-3deg"><span class="pic"><img src="../../assets/merch/667.webp" alt="Pop-art flip flops, Sativa" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Pop-art flip flops, Sativa</h3><span class="go">SHOP IT →</span></span><span class="pr">$29</span></span></a></div>
+<p style="margin:32px 0 0;font-weight:700">Real gear, shipping now from <a href="https://jeromebakerny.com/" target="_blank" rel="noopener">jeromebakerny.com</a>.</p>
+</div></section>
+<section class="talk pad"><div class="wrap">
+<h2 class="display" style="margin:0;font-size:clamp(36px,5vw,64px)">Talk to Enlightened Ed.</h2>
+<p style="margin:10px 0 0;color:#BDBDBD">They only know a few lines right now. They're working on it.</p>
+<form id="talk"><input id="msg" type="text" maxlength="200" placeholder="Say something to Enlightened Ed" aria-label="Your message" autocomplete="off"><button class="btn btn-yellow" type="submit">Send</button></form>
+<div class="log" id="log" aria-live="polite"></div>
+</div></section>
+<nav class="crew-nav pad" aria-label="More crew">
+<a href="../chomps/"><img src="../../assets/crew/shark.webp" alt="" loading="lazy">← Chomps</a>
+<a href="../">The whole crew</a>
+<a href="../baker-bot/">Baker Bot →<img src="../../assets/crew/bot.webp" alt="" loading="lazy"></a>
+</nav>
+</main>
+<footer class="pad" style="background:#0A0A0A;color:#BDBDBD;padding-top:40px;padding-bottom:calc(80px + env(safe-area-inset-bottom));font-size:14px">© 2026 Jerome Baker Designs. Adults 21+ only. The crew is fictional. The merch is real.</footer>
+</div>
+<script src="../../js/crew-data.js"></script>
+<script src="../../js/crew.js" defer></script>
+<script src="../../js/weird.js" defer></script>
+<script>
+(() => {
+  const me = window.JB_CREW.find((x) => x.slug === "enlightened-ed");
+  const line = document.getElementById('line');
+  let k = 0;
+  document.getElementById('more').addEventListener('click', () => { k = (k + 1) % me.lines.length; line.textContent = me.lines[k]; });
+  const log = document.getElementById('log'), msg = document.getElementById('msg');
+  const add = (t, who) => { const p = document.createElement('p'); p.textContent = t; if (who) p.className = 'them'; log.appendChild(p); };
+  document.getElementById('talk').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const said = msg.value.trim(); if (!said) return;
+    add(said); msg.value = '';
+    const brain = (window.JBCrew && window.JBCrew.brain) || (async () => me.lines[Math.floor(Math.random() * me.lines.length)]);
+    add(me.name + ': ' + await brain(me, { kind: 'chat', said, page: location.pathname }), true);
+  });
+})();
+</script>
+</body>
+</html>

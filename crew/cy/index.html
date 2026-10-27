@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-base="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cy. The JB Crew</title>
+<meta name="description" content="Cy: Reading an eye chart through a magnifying glass. Wearing real Jerome Baker merch.">
+<meta name="theme-color" content="#2A3B8E">
+<link rel="icon" href="../../assets/img/jb-mark.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../css/site.css">
+<link rel="stylesheet" href="../../css/crew.css">
+</head>
+<body data-weird="eye" data-crew-self="cy" data-crew-count="5">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+<header class="topbar pad"><a href="../../" aria-label="Jerome Baker home"><img src="../../assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a><nav aria-label="Main"><a href="../../#glass">Glass</a> <a href="../../#wear">Streetwear</a> <a href="../../crew/">The JB Crew</a> <a href="../../travel/" style="color:#FFF100">Travel guide</a></nav></header>
+<main id="main">
+<section class="cp-hero pad dots" style="--cc:#DA2342">
+<div class="art"><img class="bob" src="../../assets/crew/cy.webp" alt="Cy: Reading an eye chart through a magnifying glass." width="560" height="560"></div>
+<div class="copy">
+<p class="cp-title">The JB Crew · No. 16</p>
+<h1 class="cp-name"><span style="--r:-3deg">Cy</span></h1>
+<p class="cp-title" style="background:#FFF100;color:#0A0A0A">Eye doctor, one eye</p>
+<p class="cp-bio">Has one eye and 20/20 in it. Runs eye exams for the rest of the crew. Wears the red script tee and the loudest pants in New York.</p>
+<div class="say"><span class="line" id="line">Read the bottom line.</span><button type="button" class="btn btn-ink" id="more">Say more</button></div>
+</div>
+</section>
+<section class="sheet pad">
+<div class="wrap grid">
+<div class="rap"><h2>Rap sheet</h2><dl>
+<dt>Name</dt><dd>Cy</dd>
+<dt>Currently</dt><dd>Reading an eye chart through a magnifying glass.</dd>
+<dt>Known for</dt><dd>Seeing everything</dd>
+<dt>Weakness</dt><dd>Winking</dd>
+<dt>Wearing</dt><dd>Signature tee, red script</dd>
+</dl></div>
+<figure class="before"><img src="../../assets/spr/cyclops.png" alt="Cy before the merch, on the original Jerome Baker art" loading="lazy"><p>BEFORE THE MERCH</p></figure>
+</div>
+</section>
+<section class="wearing pad"><div class="wrap">
+<h2 class="display">What Cy<br>is wearing.</h2>
+<div class="merch-grid"><a class="mcard" href="https://jeromebakerny.com/product/jerome-baker-indica-inline-logo/" target="_blank" rel="noopener" style="--bg:#FFF100;--tilt:-3deg"><span class="pic"><img src="../../assets/merch/1070.webp" alt="Signature tee, red script" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Signature tee, red script</h3><span class="go">SHOP IT →</span></span><span class="pr">$35</span></span></a></div>
+<p style="margin:32px 0 0;font-weight:700">Real gear, shipping now from <a href="https://jeromebakerny.com/" target="_blank" rel="noopener">jeromebakerny.com</a>.</p>
+</div></section>
+<section class="talk pad"><div class="wrap">
+<h2 class="display" style="margin:0;font-size:clamp(36px,5vw,64px)">Talk to Cy.</h2>
+<p style="margin:10px 0 0;color:#BDBDBD">They only know a few lines right now. They're working on it.</p>
+<form id="talk"><input id="msg" type="text" maxlength="200" placeholder="Say something to Cy" aria-label="Your message" autocomplete="off"><button class="btn btn-yellow" type="submit">Send</button></form>
+<div class="log" id="log" aria-live="polite"></div>
+</div></section>
+<nav class="crew-nav pad" aria-label="More crew">
+<a href="../shellby/"><img src="../../assets/crew/turtle.webp" alt="" loading="lazy">← Shellby</a>
+<a href="../">The whole crew</a>
+<a href="../the-spinners/">The Spinners →<img src="../../assets/crew/spinners.webp" alt="" loading="lazy"></a>
+</nav>
+</main>
+<footer class="pad" style="background:#0A0A0A;color:#BDBDBD;padding-top:40px;padding-bottom:calc(80px + env(safe-area-inset-bottom));font-size:14px">© 2026 Jerome Baker Designs. Adults 21+ only. The crew is fictional. The merch is real.</footer>
+</div>
+<script src="../../js/crew-data.js"></script>
+<script src="../../js/crew.js" defer></script>
+<script src="../../js/weird.js" defer></script>
+<script>
+(() => {
+  const me = window.JB_CREW.find((x) => x.slug === "cy");
+  const line = document.getElementById('line');
+  let k = 0;
+  document.getElementById('more').addEventListener('click', () => { k = (k + 1) % me.lines.length; line.textContent = me.lines[k]; });
+  const log = document.getElementById('log'), msg = document.getElementById('msg');
+  const add = (t, who) => { const p = document.createElement('p'); p.textContent = t; if (who) p.className = 'them'; log.appendChild(p); };
+  document.getElementById('talk').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const said = msg.value.trim(); if (!said) return;
+    add(said); msg.value = '';
+    const brain = (window.JBCrew && window.JBCrew.brain) || (async () => me.lines[Math.floor(Math.random() * me.lines.length)]);
+    add(me.name + ': ' + await brain(me, { kind: 'chat', said, page: location.pathname }), true);
+  });
+})();
+</script>
+</body>
+</html>

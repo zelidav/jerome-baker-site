@@ -65,7 +65,7 @@
   wake();
 
   // ---------- Evolving words + palettes ----------
-  const words = ['fumed', 'wig-wag', 'dichroic', 'reticello', 'millie', 'knuckles', 'opal', 'ribbon cane', 'one of one', 'est. 1991', 'the OG mark', 'the booth wall'];
+  const words = ['fumed', 'wig-wag', 'dichroic', 'reticello', 'millie', 'knuckles', 'opal', 'ribbon cane', 'one of one', 'est. 1991', 'the OG mark', 'the JB Crew'];
   const pals = [['#EE342E', '#FFFFFF'], ['#FDB514', '#0A0A0A'], ['#05B48F', '#0A0A0A'], ['#2A3B8E', '#FFF100']];
   const passing = document.getElementById('passing');
   const nomap = document.getElementById('nomap');
@@ -90,7 +90,7 @@
   const load = (src) => new Promise((res) => { const i = new Image(); i.decoding = 'async'; i.onload = () => res(i); i.onerror = () => res(null); i.src = src; });
   let imgs = null, pats = null;
   let W = 0, H = 0, R = 0, cx = 0, cy = 0, tx = 0, ty = 0;
-  const SEG = 12, ANG = Math.PI * 2 / SEG;
+  let SEG = 12, ANG = Math.PI * 2 / SEG, SPD = 1, ZOOM = 1;
   const resize = () => {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const cap = 1200 / Math.max(innerWidth, innerHeight);       // keep the canvas light on big screens
@@ -124,15 +124,15 @@
     wx.globalCompositeOperation = 'overlay'; wx.globalAlpha = 0.2 + 0.5 * (0.5 + 0.5 * Math.sin(s * 0.4 + 2));
     fillPat(pats.c, s * 17 % 6000, -s * 12 % 6000, 0.55 * sc);
     wx.globalCompositeOperation = 'color'; wx.globalAlpha = 0.28;
-    wx.fillStyle = 'hsl(' + ((s * 22) % 360) + ',95%,55%)'; wx.fillRect(0, 0, R, wedge.height);
+    wx.fillStyle = 'hsl(' + ((s * 22 * SPD) % 360) + ',95%,55%)'; wx.fillRect(0, 0, R, wedge.height);
     wx.restore();
     // stamp it 12 times, every other one mirrored
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = '#0A0A0A'; ctx.fillRect(0, 0, W, H);
     const k = W / cv.clientWidth;
     ctx.translate(W / 2 + tx * k, H / 2 + ty * k);
-    ctx.rotate(s * 0.09);
-    const z = 1.08 + 0.06 * Math.sin(s * 0.5); ctx.scale(z, z);
+    ctx.rotate(s * 0.09 * SPD);
+    const z = (1.08 + 0.06 * Math.sin(s * 0.5)) * ZOOM; ctx.scale(z, z);
     for (let i = 0; i < SEG; i++) {
       ctx.save();
       if (i % 2) { ctx.rotate((i + 1) * ANG); ctx.scale(1, -1); } else { ctx.rotate(i * ANG); }
@@ -164,6 +164,16 @@
     tx = Math.round((e.clientX / innerWidth - 0.5) * 120);
     ty = Math.round((e.clientY / innerHeight - 0.5) * 60);
   }, { passive: true });
+
+  // let the evolution script turn the knobs
+  window.JBTrip = {
+    set(o) {
+      if (o.seg && o.seg !== SEG) { SEG = o.seg; ANG = Math.PI * 2 / SEG; resize(); }
+      if (o.spd) SPD = o.spd;
+      if (o.zoom) ZOOM = o.zoom;
+    },
+    get: () => ({ seg: SEG, spd: SPD, zoom: ZOOM })
+  };
 
   // ---------- Stop the GPU work when the trip is scrolled away ----------
   const trip = document.getElementById('trip');
