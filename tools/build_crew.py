@@ -8,7 +8,7 @@ import html, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
-from crew_data import CREW, MERCH, SHOP, STORE  # noqa: E402
+from crew_data import CREW, MERCH, SHOP  # noqa: E402
 
 e = html.escape
 TILTS = ["-3deg", "2deg", "-1deg", "3deg", "-2deg", "1.5deg"]
@@ -20,7 +20,7 @@ def merch_card(mid, up, i, worn=True):
     name, price, slug = MERCH[mid]
     who = WEARER.get(mid)
     badge = (f'<img class="worn" src="{up}assets/crew/{who["img"]}.webp" alt="" loading="lazy">' if worn and who else "")
-    return (f'<a class="mcard" href="{STORE}{slug}/" target="_blank" rel="noopener" style="--bg:{CARD_BG[i % 6]};--tilt:{TILTS[i % 6]}">'
+    return (f'<a class="mcard" href="{up}shop/#p={slug}" style="--bg:{CARD_BG[i % 6]};--tilt:{TILTS[i % 6]}">'
             f'{badge}<span class="pic"><img src="{up}assets/merch/{mid}.webp" alt="{e(name)}" loading="lazy" decoding="async"></span>'
             f'<span class="meta"><span><h3>{e(name)}</h3><span class="go">SHOP IT →</span></span><span class="pr">${price}</span></span></a>')
 
@@ -59,7 +59,7 @@ def head(title, desc, up, extra=""):
 
 def topbar(up):
     return (f'<header class="topbar pad"><a href="{up}" aria-label="Jerome Baker home"><img src="{up}assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a>'
-            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}#wear">Streetwear</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
+            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
 
 
 def scripts(up, weird=False):
@@ -107,7 +107,7 @@ def crew_page(c, i):
 <section class="wearing pad"><div class="wrap">
 <h2 class="display">What {e(c['name'])}<br>is wearing.</h2>
 <div class="merch-grid">{cards}</div>
-<p style="margin:32px 0 0;font-weight:700">Real gear, shipping now from <a href="https://jeromebakerny.com/" target="_blank" rel="noopener">jeromebakerny.com</a>.</p>
+<p style="margin:32px 0 0;font-weight:700">Real gear, shipping now. <a href="{up}shop/">Shop all Ritual Merch →</a></p>
 </div></section>
 <section class="talk pad"><div class="wrap">
 <h2 class="display" style="margin:0;font-size:clamp(36px,5vw,64px)">Talk to {e(c['name'])}.</h2>

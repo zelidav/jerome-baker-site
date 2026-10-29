@@ -94,6 +94,8 @@
   bodies.forEach((b) => {
     let px = 0, py = 0, lx = 0, ly = 0, lt = 0, moved = 0;
     b.el.addEventListener('pointerdown', (e) => {
+      // pointer capture would swallow the click on the VISIT link, so leave links alone
+      if (e.button !== 0 || e.target.closest('a')) return;
       b.held = true; moved = 0;
       b.el.classList.add('dragging');
       b.el.setPointerCapture(e.pointerId);
@@ -111,12 +113,15 @@
       if (!b.held) return;
       b.held = false;
       b.el.classList.remove('dragging');
-      if (moved < 6) say(b, { kind: 'hello' });          // a tap is a hello
+      const link = b.bub.classList.contains('on') && b.bub.querySelector('a');
+      if (moved < 6 && link) location.href = link.href;   // bubble already up: a tap goes to their page
+      else if (moved < 6) say(b, { kind: 'hello' });     // otherwise a tap is a hello
       else say(b, { kind: 'chat' }, 1800);
     };
     b.el.addEventListener('pointerup', drop);
     b.el.addEventListener('pointercancel', drop);
-    b.el.addEventListener('mouseenter', () => { if (!b.held) say(b, { kind: 'hello' }); });
+    b.el.addEventListener('mouseenter', () => { b.hover = true; if (!b.held) say(b, { kind: 'hello' }); });
+    b.el.addEventListener('mouseleave', () => { b.hover = false; });  // hold still while someone reaches for the link
   });
 
   // ---------- Physics ----------
@@ -126,7 +131,7 @@
     if (running && !document.body.classList.contains('no-crew')) {
       const W = innerWidth, H = innerHeight;
       for (const b of bodies) {
-        if (!b.held) {
+        if (!b.held && !b.hover) {
           b.vx += (Math.random() - 0.5) * 0.04; b.vy += (Math.random() - 0.5) * 0.04;
           const sp = Math.hypot(b.vx, b.vy), max = 2.4, min = 0.25;
           if (sp > max) { b.vx *= 0.96; b.vy *= 0.96; }
