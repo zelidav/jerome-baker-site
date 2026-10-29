@@ -40,7 +40,14 @@ def head(title, desc, up, extra=""):
 <title>{e(title)}</title>
 <meta name="description" content="{e(desc)}">
 <meta name="theme-color" content="#2A3B8E">
-<link rel="icon" href="{up}assets/img/jb-mark.webp" type="image/webp">
+<link rel="icon" href="{up}favicon.ico" sizes="any">
+<link rel="icon" href="{up}assets/icons/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="{up}assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="{up}site.webmanifest">
+<meta property="og:image" content="https://jeromebaker.cannacrypted.com/assets/icons/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
