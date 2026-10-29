@@ -14,6 +14,8 @@ e = html.escape
 TILTS = ["-3deg", "2deg", "-1deg", "3deg", "-2deg", "1.5deg"]
 CARD_BG = ["#FFF100", "#FFFFFF", "#05B48F", "#FDB514", "#F1F1F1", "#DA2342"]
 WEARER = {m: c for c in CREW for m in c["wear"]}
+# heading glitch per crew page (css/glitch.css), cycled so neighbours never match
+GLITCH = ["8bit", "text", "psycho", "clip", "hello"]
 
 
 def merch_card(mid, up, i, worn=True):
@@ -53,6 +55,7 @@ def head(title, desc, up, extra=""):
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{up}css/site.css">
 <link rel="stylesheet" href="{up}css/crew.css">
+<link rel="stylesheet" href="{up}css/glitch.css">
 {extra}</head>
 """
 
@@ -64,6 +67,7 @@ def topbar(up):
 
 def scripts(up, weird=False):
     return (f'<script src="{up}js/crew-data.js"></script>\n<script src="{up}js/crew.js" defer></script>\n'
+            f'<script src="{up}js/glitch.js" defer></script>\n'
             + (f'<script src="{up}js/weird.js" defer></script>\n' if weird else ""))
 
 
@@ -77,7 +81,7 @@ def crew_page(c, i):
     rots = ["-3deg", "2deg", "-1deg", "3deg"]
     name = "".join(f'<span style="--r:{rots[k % 4]}">{e(w)}</span>' for k, w in enumerate(words))
     cards = "".join(merch_card(m, up, k, worn=False) for k, m in enumerate(c["wear"]))
-    return head(f'{c["name"]}. The JB Crew', f'{c["name"]}: {c["doing"]} Wearing real Jerome Baker merch.', up) + f"""<body data-weird="{c['weird']}" data-crew-self="{c['slug']}" data-crew-count="5">
+    return head(f'{c["name"]}. The JB Crew', f'{c["name"]}: {c["doing"]} Wearing real Jerome Baker merch.', up) + f"""<body data-weird="{c['weird']}" data-crew-self="{c['slug']}" data-crew-count="5" data-glitch="{GLITCH[i % len(GLITCH)]}">
 <a class="skip" href="#main">Skip to content</a>
 <div class="page">
 {topbar(up)}
@@ -148,7 +152,7 @@ def crew_page(c, i):
 def crew_index():
     up = "../"
     pins = "".join(pin(c, up, i) for i, c in enumerate(CREW))
-    return head("The JB Crew. Jerome Baker", "Twenty characters off the Jerome Baker wall, in real JB merch, doing weird things.", up) + f"""<body data-crew-count="8">
+    return head("The JB Crew. Jerome Baker", "Twenty characters off the Jerome Baker wall, in real JB merch, doing weird things.", up) + f"""<body data-crew-count="8" data-glitch="psycho">
 <a class="skip" href="#main">Skip to content</a>
 <div class="page">
 {topbar(up)}
