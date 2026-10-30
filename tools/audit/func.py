@@ -67,15 +67,17 @@ with sync_playwright() as p:
 
     # ---- find your crew
     pg.goto(BASE + 'crew/match/?f=1', wait_until='load'); pg.wait_for_timeout(1000)
-    for i in range(12):
-        btns = pg.locator('main button').filter(has_not_text='Retake')
-        opts = pg.locator('.mx-opt')
-        if pg.locator('text=/your crew is|matched|you two/i').count() and i > 0:
+    check('quiz: 21+ card first', pg.locator('.mx-gate').count() == 1)
+    pg.click("text=I'm 21+. Ask me"); pg.wait_for_timeout(250)
+    for i in range(8):
+        if pg.locator('.mx-result').count():
             break
-        n = opts.count()
-        if not n:
-            break
-        opts.nth(i % n).click(); pg.wait_for_timeout(250)
+        if pg.locator('.mx-range').count():   # slider rounds: move it, then lock it in
+            pg.locator('.mx-range').focus(); pg.keyboard.press('ArrowRight')
+            pg.click('.mx-lock')
+        elif pg.locator('.mx-opt').count():
+            pg.locator('.mx-opt').nth(i % pg.locator('.mx-opt').count()).click()
+        pg.wait_for_timeout(250)
     body = pg.inner_text('main')
     check('quiz: reaches a result', 'your crew is' in body.lower(), body[:80].replace('\n', ' '))
     check('quiz: result shows merch links', pg.locator('a[href*="shop/#p="]').count() >= 1)

@@ -1,58 +1,53 @@
-/* Find your crew. Eight questions nudge six axes (see tools/crew_personas.py), then the visitor
+/* Find your crew. Four questions nudge six axes (see tools/crew_personas.py), then the visitor
    gets the crew member closest to them. Needs window.JB_CREW (js/crew-data.js).
    The scoring core is plain functions so tools can brute-force it under node. */
 (function (root) {
   const AXES = ['chaos', 'crew', 'night', 'new', 'hands', 'roam'];
 
   // Each answer nudges a few axes, -2..2. An axis is the average of every nudge it got.
+  // kind: 'scale' renders as a slider over the answers in order, 'basket' as a pile of things to grab.
   const QUESTIONS = [
-    { q: "It's Friday night. What's the plan?", a: [
-      { t: 'Warehouse party till the sun comes up', n: { night: 2, crew: 2, chaos: 1, new: 1 } },
-      { t: 'Couch, snacks, cartoons with the sound off', n: { chaos: -1, roam: -2, night: 1, crew: -1 } },
-      { t: 'Backyard cookout. Everybody is invited', n: { crew: 2, night: -1, hands: 1, roam: -1 } },
-      { t: 'Alone in the garage finishing a project', n: { crew: -2, hands: 2, night: 1, chaos: -1, new: -1 } }
+    { q: 'On a scale of 1 to 10, how high are you right now?', kind: 'scale', a: [
+      { t: 'Stone sober. Designated driver energy', n: { chaos: -2, night: -2, new: -1, hands: 1 } },
+      { t: "Had a sip of somebody's drink", n: { chaos: -2, night: -2, crew: 1, roam: -1 } },
+      { t: 'One hit, to be polite', n: { crew: 1, chaos: -2, hands: 1, roam: 1, night: -1 } },
+      { t: 'Mellow. Snacks are being considered', n: { roam: -1, hands: 1, crew: -1, chaos: -1 } },
+      { t: 'Laughing at the microwave', n: { chaos: 1, crew: 1, night: -1 } },
+      { t: 'Forgot what I walked in here for', n: { chaos: 1, roam: 1, hands: -2, crew: 1 } },
+      { t: 'The couch has absorbed me', n: { roam: -2, night: 1, crew: -1, chaos: -1 } },
+      { t: 'Talking to the dog like it owes me money', n: { chaos: 1, crew: -1, night: 1, roam: -1 } },
+      { t: 'I can hear colors', n: { new: 2, chaos: 1, night: 1, crew: -1 } },
+      { t: 'Orbiting. Send snacks to the moon', n: { chaos: 1, roam: 2, new: 2, night: 1 } }
     ] },
-    { q: 'Your pace at work?', a: [
-      { t: 'Full send. Fix it later', n: { chaos: 2, hands: 1 } },
-      { t: 'Slow and right, or not at all', n: { chaos: -2, hands: 2, new: -1 } },
-      { t: 'I talk my way through it', n: { hands: -2, crew: 1 } },
-      { t: 'Make a plan, then wander off somewhere', n: { chaos: 1, roam: 2, hands: -1 } }
+    { q: 'The crime your friends think you are most likely to commit?', a: [
+      { t: "Arson. “It was an accident.” It wasn't", n: { chaos: 2, hands: 1, night: 1, crew: -1 } },
+      { t: 'Tax fraud, with color-coded spreadsheets', n: { hands: -2, chaos: -1, crew: -1 } },
+      { t: 'Grand theft golf cart', n: { roam: 1, chaos: 1, crew: 1 } },
+      { t: 'Indecent exposure at a wedding', n: { crew: 2, night: 1, chaos: 1, new: 1, roam: 1, hands: -1 } },
+      { t: 'Running a poker game in the basement', n: { night: 2, crew: 1, roam: -2, hands: -1, new: -1 } },
+      { t: 'Smuggling something weird across a border', n: { roam: 2, new: 1, crew: -1, night: -1 } },
+      { t: 'Stealing a museum piece for the vibes', n: { new: -2, hands: 1, night: 1, crew: -2, roam: -1 } },
+      { t: 'Starting a cult. By accident', n: { crew: 2, hands: -2, new: 1 } }
     ] },
-    { q: 'You find $100 on the sidewalk. Now what?', a: [
-      { t: 'Something rare for the shelf nobody touches', n: { crew: -2, new: -1, night: 1 } },
-      { t: 'Bus ticket out of town. Figure out the rest there', n: { roam: 2, chaos: 1 } },
-      { t: 'Groceries. Feeding the whole block', n: { crew: 2, roam: -2, hands: 1, chaos: -1 } },
-      { t: 'Flip it into $300 by Monday', n: { hands: -2, new: 1, chaos: 1, crew: 1 } }
+    { q: 'Freak scale. Where do you land?', kind: 'scale', a: [
+      { t: 'Missionary. Lights off. Socks on', n: { chaos: -2, new: -2, night: -2, hands: 1, roam: -1 } },
+      { t: 'Lights on. Wild', n: { chaos: -1, new: -1, crew: 1 } },
+      { t: 'Handcuffs from a gas station', n: { chaos: 1, new: 2, roam: 1 } },
+      { t: 'The neighbors have filed a complaint', n: { night: 2, crew: 2, chaos: 1 } },
+      { t: 'Owns a sex swing and a label maker for it', n: { hands: 2, new: 1, roam: -1, chaos: -1, night: -1 } },
+      { t: 'Banned from a Renaissance Faire. Twice', n: { roam: 1, new: -1, chaos: 1, crew: 1 } },
+      { t: 'Your safe word has a safe word', n: { chaos: 2, new: 1, night: 2, crew: -1 } }
     ] },
-    { q: "What's on your playlist?", a: [
-      { t: 'Doo-wop, soul, the old 45s', n: { new: -2, crew: 1, chaos: -1 } },
-      { t: 'Four on the floor, 120 BPM, no words', n: { new: 2, night: 2 } },
-      { t: 'Loud, fast, skate-video music', n: { chaos: 2, new: 1, night: -1, roam: 1 } },
-      { t: 'Rain sounds and a singing bowl', n: { chaos: -2, night: -2, crew: -1 } }
-    ] },
-    { q: 'You can move anywhere tomorrow. Where?', a: [
-      { t: 'Mountain town with quiet mornings', n: { night: -2, chaos: -2, roam: 1 } },
-      { t: 'A beach town. Any beach town', n: { roam: 1, chaos: 1, night: 0 } },
-      { t: "Not moving. My recliner knows me", n: { roam: -2, new: -1, chaos: -1 } },
-      { t: 'Wherever the plane lands, then somewhere else', n: { roam: 2, new: 1, crew: 0 } }
-    ] },
-    { q: 'What do your friends text you for?', a: [
-      { t: 'An honest opinion. Brutal if needed', n: { crew: -1, chaos: -1, new: 1, hands: 0 } },
-      { t: 'Getting something fixed, built or made', n: { hands: 2, new: -1, night: -1 } },
-      { t: 'The gossip. All of it', n: { hands: -2, roam: -2, night: 0 } },
-      { t: "Tonight's plan. And the backup plan", n: { crew: 2, night: 1, chaos: 1, hands: -1 } }
-    ] },
-    { q: 'Be honest. When are you at your best?', a: [
-      { t: 'Up at 5, already did a lap', n: { night: -2, hands: 1 } },
-      { t: 'Golden hour, with people around', n: { night: 0, crew: 1 } },
-      { t: '3 a.m., lights off, scary movie on', n: { night: 2, crew: -1, new: -1 } },
-      { t: 'Sunrise, but from the night before', n: { night: 1, chaos: 2, crew: 1 } }
-    ] },
-    { q: 'Pick your fit for the day.', a: [
-      { t: "Same hoodie I've worn for years. It's perfect", n: { new: -2, roam: -1, chaos: -1 } },
-      { t: 'Whatever dropped this morning. I was first in line', n: { new: 2, crew: 1 } },
-      { t: 'Flip-flops. Always flip-flops', n: { roam: 1, chaos: 1, new: 0 } },
-      { t: 'A loud outfit that starts conversations', n: { hands: -2, crew: 1, chaos: 1, night: 1 } }
+    { q: 'Somebody left a basket on the table. Grab one.', kind: 'basket', a: [
+      { t: 'A fat joint', i: 'J', n: { crew: 2, roam: -1, new: -1 } },
+      { t: 'A dab off a JB rig, obviously', i: 'D', n: { new: 1, hands: 2, chaos: 1 } },
+      { t: 'A shroom chocolate', i: 'S', n: { roam: 2, new: 1, crew: -2 } },
+      { t: 'A sheet of acid', i: 'A', n: { new: 2, chaos: 2, night: 1, crew: 1 } },
+      { t: "A gummy. You'll take two", i: 'G', n: { roam: -2, night: 2, chaos: -1, new: -1, crew: -1 } },
+      { t: 'Whippets', i: 'W', n: { chaos: 1, hands: -2, new: -2 } },
+      { t: 'A forty and a scratch-off', i: '40', n: { new: -2, crew: 2, hands: -1, chaos: 1 } },
+      { t: 'The mystery baggie from the bathroom', i: '?', n: { night: 1, chaos: 1, crew: -2 } },
+      { t: 'Just coffee. Black', i: 'C', n: { night: -2, chaos: -1, hands: 1 } }
     ] }
   ];
 
@@ -125,16 +120,41 @@
     const Q = QUESTIONS[qi];
     const bar = h('div', { class: 'mx-bar', 'aria-hidden': 'true' },
       QUESTIONS.map((_, k) => h('span', { class: k < qi ? 'done' : k === qi ? 'now' : '' })));
-    const opts = Q.a.map((a, ai) => h('button', {
-      type: 'button', class: 'mx-opt' + (answers[qi] === ai ? ' picked' : ''),
-      style: `--bg:${COLORS[ai % 4]};--tilt:${TILTS[(ai + qi) % 4]}`,
-      onclick: () => { answers[qi] = ai; answers.length = qi + 1; qi + 1 < QUESTIONS.length ? showQuestion(qi + 1) : finish(); }
-    }, h('span', { class: 'mx-key', 'aria-hidden': 'true' }, 'ABCD'[ai]), a.t));
+    const pick = (ai) => { answers[qi] = ai; answers.length = qi + 1; qi + 1 < QUESTIONS.length ? showQuestion(qi + 1) : finish(); };
+    let body;
+    if (Q.kind === 'scale') {
+      // a slider over the answers, with the caption for wherever it sits
+      const start = answers[qi] != null ? answers[qi] : Math.floor((Q.a.length - 1) / 2);
+      const cap = h('p', { class: 'mx-scap', 'aria-hidden': 'true' });
+      const num = h('span', { class: 'mx-snum', 'aria-hidden': 'true' });
+      const range = h('input', { type: 'range', class: 'mx-range', min: 0, max: Q.a.length - 1, step: 1, value: start, 'aria-label': Q.q });
+      const paint = () => {
+        const i = Number(range.value);
+        num.textContent = Q.a.length === 10 ? i + 1 : '';
+        cap.textContent = Q.a[i].t;
+        range.setAttribute('aria-valuetext', Q.a[i].t);
+        range.style.setProperty('--p', (100 * i / (Q.a.length - 1)) + '%');
+      };
+      range.addEventListener('input', paint);
+      paint();
+      body = h('div', { class: 'mx-scale' },
+        h('div', { class: 'mx-sread' }, num, cap),
+        range,
+        h('div', { class: 'mx-ends', 'aria-hidden': 'true' }, h('span', null, Q.a[0].t), h('span', null, Q.a[Q.a.length - 1].t)),
+        h('button', { type: 'button', class: 'btn btn-red mx-lock', onclick: () => pick(Number(range.value)) }, 'Lock it in'));
+    } else {
+      const basket = Q.kind === 'basket';
+      body = h('div', { class: 'mx-opts' + (basket ? ' mx-basket' : ''), role: 'group', 'aria-label': Q.q }, Q.a.map((a, ai) => h('button', {
+        type: 'button', class: 'mx-opt' + (answers[qi] === ai ? ' picked' : ''),
+        style: `--bg:${COLORS[ai % 4]};--tilt:${TILTS[(ai + qi) % 4]}`,
+        onclick: () => pick(ai)
+      }, h('span', { class: 'mx-key', 'aria-hidden': 'true' }, basket ? a.i : String(ai + 1)), a.t)));
+    }
     const card = h('div', { class: 'mx-card mx-q' },
       h('p', { class: 'mx-count' }, `Question ${qi + 1} of ${QUESTIONS.length}`),
       bar,
       h('h2', { class: 'mx-qh', tabindex: '-1' }, Q.q),
-      h('div', { class: 'mx-opts', role: 'group', 'aria-label': Q.q }, opts),
+      body,
       qi > 0 ? h('button', { type: 'button', class: 'mx-back', onclick: () => showQuestion(qi - 1) }, '← Back') : null);
     swap(card, qi === 0 && !answers.length ? null : '.mx-qh');
   };
@@ -232,13 +252,23 @@
     if (scrollY > top) scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
   };
 
+  // the questions are about getting high and getting weird, so adults only, asked once per visit
+  let grown = false;
+  try { grown = sessionStorage.getItem('jbMatch21') === '1'; } catch (e) {}
   const intro = () => {
     answers = [];
-    showQuestion(0);
+    if (grown) { showQuestion(0); return; }
+    swap(h('div', { class: 'mx-card mx-gate' },
+      h('h2', { class: 'mx-qh', tabindex: '-1' }, 'Four questions. None of them are about your star sign.'),
+      h('p', null, 'How high you are, what your friends think you would get arrested for, how much of a freak you are, and what you grab out of the basket. Adults 21 and up only.'),
+      h('div', { class: 'mx-acts' },
+        h('button', { type: 'button', class: 'btn btn-red', onclick: () => { grown = true; try { sessionStorage.setItem('jbMatch21', '1'); } catch (e) {} showQuestion(0); } }, "I'm 21+. Ask me"),
+        h('a', { class: 'btn btn-ink', href: base + 'crew/' }, 'Just show me the crew'))), null);
   };
   const retake = () => {
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     answers = [];
+    if (!grown) { intro(); return; }
     showQuestion(0);
     stage.querySelector('.mx-qh').focus({ preventScroll: true });
     const top = stage.getBoundingClientRect().top + scrollY - 90;
@@ -256,10 +286,10 @@
     } else if (bySlug[slug]) showResult(bySlug[slug], null, null, true);
     else intro();
   };
-  // A-D or 1-4 picks an answer
+  // 1-9 picks an answer
   addEventListener('keydown', (ev) => {
     if (ev.ctrlKey || ev.metaKey || ev.altKey || /^(INPUT|TEXTAREA)$/.test((ev.target && ev.target.tagName) || '')) return;
-    const k = 'abcd'.indexOf(ev.key.toLowerCase()) + 1 || '1234'.indexOf(ev.key) + 1;
+    const k = '123456789'.indexOf(ev.key) + 1;
     const opts = stage.querySelectorAll('.mx-opt');
     if (k && opts[k - 1]) { ev.preventDefault(); opts[k - 1].click(); }
   });

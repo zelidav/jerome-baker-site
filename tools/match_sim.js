@@ -16,7 +16,7 @@ for (;;) {
   const r = M.rank(M.score(idx), crew);
   const s = r[0].c.slug;
   top[s]++; total++;
-  if (!best[s] || r[0].d < best[s].d) best[s] = { d: r[0].d, path: idx.map((i) => 'ABCD'[i]).join('') };
+  if (!best[s] || r[0].d < best[s].d) best[s] = { d: r[0].d, path: idx.map((i) => i + 1).join('-') };
   let k = 0;
   while (k < idx.length && ++idx[k] === sizes[k]) { idx[k] = 0; k++; }
   if (k === idx.length) break;
