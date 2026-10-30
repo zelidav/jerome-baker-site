@@ -64,7 +64,7 @@ def check_personas():
 def merch_card(mid, up, i, worn=True):
     name, price, slug = MERCH[mid]
     who = WEARER.get(mid)
-    badge = (f'<img class="worn" src="{up}assets/crew/{who["img"]}.webp" alt="" loading="lazy">' if worn and who else "")
+    badge = (f'<img class="worn" src="{up}assets/crew/{who["img"]}_s.webp" alt="" loading="lazy">' if worn and who else "")
     return (f'<a class="mcard" href="{up}shop/#p={slug}" style="--bg:{CARD_BG[i % 6]};--tilt:{TILTS[i % 6]}">'
             f'{badge}<span class="pic"><img src="{up}assets/merch/{mid}.webp" alt="{e(name)}" loading="lazy" decoding="async"></span>'
             f'<span class="meta"><span><h3>{e(name)}</h3><span class="go">SHOP IT →</span></span><span class="pr">${price}</span></span></a>')
@@ -72,7 +72,7 @@ def merch_card(mid, up, i, worn=True):
 
 def pin(c, up, i):
     return (f'<a class="pin" href="{up}crew/{c["slug"]}/" style="--tilt:{TILTS[i % 6]}">'
-            f'<img src="{up}assets/crew/{c["img"]}.webp" alt="{e(c["name"])}, {e(c["doing"])}" loading="lazy" decoding="async">'
+            f'<img src="{up}assets/crew/{c["img"]}_m.webp" alt="{e(c["name"])}, {e(c["doing"])}" loading="lazy" decoding="async">'
             f'<span class="tape">{e(c["name"])}<small>{e(c["title"])}</small></span></a>')
 
 
@@ -105,7 +105,7 @@ def head(title, desc, up, extra=""):
 
 def topbar(up):
     return (f'<header class="topbar pad"><a href="{up}" aria-label="Jerome Baker home"><img src="{up}assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a>'
-            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}comics/">The Hot Shop</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
+            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}comics/">The Hot Shop</a> <a href="{up}#made">The story</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
 
 
 def scripts(up, weird=False):
@@ -120,7 +120,7 @@ FOOT = '<footer class="pad" style="background:#0A0A0A;color:#BDBDBD;padding-top:
 def mate(slug, up, k):
     m = BY_SLUG[slug]
     return (f'<a class="mate" href="{up}crew/{slug}/" style="--tilt:{TILTS[k % 6]}">'
-            f'<img src="{up}assets/crew/{m["img"]}.webp" alt="" loading="lazy" decoding="async"><span>{e(m["name"])}</span></a>')
+            f'<img src="{up}assets/crew/{m["img"]}_s.webp" alt="" loading="lazy" decoding="async"><span>{e(m["name"])}</span></a>')
 
 
 def who_block(c, up):
@@ -200,9 +200,9 @@ def crew_page(c, i):
 <div class="log" id="log" aria-live="polite"></div>
 </div></section>
 {match_cta(up, c['name'])}<nav class="crew-nav pad" aria-label="More crew">
-<a href="../{prev['slug']}/"><img src="{up}assets/crew/{prev['img']}.webp" alt="" loading="lazy">← {e(prev['name'])}</a>
+<a href="../{prev['slug']}/"><img src="{up}assets/crew/{prev['img']}_s.webp" alt="" loading="lazy">← {e(prev['name'])}</a>
 <a href="../">The whole crew</a>
-<a href="../{nxt['slug']}/">{e(nxt['name'])} →<img src="{up}assets/crew/{nxt['img']}.webp" alt="" loading="lazy"></a>
+<a href="../{nxt['slug']}/">{e(nxt['name'])} →<img src="{up}assets/crew/{nxt['img']}_s.webp" alt="" loading="lazy"></a>
 </nav>
 </main>
 {FOOT}
@@ -262,9 +262,9 @@ def match_page():
 {topbar(up)}
 <main id="main">
 <section class="mx pad dots">
-<img class="mx-st s1" src="{up}assets/crew/lion.webp" alt="" aria-hidden="true" width="160" height="160">
-<img class="mx-st s2" src="{up}assets/crew/cobra.webp" alt="" aria-hidden="true" width="150" height="150">
-<img class="mx-st s3" src="{up}assets/crew/bot.webp" alt="" aria-hidden="true" width="140" height="140">
+<img class="mx-st s1" src="{up}assets/crew/lion_s.webp" alt="" aria-hidden="true" width="160" height="160">
+<img class="mx-st s2" src="{up}assets/crew/cobra_s.webp" alt="" aria-hidden="true" width="150" height="150">
+<img class="mx-st s3" src="{up}assets/crew/bot_s.webp" alt="" aria-hidden="true" width="140" height="140">
 <div class="wrap">
 <h1 class="display mx-h"><span>Find your</span><br><span class="y">crew.</span></h1>
 <p class="mx-lede">Twenty characters came off the Jerome Baker wall. One of them is basically you. Answer eight quick questions and we'll tell you who, and what they wear.</p>

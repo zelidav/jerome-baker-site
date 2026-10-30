@@ -129,7 +129,7 @@
     roll() {
       css('.rolly{width:150px;animation:roll 6s linear forwards}@keyframes roll{from{left:-180px;rotate:0deg}to{left:110vw;rotate:1080deg}}.knocked{rotate:var(--kr)!important;translate:0 30px!important;transition:rotate .5s cubic-bezier(.2,2,.4,1),translate .5s}');
       const go = () => {
-        const r = el('img', `top:${rnd(20, 75)}vh`, 'rolly'); r.src = base + 'assets/crew/dillo.webp'; r.alt = '';
+        const r = el('img', `top:${rnd(20, 75)}vh`, 'rolly'); r.src = base + 'assets/crew/dillo_s.webp'; r.alt = '';
         fx.appendChild(r);
         const t0 = performance.now();
         const hit = () => {

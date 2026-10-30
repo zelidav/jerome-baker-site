@@ -20,6 +20,7 @@ UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like 
 IMG_DIR = os.path.join(ROOT, 'assets', 'shop')
 MAX_IMGS = 4
 IMG_W = 900
+THUMB_W = 480
 
 # The live /shop/ sidebar. Kaleidoscope Collab is greyed out there and its items are not in the grid.
 TREE = [
@@ -92,13 +93,21 @@ def crew_for(p, worn):
 
 
 def save_img(src, dest):
-    if os.path.exists(dest):
+    """Full photo (product view) plus a 480px _t thumbnail (cards)."""
+    thumb = dest[:-5] + '_t.webp'
+    if os.path.exists(dest) and os.path.exists(thumb):
         return
-    im = Image.open(io.BytesIO(get(src, 'image/*')))
-    im = im.convert('RGBA' if im.mode in ('RGBA', 'LA', 'P') else 'RGB')
-    if im.width > IMG_W:
-        im = im.resize((IMG_W, round(im.height * IMG_W / im.width)), Image.LANCZOS)
-    im.save(dest, 'WEBP', quality=80, method=6)
+    if os.path.exists(dest):
+        im = Image.open(dest)
+    else:
+        im = Image.open(io.BytesIO(get(src, 'image/*')))
+        im = im.convert('RGBA' if im.mode in ('RGBA', 'LA', 'P') else 'RGB')
+        if im.width > IMG_W:
+            im = im.resize((IMG_W, round(im.height * IMG_W / im.width)), Image.LANCZOS)
+        im.save(dest, 'WEBP', quality=80, method=6)
+    t = im.copy()
+    t.thumbnail((THUMB_W, THUMB_W), Image.LANCZOS)
+    t.save(thumb, 'WEBP', quality=76, method=6)
 
 
 def main():

@@ -51,7 +51,7 @@
     const w = Math.round((small ? 84 : 120) + Math.random() * (small ? 30 : 50));
     el.style.setProperty('--w', w + 'px');
     const img = new Image();
-    img.src = base + 'assets/crew/' + who.img + '.webp';
+    img.src = base + 'assets/crew/' + who.img + '_s.webp';
     img.alt = '';
     img.decoding = 'async';
     el.appendChild(img);
