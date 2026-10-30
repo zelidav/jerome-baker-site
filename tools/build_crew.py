@@ -272,7 +272,7 @@ def crew_index():
 
 def match_page():
     up = "../../"
-    return head("Find your crew. The JB Crew", "Eight quick questions. We match you to the JB Crew member who fits you, and show you the real merch they wear.", up,
+    return head("Find your crew. The JB Crew", "Four questions, adults only. How high you are, your likeliest crime, your freak scale and your pick from the basket. We match you to the JB Crew member who fits.", up,
                 f'<link rel="stylesheet" href="{up}css/match.css">\n') + f"""<body data-crew-count="2" data-glitch="hello">
 <a class="skip" href="#main">Skip to content</a>
 <div class="page">
@@ -284,7 +284,7 @@ def match_page():
 <img class="mx-st s3" src="{up}assets/crew/bot_s.webp" alt="" aria-hidden="true" width="140" height="140">
 <div class="wrap">
 <h1 class="display mx-h"><span>Find your</span><br><span class="y">crew.</span></h1>
-<p class="mx-lede">Twenty characters came off the Jerome Baker wall. One of them is basically you. Answer eight quick questions and we'll tell you who, and what they wear.</p>
+<p class="mx-lede">Twenty characters came off the Jerome Baker wall. One of them is basically you. Four questions, no wrong answers, a few wrong people.</p>
 <div class="mx-stage" id="stage">
 <noscript><p class="mx-card">Find your crew needs JavaScript. You can still <a href="../">meet the whole crew</a>.</p></noscript>
 </div>

@@ -66,3 +66,25 @@ input.mx-link{display:block;width:100%;margin-top:14px;min-height:48px;border:3p
   .mx-run .pin img{height:140px}
 }
 @media (prefers-reduced-motion:reduce){.mx-opt:hover,.mx-opt:active{transform:none}}
+
+/* unhinged edition: sliders, the basket, the 21+ card */
+.mx-gate p{font-size:18px;line-height:1.5;max-width:56ch;margin:0 0 22px}
+.mx-gate .mx-acts{display:flex;flex-wrap:wrap;gap:14px}
+.mx-scale{display:grid;gap:18px}
+.mx-sread{display:flex;align-items:center;gap:18px;min-height:96px}
+.mx-snum{font-family:var(--display);font-weight:900;font-size:clamp(64px,9vw,110px);line-height:.8;color:var(--red);min-width:1.1em;text-shadow:5px 5px 0 var(--ink)}
+.mx-snum:empty{display:none}
+.mx-scap{margin:0;font-family:var(--display);font-weight:900;font-size:clamp(24px,3.4vw,40px);line-height:1.05;background:var(--yellow);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:10px 16px;rotate:-1deg}
+.mx-range{-webkit-appearance:none;appearance:none;width:100%;height:22px;border:3px solid var(--ink);background:linear-gradient(90deg,var(--blue) var(--p,50%),var(--white) var(--p,50%));cursor:pointer;margin:6px 0}
+.mx-range::-webkit-slider-thumb{-webkit-appearance:none;width:44px;height:44px;border:3px solid var(--ink);background:var(--red);box-shadow:4px 4px 0 var(--ink);border-radius:50%}
+.mx-range::-moz-range-thumb{width:40px;height:40px;border:3px solid var(--ink);background:var(--red);box-shadow:4px 4px 0 var(--ink);border-radius:50%}
+.mx-range:focus-visible{outline:4px solid var(--red);outline-offset:6px}
+.mx-ends{display:flex;justify-content:space-between;gap:16px;font-weight:700;font-size:13px;color:#555}
+.mx-ends span:last-child{text-align:right}
+.mx-lock{justify-self:start;box-shadow:6px 6px 0 var(--ink)}
+/* the basket: a woven tray the picks spill out of */
+.mx-basket{position:relative;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));padding:26px 20px 34px;border:4px solid var(--ink);border-radius:0 0 40px 40px;
+  background:repeating-linear-gradient(45deg,#C98B3E 0 12px,#A86C28 12px 24px),#B57A32;box-shadow:inset 0 10px 0 rgba(10,10,10,.25),10px 10px 0 var(--ink)}
+.mx-basket .mx-opt{min-height:64px;font-size:16px}
+.mx-basket .mx-key{width:auto;min-width:34px;padding:0 6px}
+@media (max-width:640px){.mx-basket{grid-template-columns:1fr 1fr;gap:12px;padding:18px 12px 26px}.mx-basket .mx-opt{font-size:14px;padding:10px;gap:8px;min-height:84px}.mx-basket .mx-key{min-width:28px;height:28px;font-size:13px}}
