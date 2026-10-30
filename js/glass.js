@@ -317,6 +317,8 @@
     cur = p;
     page.off('hero');
     bSmoke.ps = [];
+    hitter.className = 'hitter';  // a new piece gets a fresh visitor
+    say.classList.remove('on');
     bImg.src = img(p);
     bImg.alt = `${p.name}, hand-blown Jerome Baker glass`;
     bFill.style.webkitMaskImage = bFill.style.maskImage = `url(${img(p)})`;
@@ -458,7 +460,38 @@
       o.connect(vf).connect(vg).connect(c.destination);
       o.start(t); o.stop(t + .26);
     }
-    return { blip, startGurgle, level, stopGurgle, cough };
+    // the lighter: a hard click, two sparks off the wheel, then the hiss of the flame while it burns
+    let flame = null;
+    function flick() {
+      const c = ac();
+      if (!c) return;
+      const t = c.currentTime;
+      [[0, .5, 2600], [.05, .28, 5200], [.09, .2, 6400]].forEach(([dt, v, f]) => {
+        const src = c.createBufferSource(), hp = c.createBiquadFilter(), g = c.createGain();
+        src.buffer = noise;
+        hp.type = 'highpass'; hp.frequency.value = f;
+        env(g, t + dt, v, .002, .03);
+        src.connect(hp).connect(g).connect(c.destination);
+        src.start(t + dt, Math.random() * .5); src.stop(t + dt + .05);
+      });
+      if (flame) return;
+      const src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = noise; src.loop = true;
+      bp.type = 'bandpass'; bp.frequency.value = 900; bp.Q.value = .6;
+      g.gain.setValueAtTime(.0001, t + .08);
+      g.gain.exponentialRampToValueAtTime(.06, t + .2);
+      src.connect(bp).connect(g).connect(c.destination);
+      src.start(t + .08);
+      flame = { src, g };
+    }
+    function douse() {
+      if (!flame) return;
+      const { src, g } = flame;
+      flame = null;
+      g.gain.setTargetAtTime(.0001, ctx.currentTime, .04);
+      src.stop(ctx.currentTime + .25);
+    }
+    return { blip, startGurgle, level, stopGurgle, cough, flick, douse };
   })();
 
   const hitter = $('#bHitter'), say = $('#bSay');
@@ -466,7 +499,7 @@
   let hitterOut = 0;
   function walkUp() {
     const crew = window.JB_CREW || [];
-    if (!crew.length || hitter.classList.contains('in')) return;
+    if (!crew.length) return;
     clearTimeout(hitterOut);
     const c = crew[(Math.random() * crew.length) | 0];
     const st = $('#bStage').getBoundingClientRect(), r = bImg.getBoundingClientRect();
@@ -480,6 +513,26 @@
     void hitter.offsetWidth;
     hitter.classList.add('in');
     setTimeout(() => { if (hitter.classList.contains('in')) hitter.classList.add('at'); }, 800);
+  }
+  const lighter = $('#bLighter');
+  let flickT = 0;
+  function light_up() {
+    const [bx, by] = cur.base;
+    lighter.style.left = Math.min(96, (bx + cur.bw * .42) * 100) + '%';
+    lighter.style.top = (by * 100 - 14) + '%';
+    lighter.classList.add('on');
+    clearTimeout(flickT);
+    flickT = setTimeout(() => {
+      if (!holding) return;
+      Sfx.flick();
+      lighter.classList.add('lit');
+    }, hitter.classList.contains('at') ? 150 : 650);
+  }
+  function lights_out() {
+    clearTimeout(flickT);
+    Sfx.douse();
+    lighter.classList.remove('lit');
+    setTimeout(() => { if (!holding) lighter.classList.remove('on'); }, 400);
   }
   function walkOff(delay) {
     clearTimeout(hitterOut);
@@ -530,6 +583,7 @@
     $('#bHitLabel').textContent = 'Keep holding';
     Sfx.startGurgle();
     walkUp();
+    light_up();
     raf = requestAnimationFrame(tick);
   }
   function release(quiet) {
@@ -539,6 +593,7 @@
     hit.classList.remove('on');
     $('#bHitLabel').textContent = 'Hold to take a hit';
     Sfx.stopGurgle();
+    lights_out();
     const took = lvl;
     if (quiet === true) { hitter.className = 'hitter'; say.classList.remove('on'); }
     if (took <= .12 && quiet !== true) walkOff(200);

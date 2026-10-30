@@ -154,6 +154,14 @@ body.in-shop .crew-layer{opacity:0;pointer-events:none;transition:opacity .4s}
 @keyframes walk{50%{rotate:-5deg}}
 @keyframes lean{50%{rotate:-7deg}}
 @keyframes cough{25%{rotate:-12deg;scale:1.05}70%{rotate:6deg}}
+/* the lighter at the bowl: a red body, and a flame that only shows while somebody is pulling */
+.lighter{position:absolute;z-index:3;width:16px;height:34px;margin-left:-8px;background:var(--red);border:2px solid var(--ink);border-radius:4px 4px 6px 6px;opacity:0;translate:14px 14px;rotate:-16deg;transition:opacity .2s,translate .3s;pointer-events:none}
+.lighter::before{content:"";position:absolute;left:3px;right:3px;top:-7px;height:7px;background:#bbb;border:2px solid var(--ink);border-bottom:0}
+.lighter.on{opacity:1;translate:0 0}
+.flame{position:absolute;left:50%;bottom:calc(100% + 5px);width:14px;height:26px;margin-left:-7px;border-radius:50% 50% 45% 45%/60% 60% 40% 40%;
+  background:radial-gradient(60% 50% at 50% 75%,#fff 0 22%,#FFF100 38%,#FDB514 60%,rgba(218,35,66,.85) 80%,transparent 100%);opacity:0;transform-origin:50% 100%;filter:drop-shadow(0 0 6px #FDB514)}
+.lighter.lit .flame{opacity:1;animation:flick .12s ease-in-out infinite alternate}
+@keyframes flick{from{scale:1 1;rotate:-4deg}to{scale:.88 1.12;rotate:5deg}}
 .say{position:absolute;z-index:5;margin:0;max-width:200px;background:var(--white);color:var(--ink);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:8px 12px;font:800 16px/1.2 var(--display);opacity:0;scale:.6;transition:opacity .2s,scale .2s;pointer-events:none}
 .say.on{opacity:1;scale:1}
 .snd{position:absolute;left:14px;top:12px;z-index:6;min-height:44px;padding:0 14px;border:3px solid var(--ink);background:var(--white);color:var(--ink);font:800 14px var(--body);cursor:pointer;box-shadow:4px 4px 0 var(--ink)}
