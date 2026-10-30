@@ -42,6 +42,16 @@ section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333
 .issue .blurb{color:#cfcfcf;max-width:56ch;font-size:16px;line-height:1.5;margin:10px 0 28px}
 .acts{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px}
 .acts .btn{font-size:16px;min-height:44px;padding:0 18px}
+.whos{padding-top:56px;padding-bottom:56px;background:var(--blue);color:var(--white);border-bottom:4px solid var(--yellow)}
+.whos h2{margin:0;font-family:var(--display);font-weight:900;font-size:clamp(40px,6vw,76px);line-height:.9;letter-spacing:-.02em;color:var(--yellow);text-shadow:6px 6px 0 var(--ink)}
+.whos-lede{max-width:56ch;font-size:18px;line-height:1.5;font-weight:600;margin:14px 0 26px}
+.who-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.who-card{display:flex;gap:12px;align-items:center;background:var(--white);color:var(--ink);text-decoration:none;border:3px solid var(--ink);box-shadow:5px 5px 0 var(--red);padding:8px 12px 8px 8px;rotate:var(--t,0deg);font-size:14px;line-height:1.35}
+.who-card:hover{background:var(--yellow)}
+.who-card img{width:64px;height:64px;object-fit:contain;flex:none}
+.who-card b{display:block;font-family:var(--display);font-weight:900;font-size:18px}
+.who-card small{display:block;font-weight:700;color:#555;margin-bottom:2px}
+.issue h2 .no.og{display:inline-block;background:var(--red);color:var(--white);padding:0 10px;margin:0 12px 8px 0}
 .next{padding-top:72px;padding-bottom:96px;color:var(--white);text-align:center}
 .next h2{font-family:var(--display);font-weight:900;font-size:clamp(36px,6vw,72px);line-height:.9;margin:0}
 .next p{color:#cfcfcf;margin:14px auto 0;max-width:46ch}
@@ -79,6 +89,14 @@ section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333
 <a href="../crew/mama-cobra/" style="--t:-1deg"><img src="../assets/crew/cobra_s.webp" alt="">Mama Cobra</a>
 <a href="../crew/dillo/" style="--t:2deg"><img src="../assets/crew/dillo_s.webp" alt="">Dillo</a>
 </div>
+</div>
+</section>
+
+<section class="whos pad" aria-labelledby="whoTitle">
+<div class="wrap">
+<h2 id="whoTitle">Who's who</h2>
+<p class="whos-lede">New here? Torch is a lion who blows glass. The rest are the lunatics he hired. Start with Origins and read down.</p>
+<div class="who-grid"><a class="who-card" href="../crew/torch/" style="--t:-1.5deg"><img src="../assets/crew/lion_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Torch</b><small>Eugene, Oregon</small>The gaffer. Owns the shop, runs the bench, regrets everything.</span></a><a class="who-card" href="../crew/chomps/" style="--t:1deg"><img src="../assets/crew/shark_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Chomps</b><small>Venice Beach</small>Runs the glory hole. Banned from four skateparks and an aquarium.</span></a><a class="who-card" href="../crew/major-tom-tom/" style="--t:-.5deg"><img src="../assets/crew/chimp_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Major Tom-Tom</b><small>Cocoa Beach</small>Apprentice. Splashed down years late. Still floating.</span></a><a class="who-card" href="../crew/enlightened-ed/" style="--t:1.5deg"><img src="../assets/crew/octo_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Enlightened Ed</b><small>Big Sur</small>Kiln master. Talks to the fire. The fire talks back.</span></a><a class="who-card" href="../crew/crude/" style="--t:-1.5deg"><img src="../assets/crew/crude_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Crude</b><small>Port Arthur, Texas</small>Assistant. Drinks the 30-weight. Drunk by 10 a.m.</span></a><a class="who-card" href="../crew/lil-lucky/" style="--t:1deg"><img src="../assets/crew/devil_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Lil' Lucky</b><small>Phoenix</small>Sales. Sells the same piece three times. Owes you twenty bucks.</span></a><a class="who-card" href="../crew/mama-cobra/" style="--t:-.5deg"><img src="../assets/crew/cobra_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Mama Cobra</b><small>New Orleans</small>Showroom. Charms the wallet right out of your pants.</span></a><a class="who-card" href="../crew/shellby/" style="--t:1.5deg"><img src="../assets/crew/turtle_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Shellby</b><small>Daytona Beach</small>Delivery. Has crashed the van into the annealer twice.</span></a><a class="who-card" href="../crew/dillo/" style="--t:-1.5deg"><img src="../assets/crew/dillo_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Dillo</b><small>Austin</small>Cleanup. Knocks over everything he just stacked.</span></a><a class="who-card" href="../crew/cy/" style="--t:1deg"><img src="../assets/crew/cy_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Cy</b><small>Brooklyn</small>Quality control. One eye. Rejects everything.</span></a><a class="who-card" href="../crew/two-can/" style="--t:-.5deg"><img src="../assets/crew/toucan_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Two-Can</b><small>San Juan</small>Runner. Has lost the order, the keys and the van.</span></a><a class="who-card" href="../crew/peeper/" style="--t:1.5deg"><img src="../assets/crew/peeper_s.webp" alt="" width="120" height="120" loading="lazy"><span><b>Peeper</b><small>Baltimore</small>Lives in the door. Knows your business before you do.</span></a></div>
 </div>
 </section>
 
@@ -126,11 +144,11 @@ section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333
       return `<span class="smoke ${f.t === 'smoke' ? '' : f.t}" style="${pos}"><i></i><i></i><i></i><i></i></span>`;
     };
     strips.innerHTML = ISSUES.map((s) => `<section class="issue pad" id="issue-${s.n}"><div class="wrap">
-<h2><span class="no">#${s.n}</span>${s.title}</h2><p class="blurb">${s.blurb}</p>
-<div class="hs-strip" role="group" aria-label="The Hot Shop #${s.n}, ${s.title}">${s.panels.map((p, i) => `<div class="pn${p.shake ? ' shake' : ''}">
+<h2><span class="no${String(s.n).startsWith('o') ? ' og' : ''}">${s.label || '#' + s.n}</span>${s.title}</h2><p class="blurb">${s.blurb}</p>
+<div class="hs-strip" role="group" aria-label="The Hot Shop ${s.label || '#' + s.n}, ${s.title}">${s.panels.map((p, i) => `<div class="pn${p.shake ? ' shake' : ''}">
 <img src="hotshop/${p.img}" alt="Panel ${i + 1}: ${p.alt.replace(/"/g, '&quot;')}" width="900" height="1200" loading="lazy" decoding="async">
 <div class="fx" aria-hidden="true">${p.flash ? '<span class="flash"></span>' : ''}${(p.fx || []).map(fxHtml).join('')}</div></div>`).join('')}</div>
-<div class="acts"><button class="btn btn-yellow" type="button" data-share="${s.n}">Share #${s.n}</button><a class="btn btn-ink" href="hotshop/${s.slug}-strip.jpg" download>Save the strip</a></div>
+<div class="acts"><button class="btn btn-yellow" type="button" data-share="${s.n}">Share ${s.label || '#' + s.n}</button><a class="btn btn-ink" href="hotshop/${s.slug}-strip.jpg" download>Save the strip</a></div>
 </div></section>`).join('');
     // motion runs only while a panel is on screen
     const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('live', e.isIntersecting)), { threshold: 0.35 });
@@ -147,8 +165,8 @@ section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333
     const s = ISSUES.find((x) => x.n == b.dataset.share);
     const url = location.origin + location.pathname + '#issue-' + s.n;
     try {
-      if (navigator.share) await navigator.share({ title: 'The Hot Shop #' + s.n + ': ' + s.title, text: '21+ only.', url });
-      else { await navigator.clipboard.writeText(url); b.textContent = 'Link copied'; setTimeout(() => (b.textContent = 'Share #' + s.n), 1800); }
+      if (navigator.share) await navigator.share({ title: 'The Hot Shop ' + (s.label || '#' + s.n) + ': ' + s.title, text: '21+ only.', url });
+      else { await navigator.clipboard.writeText(url); b.textContent = 'Link copied'; setTimeout(() => (b.textContent = 'Share ' + (s.label || '#' + s.n)), 1800); }
     } catch (err) {}
   });
 })();
