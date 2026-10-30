@@ -1,0 +1,52 @@
+/* The alter ego: a calm museum version of the site that tears in over the chaos for a few seconds,
+   then shatters back out. Test pages only (serene/, serene-glass/). See js/serene.js. */
+.sr{--sr-wall:#F5F3EF;--sr-ink:#1D1D1F;--sr-mute:#86868B;--sr-line:#D2D2D7;
+  position:fixed;inset:0;z-index:9000;background:var(--sr-wall);color:var(--sr-ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;font-weight:300;
+  display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;-webkit-font-smoothing:antialiased}
+.sr[hidden]{display:none}
+.sr-top{display:flex;justify-content:space-between;align-items:center;padding:18px clamp(16px,4vw,48px);font-size:13px;letter-spacing:.01em;border-bottom:1px solid var(--sr-line)}
+.sr-brand{font-weight:500;font-size:15px;letter-spacing:.02em}
+.sr-nav{display:flex;gap:clamp(14px,3vw,32px);color:var(--sr-mute)}
+.sr-snd{border:0;background:none;color:var(--sr-mute);font:400 13px Inter,-apple-system,sans-serif;cursor:pointer;padding:8px 0 8px 12px}
+.sr-snd[aria-pressed=false]{text-decoration:line-through}
+.sr-room{position:relative;display:grid;grid-template-columns:1fr minmax(260px,360px);align-items:center;gap:clamp(24px,5vw,80px);padding:clamp(16px,4vw,56px) clamp(16px,6vw,96px);min-height:0}
+/* a soft pool of light from above, then the plinth */
+.sr-exhibit{position:relative;height:100%;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center}
+.sr-exhibit::before{content:"";position:absolute;left:50%;top:-10%;width:min(70%,520px);height:110%;translate:-50% 0;background:radial-gradient(50% 60% at 50% 30%,rgba(255,255,255,.95),rgba(255,255,255,0) 70%);pointer-events:none}
+.sr-piece{position:relative;z-index:1;height:min(56vh,520px);width:auto;max-width:100%;object-fit:contain;filter:drop-shadow(0 18px 22px rgba(0,0,0,.12));transition:opacity 1.2s ease}
+.sr-plinth{position:relative;z-index:0;width:min(46%,300px);height:clamp(40px,7vh,72px);margin-top:-6px;background:linear-gradient(#FFFFFF,#ECEAE5);box-shadow:0 30px 40px -24px rgba(0,0,0,.25)}
+.sr-card{display:grid;gap:10px;align-content:center}
+.sr-kicker{margin:0;font-size:12px;letter-spacing:.08em;color:var(--sr-mute)}
+.sr-name{margin:0;font-size:clamp(30px,3.4vw,48px);font-weight:200;line-height:1.08;letter-spacing:-.015em}
+.sr-meta{margin:0;font-size:15px;color:var(--sr-mute);line-height:1.5}
+.sr-price{margin:6px 0 0;font-size:19px;font-weight:400}
+.sr-buy{justify-self:start;margin-top:8px;display:inline-block;padding:11px 22px;border-radius:980px;background:#0071E3;color:#fff;font-size:15px;font-weight:400;text-decoration:none}
+.sr-buy:hover{background:#0077ED}
+.sr-arrows{display:flex;gap:10px;margin-top:20px}
+.sr-arrows button{width:40px;height:40px;border-radius:50%;border:1px solid var(--sr-line);background:#fff;color:var(--sr-ink);font-size:18px;cursor:pointer}
+.sr-arrows[hidden]{display:none}
+.sr-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px clamp(16px,4vw,48px);border-top:1px solid var(--sr-line);font-size:12px;color:var(--sr-mute)}
+.sr-stay{border:1px solid var(--sr-ink);background:transparent;color:var(--sr-ink);border-radius:980px;padding:9px 16px;font:400 13px Inter,-apple-system,sans-serif;cursor:pointer}
+.sr-stay:hover{background:var(--sr-ink);color:var(--sr-wall)}
+.sr :focus-visible{outline:2px solid #0071E3;outline-offset:3px}
+
+/* the way back out: copies of the calm room, cut into shards or strips, that fly apart */
+.sr-shard{position:fixed;inset:0;z-index:9001;pointer-events:none;will-change:transform,opacity}
+.sr-flash{position:fixed;inset:0;z-index:9002;background:#fff;pointer-events:none}
+
+/* the button that calls it on purpose, on the chaos side */
+.sr-call{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:8999;border:3px solid #0A0A0A;background:#fff;color:#0A0A0A;font:800 14px Montserrat,Arial,sans-serif;padding:10px 14px;cursor:pointer;box-shadow:4px 4px 0 #0A0A0A}
+.sr-call:hover{background:#FFF100}
+/* the chaos side flinches just before the calm one cuts in */
+.sr-jolt{animation:srjolt .22s steps(3) 1}
+@keyframes srjolt{0%{translate:0 0;filter:none}33%{translate:-14px 6px;filter:hue-rotate(90deg) saturate(3)}66%{translate:12px -8px;filter:invert(1)}100%{translate:0 0;filter:none}}
+
+@media (max-width:760px){
+  .sr-room{grid-template-columns:1fr;grid-template-rows:1fr auto;gap:12px;text-align:center}
+  .sr-card{justify-items:center}
+  .sr-buy{justify-self:center}
+  .sr-piece{height:min(42vh,380px)}
+  .sr-nav{display:none}
+  .sr-top{gap:12px}
+  .sr-foot{flex-direction:column}
+}

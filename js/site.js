@@ -22,7 +22,7 @@
     for (let i = 0; i < n; i++) {
       const big = rnd() < 0.18;
       const img = new Image();
-      img.src = 'assets/img/jb-mark.webp';
+      img.src = (document.documentElement.dataset.base || '') + 'assets/img/jb-mark.webp';
       img.alt = '';
       img.decoding = 'async';
       img.loading = 'lazy';

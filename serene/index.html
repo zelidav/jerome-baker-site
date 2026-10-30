@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en" data-base="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jerome Baker. Weird since 1991.</title>
+<meta name="description" content="Hand-made Jerome Baker glass and the streetwear that rides with it. One of one, since 1991.">
+<meta name="theme-color" content="#2A3B8E">
+<meta property="og:title" content="Jerome Baker. Weird since 1991.">
+<meta property="og:description" content="Hand-made glass and streetwear. Start your trip at the Jerome Baker Travel Guide.">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" href="../assets/icons/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+<meta property="og:image" content="https://jeromebaker.cannacrypted.com/assets/icons/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="image" href="../assets/img/box.webp" type="image/webp">
+<link rel="preload" as="image" href="../assets/img/jb-mark.webp" type="image/webp">
+<link rel="preload" as="image" href="../assets/img/glass-sprite.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="stylesheet" href="../css/crew.css">
+<link rel="stylesheet" href="../css/glitch.css">
+<style>
+.ticker{background:var(--yellow);overflow:hidden;border-bottom:3px solid var(--ink)}
+.ticker .marq{padding:8px 0;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.12em;white-space:nowrap}
+.ticker span{padding-right:40px}
+header.top{background:var(--blue);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px;position:sticky;top:0;z-index:60}
+header.top .logo img{width:118px;height:auto;filter:drop-shadow(5px 6px 0 var(--ink));rotate:-4deg}
+nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;align-items:center}
+nav a{color:var(--white);font-weight:700;font-size:14px;text-decoration:none;padding:12px 2px;display:inline-block}
+nav a:hover{color:var(--yellow)}
+nav a.hot{color:var(--yellow)}
+.hero{padding-top:clamp(32px,5vw,72px);padding-bottom:110px;display:flex;flex-wrap:wrap;gap:32px;align-items:center;background:var(--blue)}
+.hero .wash{position:absolute;inset:0;background:var(--blue);mix-blend-mode:multiply;opacity:.78;z-index:0}
+.hero .dots{position:absolute;inset:0;z-index:0}
+.hero-copy{flex:1 1 520px;min-width:0;position:relative;z-index:2}
+.ransom{margin:0;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;font-family:var(--display);font-weight:900;font-size:clamp(48px,7.4vw,118px);line-height:.92;letter-spacing:-.02em}
+.ransom span{padding:4px 16px}
+.lede{margin:36px 0 0;max-width:46ch;color:var(--white);font-size:18px;line-height:1.5}
+.ctas{display:flex;flex-wrap:wrap;gap:16px;margin-top:28px}
+.collage{flex:1 1 520px;min-width:0;height:720px;position:relative;z-index:2}
+.collage .gl{position:absolute;filter:drop-shadow(10px 14px 0 rgba(10,10,10,.6))}
+.redband{background:var(--red);transform:rotate(-2deg);margin:-40px -20px 0;position:relative;z-index:5;overflow:hidden;border-top:4px solid var(--ink);border-bottom:4px solid var(--ink)}
+.redband .marq{padding:14px 0;font-family:var(--display);font-weight:900;font-size:clamp(28px,4vw,52px);color:var(--white);white-space:nowrap}
+.redband span{padding-right:48px}
+.wall{height:780px}
+.wall-title{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%) rotate(-4deg);z-index:6;display:flex;flex-direction:column;align-items:center;gap:8px;width:max-content;max-width:92vw}
+.wall-title span{font-family:var(--display);font-weight:900;line-height:.9;padding:6px 22px}
+section.glass{background-color:var(--gray);padding-top:96px;padding-bottom:112px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:48px}
+.sec-head h2{margin:0;font-size:clamp(56px,9vw,140px);line-height:.85;letter-spacing:-.03em;color:var(--blue);rotate:-2deg}
+.cards{display:flex;flex-wrap:wrap;gap:28px}
+.card{flex:1 1 280px;min-width:0;background:var(--bg);rotate:var(--tilt);border:3px solid var(--ink);box-shadow:10px 10px 0 var(--ink);padding:20px;display:flex;flex-direction:column;gap:14px}
+.card-img{height:380px;display:flex;align-items:center;justify-content:center;position:relative}
+.card-img .gl{height:100%;filter:drop-shadow(6px 8px 0 rgba(10,10,10,.35))}
+.card-mark{left:-36px;top:-40px;width:120px;rotate:-14deg;z-index:2}
+.oneofone{position:absolute;right:0;top:0;background:var(--ink);color:var(--yellow);font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.18em;padding:6px 8px}
+.card-body{background:var(--white);border:2px solid var(--ink);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card-body h3{margin:0;font-family:var(--display);font-weight:400;font-size:18px;line-height:25px}
+.price{margin:2px 0 0;font-weight:800;font-size:20px;color:var(--blue)}
+.card-body .btn{font-size:16px;padding:0 16px;box-shadow:none;min-height:44px}
+section.wear{background:var(--yellow);padding-top:96px;padding-bottom:96px;border-top:4px solid var(--ink);border-bottom:4px solid var(--ink)}
+.wear-grid{display:flex;flex-wrap:wrap;gap:56px;align-items:center}
+.wear-art{flex:1 1 420px;min-width:0;position:relative;padding:24px}
+.wear-art .panel{width:100%;aspect-ratio:1/1;border:10px solid var(--white);box-shadow:14px 14px 0 var(--ink);rotate:4deg;overflow:hidden}
+.wear-copy{flex:1 1 520px;min-width:0}
+.wear-copy h2{margin:0 0 8px;font-size:clamp(48px,7vw,104px);line-height:.88;letter-spacing:-.03em}
+.toc{list-style:none;margin:0;padding:0}
+.toc li{display:flex;align-items:baseline;gap:12px;padding:10px 0;border-bottom:3px dotted var(--ink)}
+.toc .n{font-family:var(--display);font-weight:900;font-size:28px;color:var(--blue);width:40px}
+.toc .name{flex:1;font-weight:700;font-size:18px;line-height:25px}
+.toc .pr{font-weight:800;font-size:20px}
+.story{list-style:none;margin:36px 0 0;padding:0;max-width:56ch;display:flex;flex-direction:column;gap:14px}
+.story li{display:flex;gap:16px;align-items:baseline;border-left:4px solid #FFF100;padding-left:14px}
+.story b{font-family:var(--display);font-weight:900;font-size:20px;color:#FFF100;min-width:5.5em}
+.story span{font-size:17px;line-height:1.5;color:#F1F1F1}
+.story .hit{border-color:#DA2342}
+.story .hit b{color:#DA2342}
+.tt-copy{max-width:760px;display:flex;flex-direction:column;align-items:flex-start;min-height:300px;justify-content:center}
+.tt-eyebrow{font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.18em;color:#FFF100}
+.tt-stage{display:block;margin-top:10px;font-size:clamp(34px,5.4vw,76px);line-height:.98;min-height:2em}
+.tt-stage .ch{display:inline-block;transition:opacity .7s ease,filter .7s ease,translate .9s ease,rotate .9s ease,color 1s}
+.tt-stage .ch.pre{opacity:0;filter:blur(10px);translate:0 30px}
+.tt-stage .ch.out{opacity:0;filter:blur(8px);translate:var(--dx) var(--dy);rotate:var(--rr)}
+.tt-sub{margin-top:12px;max-width:52ch;font-size:17px;line-height:1.5;color:#F1F1F1;transition:opacity .8s}
+.trip-teaser.tripping{animation:ttHue 12s linear infinite}
+@keyframes ttHue{to{filter:hue-rotate(360deg)}}
+.trip-teaser.tripping .disc{animation-duration:4s}
+section.made{background:var(--ink);color:var(--white);padding-top:112px;padding-bottom:112px}
+.made-grid{display:flex;flex-wrap:wrap-reverse;gap:56px;align-items:center}
+.made-grid h2{margin:0;font-size:clamp(48px,7vw,104px);line-height:.88;letter-spacing:-.03em}
+.made-grid figure{flex:1 1 420px;min-width:0;margin:0 0 60px;position:relative}
+.trip-teaser{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:40px;padding-top:96px;padding-bottom:96px;background:var(--blue);color:var(--white);border-top:4px solid var(--yellow);overflow:hidden}
+.trip-teaser .disc{width:220px;height:220px;border-radius:50%;overflow:hidden;border:6px solid var(--yellow);flex:none}
+.trip-teaser .disc img{width:100%;height:100%;object-fit:cover}
+@media (max-width:720px){.collage{height:520px}.wall{height:900px}header.top{position:relative}}
+</style>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/serene.css">
+</head>
+<body data-glitch="hello">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page" id="page">
+<div class="ticker" aria-hidden="true"><div class="marq"><span>HAND MADE ✱ ONE OF ONE ✱ FUMED ✱ WIG-WAG ✱ DICHROIC ✱ RETICELLO ✱ EST. 1991 ✱ JB ✱ </span><span>HAND MADE ✱ ONE OF ONE ✱ FUMED ✱ WIG-WAG ✱ DICHROIC ✱ RETICELLO ✱ EST. 1991 ✱ JB ✱ </span></div></div>
+
+<header class="top pad">
+<a class="logo" href="#top" aria-label="Jerome Baker, back to top"><img src="../assets/img/jb-mark.webp" alt="Jerome Baker" width="118" height="91"></a>
+<nav aria-label="Main"><ul>
+<li><a href="../glass/">Glass</a></li>
+<li><a href="../shop/">Ritual merch</a></li>
+<li><a href="#crew">The JB Crew</a></li>
+<li><a href="../crew/match/">Find your crew</a></li>
+<li><a href="../comics/">The Hot Shop</a></li>
+<li><a href="#made">The story</a></li>
+<li><a class="hot" href="../travel/">Travel guide</a></li>
+<li><a class="btn btn-red" href="../shop/" style="font-size:16px;min-height:44px;padding:0 18px;color:#fff">Shop merch</a></li>
+</ul></nav>
+</header>
+
+<main id="main">
+<section id="top" class="hero boxbg pad">
+<div class="wash" aria-hidden="true"></div><div class="dots" aria-hidden="true"></div>
+<div class="hero-copy">
+<h1 class="ransom">
+<span style="background:#FFF100;color:#0A0A0A;rotate:-3deg">Blown</span>
+<span style="background:#FFFFFF;color:#2A3B8E;rotate:2deg;font-style:italic">in the</span>
+<span style="background:#DA2342;color:#FFFFFF;rotate:-1deg">back room.</span>
+<span style="background:#0A0A0A;color:#FFF100;rotate:3deg;text-decoration:line-through;text-decoration-color:#DA2342;text-decoration-thickness:10px">Raided.</span>
+<span style="background:#FFFFFF;color:#0A0A0A;rotate:-4deg">Still</span>
+<span style="background:#FFF100;color:#DA2342;rotate:2deg">here.</span>
+</h1>
+<p class="lede">Hand-made Jerome Baker glass and the streetwear that rides with it. One of one pieces, pulled by hand since 1991. When a piece is gone, it's gone.</p>
+<div class="ctas"><a class="btn btn-red" href="../glass/">Shop the glass</a><a class="btn btn-yellow" href="../travel/">Start your trip here</a></div>
+</div>
+<div class="collage" aria-hidden="true">
+<img class="mark bob2" src="../assets/img/jb-mark.webp" alt="" style="left:-4%;top:26%;width:108%;rotate:-8deg;z-index:2;filter:drop-shadow(12px 14px 0 #0A0A0A)" width="520" height="401">
+<span class="sticker st s-reefer round" style="left:0;top:0;rotate:-10deg;z-index:1"></span>
+<img class="sticker" src="../assets/cut/lion.webp" alt="" style="right:0;top:0;width:210px;rotate:7deg;z-index:3" loading="eager">
+<span class="sticker st s-cobra" style="right:2%;top:36%;rotate:-6deg;z-index:1"></span>
+<span class="sticker st s-devil" style="left:6%;top:46%;rotate:5deg;z-index:1"></span>
+<span class="sticker st s-alien jig" style="right:12%;bottom:0;z-index:5"></span>
+<span class="sticker st s-swirl round spin" style="left:40%;top:6%;z-index:6"></span>
+<span class="sticker st s-jbd" style="left:0;bottom:2%;rotate:-12deg;z-index:6"></span>
+<div class="gl bob" style="left:14%;top:8%;height:88%;background-position:0.000% 0;rotate:-14deg;z-index:4"></div>
+<div class="gl bob" style="left:62%;top:14%;height:80%;background-position:9.091% 0;rotate:16deg;z-index:3"></div>
+<div class="gl bob2" style="left:38%;top:0;height:96%;background-position:18.182% 0;rotate:6deg;z-index:4"></div>
+<div class="star spin" style="position:absolute;left:33%;bottom:6%;width:140px;height:140px;background:#FFF100;z-index:7"></div>
+<div class="display" style="position:absolute;left:33%;bottom:6%;width:140px;height:140px;display:flex;align-items:center;justify-content:center;z-index:8;font-size:24px;line-height:.9;text-align:center;color:#DA2342;rotate:-12deg">1 OF<br>1</div>
+</div>
+</section>
+
+<div class="redband" aria-hidden="true"><div class="marq rev"><span>NO RESTOCKS ✱ NO REPEATS ✱ NO TWO ALIKE ✱ FORGED IN RITUAL ✱ </span><span>NO RESTOCKS ✱ NO REPEATS ✱ NO TWO ALIKE ✱ FORGED IN RITUAL ✱ </span></div></div>
+
+<section class="wall boxbg" aria-label="Sticker wall" style="position:relative;overflow:hidden;border-bottom:4px solid #0A0A0A">
+<span class="sticker st s-burning" style="left:2%;top:7%;rotate:-6deg"></span>
+<span class="sticker st s-gorilla" style="left:30%;top:3%;rotate:4deg"></span>
+<span class="sticker st s-turtle round" style="left:54%;top:9%;rotate:-3deg;z-index:2"></span>
+<img class="mark" src="../assets/crew/shark_m.webp" alt="" loading="lazy" decoding="async" style="right:3%;top:3%;width:210px;rotate:6deg;filter:drop-shadow(7px 9px 0 rgba(10,10,10,.65))">
+<span class="sticker st s-pumpkin" style="left:4%;top:46%;rotate:5deg"></span>
+<img class="mark jig" src="../assets/crew/octo_m.webp" alt="" loading="lazy" decoding="async" style="left:22%;top:38%;width:170px;rotate:-8deg;z-index:3;filter:drop-shadow(7px 9px 0 rgba(10,10,10,.65))">
+<span class="sticker st s-adults" style="left:22%;bottom:6%;rotate:-7deg;z-index:3"></span>
+<span class="sticker st s-rose round jig" style="left:44%;bottom:4%;z-index:3"></span>
+<span class="sticker st s-lips" style="right:26%;bottom:8%;rotate:9deg;z-index:2"></span>
+<img class="mark" src="../assets/crew/chimp_m.webp" alt="" loading="lazy" decoding="async" style="right:2%;bottom:3%;width:200px;rotate:-5deg;z-index:1;filter:drop-shadow(7px 9px 0 rgba(10,10,10,.65))">
+<span class="sticker st s-enjoy" style="right:30%;top:40%;rotate:-14deg;z-index:4"></span>
+<span class="sticker st s-narcotics" style="left:-2%;top:39%;rotate:3deg;z-index:4"></span>
+<span class="sticker wt w-keyhole jig" style="left:76%;top:30%;rotate:-8deg;z-index:5"></span>
+<span class="sticker wt w-teeth" style="left:13%;top:2%;rotate:-3deg;z-index:1"></span>
+<span class="sticker wt w-opart round spin" style="left:63%;top:58%;z-index:4"></span>
+<span class="sticker wt w-see" style="left:36%;top:34%;rotate:10deg;z-index:5"></span>
+<img class="sticker" src="../assets/cut/mind.webp" alt="" loading="lazy" decoding="async" style="left:68%;top:4%;width:120px;rotate:8deg;z-index:3">
+<img class="mark jig" src="../assets/img/jb-mark.webp" alt="" style="left:1%;bottom:3%;width:300px;z-index:5" width="300" height="231">
+<div class="wall-title"><span style="background:#0A0A0A;color:#FFF100;font-size:clamp(48px,8vw,120px)">Weird</span><span style="background:#DA2342;color:#FFFFFF;font-size:clamp(36px,6vw,88px);rotate:5deg">since 1991.</span></div>
+</section>
+
+<section id="glass" class="glass dots-ink pad">
+<div class="wrap">
+<div class="sec-head"><h2 class="display">The glass<br><span style="background:#FFF100;color:#0A0A0A;padding:0 12px">wall</span></h2>
+<img class="bob" src="../assets/img/jb-mark.webp" alt="" aria-hidden="true" style="width:220px;rotate:10deg;filter:drop-shadow(8px 10px 0 #0A0A0A)" width="220" height="170" loading="lazy">
+<p style="margin:0;max-width:34ch;font-size:16px;line-height:1.5">Straight from the Jerome Baker archive. Color tubes, fumed bulbs, wig-wag crowns, critters at the joint. Each one is the only one.</p></div>
+<div class="cards">
+<article class="card" style="--bg:#FFF100;--tilt:-2deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Agent Orange, hand-made Jerome Baker glass" style="background-position:0.000% 0;rotate:-6deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Agent Orange</h3><p class="price">$25,000</p></div><a class="btn btn-red" href="../glass/#p=JBD-7F9BF1B7B45F">See it</a></div>
+</article>
+<article class="card" style="--bg:#2A3B8E;--tilt:1.5deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Baker, hand-made Jerome Baker glass" style="background-position:9.091% 0;rotate:4deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Baker</h3><p class="price">$25,000</p></div><a class="btn btn-red" href="../glass/#p=JBD-595E91DF67DE">See it</a></div>
+</article>
+<article class="card" style="--bg:#DA2342;--tilt:-1deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="The Alien, hand-made Jerome Baker glass" style="background-position:18.182% 0;rotate:-3deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>The Alien</h3><p class="price">$40,000</p></div><a class="btn btn-red" href="../glass/#p=JBD-30A28BA0570D">See it</a></div>
+</article>
+<article class="card" style="--bg:#FFFFFF;--tilt:2.5deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Mellow Yellow, hand-made Jerome Baker glass" style="background-position:27.273% 0;rotate:7deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Mellow Yellow</h3><p class="price">$25,000</p></div><a class="btn btn-red" href="../glass/#p=JBD-5261B7223810">See it</a></div>
+</article>
+<article class="card" style="--bg:#05B48F;--tilt:-2.5deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Ol' Blue Eyes, hand-made Jerome Baker glass" style="background-position:36.364% 0;rotate:-5deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Ol' Blue Eyes</h3><p class="price">$750</p></div><a class="btn btn-red" href="../glass/#p=JBD-A3185688FDEB">See it</a></div>
+</article>
+<article class="card" style="--bg:#FDB514;--tilt:1deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Knuckle Sandwich, hand-made Jerome Baker glass" style="background-position:45.455% 0;rotate:3deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Knuckle Sandwich</h3><p class="price">$750</p></div><a class="btn btn-red" href="../glass/#p=JBD-D292E97DB854">See it</a></div>
+</article>
+<article class="card" style="--bg:#FFF100;--tilt:-2deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="The Chong Bong, hand-made Jerome Baker glass" style="background-position:54.545% 0;rotate:-6deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>The Chong Bong</h3><p class="price">In a collection</p></div><a class="btn btn-red" href="../glass/#p=JBD-75701CAB2CAE">See it</a></div>
+</article>
+<article class="card" style="--bg:#2A3B8E;--tilt:1.5deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Woodstock, hand-made Jerome Baker glass" style="background-position:63.636% 0;rotate:4deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Woodstock</h3><p class="price">$550</p></div><a class="btn btn-red" href="../glass/#p=JBD-BBEF8E9E848B">See it</a></div>
+</article>
+<article class="card" style="--bg:#DA2342;--tilt:-1deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Flecko the Gecko, hand-made Jerome Baker glass" style="background-position:72.727% 0;rotate:-3deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Flecko the Gecko</h3><p class="price">$550</p></div><a class="btn btn-red" href="../glass/#p=JBD-C03E08E3D935">See it</a></div>
+</article>
+<article class="card" style="--bg:#FFFFFF;--tilt:2.5deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Coney Island, hand-made Jerome Baker glass" style="background-position:81.818% 0;rotate:7deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Coney Island</h3><p class="price">$550</p></div><a class="btn btn-red" href="../glass/#p=JBD-3B07BA3340B4">See it</a></div>
+</article>
+<article class="card" style="--bg:#05B48F;--tilt:-2.5deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Lazarus, hand-made Jerome Baker glass" style="background-position:90.909% 0;rotate:-5deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Lazarus</h3><p class="price">$45</p></div><a class="btn btn-red" href="../glass/#p=JBD-87441F985788">See it</a></div>
+</article>
+<article class="card" style="--bg:#FDB514;--tilt:1deg">
+<div class="card-img"><img class="mark card-mark" src="../assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Nirvana, hand-made Jerome Baker glass" style="background-position:100.000% 0;rotate:3deg"></div><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Nirvana</h3><p class="price">$45</p></div><a class="btn btn-red" href="../glass/#p=JBD-5FBD54A2A4F6">See it</a></div>
+</article>
+</div>
+</div>
+</section>
+
+<div class="strip torn boxbg" aria-hidden="true" style="rotate:1.5deg"></div>
+
+<section id="crew" class="crew pad">
+<div class="wrap">
+<h2 class="display">The JB<br><span style="color:#FFF100">Crew.</span></h2>
+<p class="lede">They came off the booth wall, the box art and the old posters. Then they got dressed in real JB merch and started doing whatever they want. Some of them are floating around this page right now. Grab one and throw it. Tap one to say hi.</p>
+<div class="pinboard"><!-- CREW --><a class="pin" href="../crew/torch/" style="--tilt:-3deg"><img src="../assets/crew/lion_m.webp" alt="Torch, Pulling a glass bubble off a blowpipe. On a skateboard." loading="lazy" decoding="async"><span class="tape">Torch<small>The lion on the torch</small></span></a><a class="pin" href="../crew/major-tom-tom/" style="--tilt:2deg"><img src="../assets/crew/chimp_m.webp" alt="Major Tom-Tom, Juggling high tops upside down in zero gravity." loading="lazy" decoding="async"><span class="tape">Major Tom-Tom<small>Astronaut, retired, still floating</small></span></a><a class="pin" href="../crew/chomps/" style="--tilt:-1deg"><img src="../assets/crew/shark_m.webp" alt="Chomps, Kickflipping in high tops on two small legs he grew out of spite." loading="lazy" decoding="async"><span class="tape">Chomps<small>Kickflips, bites things</small></span></a><a class="pin" href="../crew/enlightened-ed/" style="--tilt:3deg"><img src="../assets/crew/octo_m.webp" alt="Enlightened Ed, Dancing at the beach, yelling ENLIGHTEN ALL HUMANS." loading="lazy" decoding="async"><span class="tape">Enlightened Ed<small>Eight arms, four flip-flops</small></span></a><a class="pin" href="../crew/baker-bot/" style="--tilt:-2deg"><img src="../assets/crew/bot_m.webp" alt="Baker Bot, DJing on two turntables, antenna sparking." loading="lazy" decoding="async"><span class="tape">Baker Bot<small>DJ, one of one sets only</small></span></a><a class="pin" href="../crew/honey-pot/" style="--tilt:1.5deg"><img src="../assets/crew/bear_m.webp" alt="Honey Pot, Flipping honeycomb on a tiny grill. Do not talk to him while he flips." loading="lazy" decoding="async"><span class="tape">Honey Pot<small>Grillmaster, very serious about it</small></span></a><a class="pin" href="../crew/two-can/" style="--tilt:-3deg"><img src="../assets/crew/toucan_m.webp" alt="Two-Can, Riding a single giant high top like a skateboard." loading="lazy" decoding="async"><span class="tape">Two-Can<small>Rides one shoe</small></span></a><a class="pin" href="../crew/crude/" style="--tilt:2deg"><img src="../assets/crew/crude_m.webp" alt="Crude, Surfing a wave of black oil in board shorts." loading="lazy" decoding="async"><span class="tape">Crude<small>Robot, needs oil, surfs it</small></span></a><a class="pin" href="../crew/gray/" style="--tilt:-1deg"><img src="../assets/crew/alien_m.webp" alt="Gray, Beaming up a cow with a tiny saucer, sipping a juice box." loading="lazy" decoding="async"><span class="tape">Gray<small>Abducts cows, drinks juice boxes</small></span></a><a class="pin" href="../crew/mama-cobra/" style="--tilt:3deg"><img src="../assets/crew/cobra_m.webp" alt="Mama Cobra, Playing the flute to charm a garden hose." loading="lazy" decoding="async"><span class="tape">Mama Cobra<small>Snake charmer, reversed</small></span></a><a class="pin" href="../crew/lil-lucky/" style="--tilt:-2deg"><img src="../assets/crew/devil_m.webp" alt="Lil&#x27; Lucky, Scooping ice cream with a pitchfork. Melting." loading="lazy" decoding="async"><span class="tape">Lil&#x27; Lucky<small>Runs an ice cream cart in a hot place</small></span></a><a class="pin" href="../crew/public-enemy/" style="--tilt:1.5deg"><img src="../assets/crew/gorilla_m.webp" alt="Public Enemy No. 1, Very carefully embroidering a tiny heart." loading="lazy" decoding="async"><span class="tape">Public Enemy No. 1<small>Wanted poster, retired</small></span></a><a class="pin" href="../crew/jack/" style="--tilt:-3deg"><img src="../assets/crew/pumpkin_m.webp" alt="Jack, Carving a face into a watermelon. Feels right about it." loading="lazy" decoding="async"><span class="tape">Jack<small>Carves watermelons</small></span></a><a class="pin" href="../crew/dillo/" style="--tilt:2deg"><img src="../assets/crew/dillo_m.webp" alt="Dillo, Rolling down a bowling lane in a crop top." loading="lazy" decoding="async"><span class="tape">Dillo<small>Bowls with himself</small></span></a><a class="pin" href="../crew/shellby/" style="--tilt:-1deg"><img src="../assets/crew/turtle_m.webp" alt="Shellby, Sprinting in four high tops. Speed lines included." loading="lazy" decoding="async"><span class="tape">Shellby<small>Fastest turtle in glass</small></span></a><a class="pin" href="../crew/cy/" style="--tilt:3deg"><img src="../assets/crew/cy_m.webp" alt="Cy, Reading an eye chart through a magnifying glass." loading="lazy" decoding="async"><span class="tape">Cy<small>Eye doctor, one eye</small></span></a><a class="pin" href="../crew/the-spinners/" style="--tilt:-2deg"><img src="../assets/crew/spinners_m.webp" alt="The Spinners, Swaying like a doo-wop group. Eyes spinning." loading="lazy" decoding="async"><span class="tape">The Spinners<small>Three heads, one harmony</small></span></a><a class="pin" href="../crew/peeper/" style="--tilt:1.5deg"><img src="../assets/crew/peeper_m.webp" alt="Peeper, Climbing out of a porthole to read the paper." loading="lazy" decoding="async"><span class="tape">Peeper<small>Lives in a porthole</small></span></a><a class="pin" href="../crew/mr-x/" style="--tilt:-3deg"><img src="../assets/crew/mrx_m.webp" alt="Mr. X, Tree pose on a mushroom. Very centered." loading="lazy" decoding="async"><span class="tape">Mr. X<small>The mark, on a mushroom</small></span></a><a class="pin" href="../crew/the-grin/" style="--tilt:2deg"><img src="../assets/crew/grin_m.webp" alt="The Grin, Brushing its own teeth with a huge toothbrush." loading="lazy" decoding="async"><span class="tape">The Grin<small>All teeth, all the time</small></span></a><!-- /CREW --></div>
+<p style="margin:48px 0 0;display:flex;flex-wrap:wrap;gap:18px 22px;justify-content:center"><a class="btn btn-yellow" href="../crew/">Meet the whole crew</a><a class="btn btn-red" href="../crew/match/">Find your crew</a></p>
+</div>
+</section>
+
+<div class="strip torn boxbg" aria-hidden="true" style="rotate:-1deg"></div>
+
+<section id="wear" class="wear pad">
+<div class="wrap">
+<div class="sec-head">
+<h2 class="display" style="color:#0A0A0A">Wear the<br><span style="color:#DA2342;font-style:italic">ritual.</span></h2>
+<img class="bob" src="../assets/crew/bot_m.webp" alt="" aria-hidden="true" style="width:200px;rotate:6deg" width="200" height="250" loading="lazy">
+<p style="margin:0;max-width:36ch;font-size:16px;line-height:1.5">Real gear, shipping now. Signature script hoodies and tees, Crossed Bongs polos, and the NY Drop 1 pop art on high tops, buckets, flip flops and board shorts. The sticker on each one is the crew member who wears it best.</p>
+</div>
+<div class="merch-grid"><!-- SHOP --><a class="mcard" href="../shop/#p=unisex-midweight-hoodie" style="--bg:#FFF100;--tilt:-3deg"><img class="worn" src="../assets/crew/lion_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/824.webp" alt="Signature hoodie, green script" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Signature hoodie, green script</h3><span class="go">SHOP IT →</span></span><span class="pr">$53</span></span></a><a class="mcard" href="../shop/#p=unisex-midweight-hoodie-2" style="--bg:#FFFFFF;--tilt:2deg"><img class="worn" src="../assets/crew/gorilla_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/852.webp" alt="Signature hoodie, sleeve hit" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Signature hoodie, sleeve hit</h3><span class="go">SHOP IT →</span></span><span class="pr">$53</span></span></a><a class="mcard" href="../shop/#p=classic-tee-ny-drop-1-indica-style" style="--bg:#05B48F;--tilt:-1deg"><img class="worn" src="../assets/crew/bot_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/7622.webp" alt="NY Drop 1 classic tee, Indica" loading="lazy" decoding="async"></span><span class="meta"><span><h3>NY Drop 1 classic tee, Indica</h3><span class="go">SHOP IT →</span></span><span class="pr">$35</span></span></a><a class="mcard" href="../shop/#p=jerome-baker-indica-inline-logo" style="--bg:#FDB514;--tilt:3deg"><img class="worn" src="../assets/crew/cy_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/1070.webp" alt="Signature tee, red script" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Signature tee, red script</h3><span class="go">SHOP IT →</span></span><span class="pr">$35</span></span></a><a class="mcard" href="../shop/#p=indica-bong-polo" style="--bg:#F1F1F1;--tilt:-2deg"><img class="worn" src="../assets/crew/bear_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/672.webp" alt="Crossed Bongs polo, red" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Crossed Bongs polo, red</h3><span class="go">SHOP IT →</span></span><span class="pr">$61</span></span></a><a class="mcard" href="../shop/#p=bucket-hat-4" style="--bg:#DA2342;--tilt:1.5deg"><img class="worn" src="../assets/crew/bear_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/1310.webp" alt="Signature bucket hat, red" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Signature bucket hat, red</h3><span class="go">SHOP IT →</span></span><span class="pr">$39</span></span></a><a class="mcard" href="../shop/#p=reversible-bucket-hat-ny-drop-1-sativa-style-graphic" style="--bg:#FFF100;--tilt:-3deg"><img class="worn" src="../assets/crew/chimp_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/7426.webp" alt="Pop-art reversible bucket, Sativa" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Pop-art reversible bucket, Sativa</h3><span class="go">SHOP IT →</span></span><span class="pr">$43</span></span></a><a class="mcard" href="../shop/#p=hat-hybrid" style="--bg:#FFFFFF;--tilt:2deg"><img class="worn" src="../assets/crew/toucan_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/6752.webp" alt="All-over snapback, Hybrid" loading="lazy" decoding="async"></span><span class="meta"><span><h3>All-over snapback, Hybrid</h3><span class="go">SHOP IT →</span></span><span class="pr">$50</span></span></a><a class="mcard" href="../shop/#p=jb-sativa-mens-high-top-canvas-shoes-pop-art" style="--bg:#05B48F;--tilt:-1deg"><img class="worn" src="../assets/crew/chimp_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/252.webp" alt="Men&#x27;s pop-art high top, Sativa" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Men&#x27;s pop-art high top, Sativa</h3><span class="go">SHOP IT →</span></span><span class="pr">$89</span></span></a><a class="mcard" href="../shop/#p=jb-sativa-womens-high-top-canvas-shoes-pop-art" style="--bg:#FDB514;--tilt:3deg"><img class="worn" src="../assets/crew/turtle_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/272.webp" alt="Women&#x27;s pop-art high top, Sativa" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Women&#x27;s pop-art high top, Sativa</h3><span class="go">SHOP IT →</span></span><span class="pr">$89</span></span></a><a class="mcard" href="../shop/#p=jb-sativa-flip-flops-pop-art" style="--bg:#F1F1F1;--tilt:-2deg"><img class="worn" src="../assets/crew/octo_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/667.webp" alt="Pop-art flip flops, Sativa" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Pop-art flip flops, Sativa</h3><span class="go">SHOP IT →</span></span><span class="pr">$29</span></span></a><a class="mcard" href="../shop/#p=backpack-5" style="--bg:#DA2342;--tilt:1.5deg"><img class="worn" src="../assets/crew/bot_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/1302.webp" alt="Luchador backpack, Hybrid" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Luchador backpack, Hybrid</h3><span class="go">SHOP IT →</span></span><span class="pr">$69</span></span></a><a class="mcard" href="../shop/#p=mens-board-shorts-ny-drop-1-sativa-style-graphic" style="--bg:#FFF100;--tilt:-3deg"><img class="worn" src="../assets/crew/crude_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/7220.webp" alt="Pop-art board shorts, Sativa" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Pop-art board shorts, Sativa</h3><span class="go">SHOP IT →</span></span><span class="pr">$92</span></span></a><a class="mcard" href="../shop/#p=cotton-crop-top-ny-drop-1-sativa-style-graphic" style="--bg:#FFFFFF;--tilt:2deg"><img class="worn" src="../assets/crew/dillo_s.webp" alt="" loading="lazy"><span class="pic"><img src="../assets/merch/7354.webp" alt="Pop-art crop top, Sativa" loading="lazy" decoding="async"></span><span class="meta"><span><h3>Pop-art crop top, Sativa</h3><span class="go">SHOP IT →</span></span><span class="pr">$22</span></span></a><!-- /SHOP --></div>
+<p style="margin:44px 0 0"><a class="btn btn-ink" href="../shop/">Shop all Ritual Merch</a></p>
+</div>
+</section>
+
+<div class="strip torn boxbg" aria-hidden="true" style="rotate:1deg"></div>
+
+<section id="made" class="made pad">
+<div class="wrap made-grid">
+<div style="flex:1 1 480px;min-width:0">
+<h2 class="display">A rod of glass.<br><span style="color:#FFF100">A torch.</span><br><span style="background:#DA2342;padding:0 12px">No molds.</span></h2>
+<ol class="story">
+<li><b>1989</b><span>A parking lot outside a Dead show. A pipe that changed color the more it got used. A kid who had to know how.</span></li>
+<li><b>1991</b><span>Eugene, Oregon. A garage, a torch, and the guy who invented fuming down the street. Jerome Baker starts here.</span></li>
+<li><b>1995</b><span>Jerome Baker Designs goes official. The Mothership takes off: orb base, long neck, frogs and dragonflies at the joint.</span></li>
+<li><b>1999</b><span>Seventy glassblowers on two shifts. The biggest smokeware shop on the planet, and five Cannabis Cups on the shelf.</span></li>
+<li class="hit"><b>Feb 24, 2003</b><span>6 a.m. The feds come through every door at once. Operation Pipe Dreams. The website gets seized. The torches go out the back to a barn.</span></li>
+<li><b>After</b><span>Teaching. Blowing glass. Keeping the flame lit in somebody else's studio.</span></li>
+<li><b>2026</b><span>New York. Same torch, same weird. The crew came too.</span></li>
+</ol>
+</div>
+<figure>
+<img src="../assets/img/booth-side.webp" alt="The Jerome Baker booth wall: the lion on the torch in the window, a wanted poster, Baker Bots and the hypno heads on barn wood" width="1800" height="1279" loading="lazy" decoding="async" style="width:100%;height:auto;border:10px solid #fff;rotate:-2deg;box-shadow:14px 14px 0 #2A3B8E">
+<img src="../assets/img/glassblower.webp" alt="Live glassblowing at a Jerome Baker event" width="800" height="1067" loading="lazy" decoding="async" style="position:absolute;right:-10px;bottom:-60px;width:38%;height:auto;border:8px solid #fff;rotate:5deg;box-shadow:10px 10px 0 #DA2342">
+<figcaption style="position:absolute;left:-8px;top:-18px;background:#FFF100;color:#0A0A0A;font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.16em;padding:8px 12px;rotate:-4deg">STILL ON THE TORCH</figcaption>
+</figure>
+</div>
+</section>
+
+<section class="trip-teaser pad" id="trip" aria-label="The Jerome Baker Travel Guide">
+<span class="disc spin" aria-hidden="true"><img src="../assets/img/kaleido-b.webp" alt="" width="442" height="442" loading="lazy"></span>
+<span class="tt-copy">
+<span class="tt-eyebrow">THE JEROME BAKER TRAVEL GUIDE</span>
+<span class="tt-stage display" id="tt" aria-live="polite">Start your trip here.</span>
+<span class="tt-sub" id="tt-sub">A trip companion for when you're tripping. Put it on the biggest screen you have, go full screen, lie back.</span>
+<a class="btn btn-yellow" href="../travel/" style="margin-top:22px">Start your trip here</a>
+</span>
+</section>
+</main>
+
+<div class="strip torn boxbg" aria-hidden="true" style="rotate:-1deg"></div>
+
+<!-- FOOT --><footer class="site-foot pad"><div class="sf-cols"><img src="../assets/cut/tealjbd.webp" alt="JBD" width="200" height="122" loading="lazy" class="sf-mark"><div><b>Say hi</b><a href="mailto:info@jeromebakerny.com">info@jeromebakerny.com</a><b>Wholesale</b><a href="mailto:sales@jeromebakerny.com">sales@jeromebakerny.com</a></div><div><b>Explore</b><ul><li><a href="../glass/">Glass</a></li><li><a href="../shop/">Ritual merch</a></li><li><a href="../crew/">The JB Crew</a></li><li><a href="../crew/match/">Find your crew</a></li><li><a href="../comics/">The Hot Shop</a></li><li><a href="#made">The story</a></li><li><a href="../travel/">Travel guide</a></li></ul></div><div><b>Follow</b><a href="https://www.instagram.com/jerome_baker" target="_blank" rel="noopener">@jerome_baker</a><b>Find the glass</b><a href="https://jeromebaker.com/" target="_blank" rel="noopener">jeromebaker.com</a><b>Shop merch</b><a href="../shop/">Ritual merch</a></div></div><p class="sf-legal">© 2026 Jerome Baker Designs. Adults 21+ only. Glass ships from the studio with its provenance record. Streetwear ships from Ritual Merch.</p></footer><!-- /FOOT -->
+<div class="watermark" aria-hidden="true" id="wm"></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="../js/crew-data.js"></script>
+<script src="../js/crew.js" defer></script>
+<script src="../js/site.js" defer></script>
+<script src="../js/glitch.js" defer></script>
+<script src="../js/glass-data.js"></script>
+<script src="../js/serene.js" defer></script>
+</body>
+</html>
