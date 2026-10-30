@@ -70,8 +70,16 @@
   }
   window.JBReal = { now };
 
+  // on a character's own page their hero turns real 2-3 seconds after you land
+  const crewPage = /\/crew\/(?!match\/)[a-z0-9-]+\/?$/.test(location.pathname);
+  if (crewPage) {
+    setTimeout(() => {
+      const hero = [...document.querySelectorAll('.cp-hero img')].find((i) => who(i) && onScreen(i));
+      if (hero && !busy) morph(hero);
+    }, rand(2000, 3000));
+  }
   // the first one within a few seconds of landing, then every 20-40 seconds
-  let next = performance.now() + rand(6000, 12000);
+  let next = performance.now() + (crewPage ? rand(14000, 22000) : rand(6000, 12000));
   setInterval(() => {
     if (document.hidden || busy || performance.now() < next) return;
     next = performance.now() + rand(20000, 40000);
