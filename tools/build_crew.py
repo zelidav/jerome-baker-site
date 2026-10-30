@@ -1,6 +1,7 @@
 """Build the JB Crew pages from tools/crew_data.py.
 
-Writes js/crew-data.js, crew/index.html, crew/<slug>/index.html, and fills the
+Personas come from tools/crew_personas.py and are checked here; a bad one stops the build.
+Writes js/crew-data.js, crew/index.html, crew/<slug>/index.html, crew/match/index.html, and fills the
 <!-- CREW --> and <!-- SHOP --> blocks in index.html. Run from anywhere:
     python tools/build_crew.py
 """
@@ -9,6 +10,7 @@ import html, json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 from crew_data import CREW, MERCH, SHOP  # noqa: E402
+from crew_personas import PERSONAS, AXES, brief  # noqa: E402
 
 e = html.escape
 TILTS = ["-3deg", "2deg", "-1deg", "3deg", "-2deg", "1.5deg"]
@@ -16,6 +18,47 @@ CARD_BG = ["#FFF100", "#FFFFFF", "#05B48F", "#FDB514", "#F1F1F1", "#DA2342"]
 WEARER = {m: c for c in CREW for m in c["wear"]}
 # heading glitch per crew page (css/glitch.css), cycled so neighbours never match
 GLITCH = ["8bit", "text", "psycho", "clip", "hello"]
+BY_SLUG = {c["slug"]: c for c in CREW}
+# persona fields every crew member must have; `vice` is comic-only and never reaches the site
+PERSONA_FIELDS = ["type", "from_", "backstory", "shop_job", "vice", "voice", "loves", "hates", "vibes_with", "friends", "beef", "axes"]
+PUBLIC_FIELDS = ["type", "from_", "backstory", "shop_job", "voice", "loves", "hates", "vibes_with", "friends", "beef", "axes"]
+
+
+def check_personas():
+    """Fail the build loudly if any crew member is missing a persona or has a bad one."""
+    errs = []
+    for c in CREW:
+        p = PERSONAS.get(c["slug"])
+        if p is None:
+            errs.append(f"{c['slug']}: no persona in crew_personas.py")
+            continue
+        for f in PERSONA_FIELDS:
+            if f not in p or (p[f] in (None, "", []) and f not in ("friends", "beef")):
+                errs.append(f"{c['slug']}: missing or empty '{f}'")
+        for f in ("friends", "beef"):
+            for s in p.get(f, []):
+                if s not in BY_SLUG:
+                    errs.append(f"{c['slug']}: {f} '{s}' is not a crew slug")
+                elif s == c["slug"]:
+                    errs.append(f"{c['slug']}: lists itself in {f}")
+        ax = p.get("axes") or {}
+        if sorted(ax) != sorted(AXES):
+            errs.append(f"{c['slug']}: axes must be exactly {AXES}, got {sorted(ax)}")
+        for k, v in ax.items():
+            if not isinstance(v, (int, float)) or isinstance(v, bool) or not -2 <= v <= 2:
+                errs.append(f"{c['slug']}: axis {k}={v!r} is outside -2..2")
+    for s in PERSONAS:
+        if s not in BY_SLUG:
+            errs.append(f"{s}: persona has no crew member in crew_data.py")
+    vecs = {}
+    for c in CREW:
+        p = PERSONAS.get(c["slug"]) or {}
+        v = tuple((p.get("axes") or {}).get(a) for a in AXES)
+        if v in vecs:
+            errs.append(f"{c['slug']}: same axes as {vecs[v]}, Find your crew can never tell them apart")
+        vecs[v] = c["slug"]
+    if errs:
+        sys.exit("crew personas are broken:\n  " + "\n  ".join(errs))
 
 
 def merch_card(mid, up, i, worn=True):
@@ -62,7 +105,7 @@ def head(title, desc, up, extra=""):
 
 def topbar(up):
     return (f'<header class="topbar pad"><a href="{up}" aria-label="Jerome Baker home"><img src="{up}assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a>'
-            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
+            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
 
 
 def scripts(up, weird=False):
@@ -72,6 +115,43 @@ def scripts(up, weird=False):
 
 
 FOOT = '<footer class="pad" style="background:#0A0A0A;color:#BDBDBD;padding-top:40px;padding-bottom:calc(80px + env(safe-area-inset-bottom));font-size:14px">© 2026 Jerome Baker Designs. Adults 21+ only. The crew is fictional. The merch is real.</footer>'
+
+
+def mate(slug, up, k):
+    m = BY_SLUG[slug]
+    return (f'<a class="mate" href="{up}crew/{slug}/" style="--tilt:{TILTS[k % 6]}">'
+            f'<img src="{up}assets/crew/{m["img"]}.webp" alt="" loading="lazy" decoding="async"><span>{e(m["name"])}</span></a>')
+
+
+def who_block(c, up):
+    p = PERSONAS[c["slug"]]
+    friends = "".join(mate(s, up, k) for k, s in enumerate(p["friends"])) or '<p class="none">Nobody yet.</p>'
+    beef = "".join(mate(s, up, k + 3) for k, s in enumerate(p["beef"])) or '<p class="none">Gets along with everyone. Suspicious.</p>'
+    return f"""<section class="who pad dots" aria-label="Who they are">
+<div class="wrap">
+<p class="who-tag">Who they are</p>
+<h2 class="display who-type"><span>{e(p['type'])}</span></h2>
+<p class="who-from"><span>From</span> {e(p['from_'])}</p>
+<div class="who-grid">
+<div class="who-story"><h3>The backstory</h3><p>{e(p['backstory'])}</p><p class="who-job"><b>At the Hot Shop:</b> {e(p['shop_job'])}</p></div>
+<div class="who-vibe"><h3>Vibes with</h3><p>{e(p['vibes_with'])}</p></div>
+<div class="who-love"><h3>Loves</h3><p>{e(p['loves'])}</p></div>
+<div class="who-hate"><h3>Hates</h3><p>{e(p['hates'])}</p></div>
+</div>
+<div class="who-rel">
+<div><h3>Crew friends</h3><div class="mates">{friends}</div></div>
+<div><h3>Beef with</h3><div class="mates beef">{beef}</div></div>
+</div>
+</div>
+</section>
+"""
+
+
+def match_cta(up, name=None):
+    q = f"Is {e(name)} your crew?" if name else "Which one is your crew?"
+    return (f'<section class="find-cta pad"><div class="wrap"><p class="display">{q}</p>'
+            f'<p>Eight quick questions. One crew member who gets you.</p>'
+            f'<a class="btn btn-yellow" href="{up}crew/match/">Find your crew</a></div></section>\n')
 
 
 def crew_page(c, i):
@@ -96,7 +176,7 @@ def crew_page(c, i):
 <div class="say"><span class="line" id="line">{e(c['lines'][0])}</span><button type="button" class="btn btn-ink" id="more">Say more</button></div>
 </div>
 </section>
-<section class="sheet pad">
+{who_block(c, up)}<section class="sheet pad">
 <div class="wrap grid">
 <div class="rap"><h2>Rap sheet</h2><dl>
 <dt>Name</dt><dd>{e(c['name'])}</dd>
@@ -119,7 +199,7 @@ def crew_page(c, i):
 <form id="talk"><input id="msg" type="text" maxlength="200" placeholder="Say something to {e(c['name'])}" aria-label="Your message" autocomplete="off"><button class="btn btn-yellow" type="submit">Send</button></form>
 <div class="log" id="log" aria-live="polite"></div>
 </div></section>
-<nav class="crew-nav pad" aria-label="More crew">
+{match_cta(up, c['name'])}<nav class="crew-nav pad" aria-label="More crew">
 <a href="../{prev['slug']}/"><img src="{up}assets/crew/{prev['img']}.webp" alt="" loading="lazy">← {e(prev['name'])}</a>
 <a href="../">The whole crew</a>
 <a href="../{nxt['slug']}/">{e(nxt['name'])} →<img src="{up}assets/crew/{nxt['img']}.webp" alt="" loading="lazy"></a>
@@ -161,13 +241,44 @@ def crew_index():
 <div class="wrap">
 <h1 class="display" style="margin:0;font-size:clamp(64px,11vw,170px);line-height:.85;letter-spacing:-.03em;rotate:-2deg;text-shadow:6px 6px 0 #0A0A0A">The JB<br><span style="color:#FFF100">Crew.</span></h1>
 <p class="lede">They came off the booth wall, the box art and the old posters. They got dressed in real JB merch. Now they float around the site doing whatever they want. Grab one. Throw it. Tap one to say hi. Every crew member has a page, and every page is weird in its own way.</p>
+<p class="find-inline"><a class="btn btn-yellow" href="../crew/match/">Find your crew</a><span>Eight questions. We match you to the one who gets you.</span></p>
 <div class="pinboard">{pins}</div>
+</div>
+</section>
+{match_cta(up)}</main>
+{FOOT}
+</div>
+{scripts(up)}</body>
+</html>
+"""
+
+
+def match_page():
+    up = "../../"
+    return head("Find your crew. The JB Crew", "Eight quick questions. We match you to the JB Crew member who fits you, and show you the real merch they wear.", up,
+                f'<link rel="stylesheet" href="{up}css/match.css">\n') + f"""<body data-crew-count="2" data-glitch="hello">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+{topbar(up)}
+<main id="main">
+<section class="mx pad dots">
+<img class="mx-st s1" src="{up}assets/crew/lion.webp" alt="" aria-hidden="true" width="160" height="160">
+<img class="mx-st s2" src="{up}assets/crew/cobra.webp" alt="" aria-hidden="true" width="150" height="150">
+<img class="mx-st s3" src="{up}assets/crew/bot.webp" alt="" aria-hidden="true" width="140" height="140">
+<div class="wrap">
+<h1 class="display mx-h"><span>Find your</span><br><span class="y">crew.</span></h1>
+<p class="mx-lede">Twenty characters came off the Jerome Baker wall. One of them is basically you. Answer eight quick questions and we'll tell you who, and what they wear.</p>
+<div class="mx-stage" id="stage">
+<noscript><p class="mx-card">Find your crew needs JavaScript. You can still <a href="../">meet the whole crew</a>.</p></noscript>
+</div>
 </div>
 </section>
 </main>
 {FOOT}
 </div>
-{scripts(up)}</body>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+{scripts(up)}<script src="{up}js/match.js" defer></script>
+</body>
 </html>
 """
 
@@ -180,9 +291,21 @@ def write(path, text):
 
 
 def main():
-    data = [{k: c[k] for k in ("slug", "img", "name", "title", "doing", "lines", "color")} for c in CREW]
-    write("js/crew-data.js", "// Generated by tools/build_crew.py. Edit tools/crew_data.py instead.\nwindow.JB_CREW = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n")
+    check_personas()
+    data = []
+    for c in CREW:
+        d = {k: c[k] for k in ("slug", "img", "name", "title", "doing", "lines", "color")}
+        p = PERSONAS[c["slug"]]
+        for f in PUBLIC_FIELDS:
+            d["from" if f == "from_" else f] = p[f]
+        d["axes"] = {a: p["axes"][a] for a in AXES}
+        d["brief"] = brief(c["slug"], c)
+        d["wear"] = [dict(id=m, name=MERCH[m][0], price=MERCH[m][1], slug=MERCH[m][2]) for m in c["wear"]]
+        data.append(d)
+    write("js/crew-data.js", "// Generated by tools/build_crew.py. Edit tools/crew_data.py and tools/crew_personas.py instead.\nwindow.JB_CREW = " + json.dumps(data, ensure_ascii=False, indent=1) + ";\n"
+          + "window.JB_AXES = " + json.dumps(AXES) + ";\n")
     write("crew/index.html", crew_index())
+    write("crew/match/index.html", match_page())
     for i, c in enumerate(CREW):
         write(f"crew/{c['slug']}/index.html", crew_page(c, i))
     idx = os.path.join(ROOT, "index.html")
@@ -192,7 +315,7 @@ def main():
     s = re.sub(r"<!-- CREW -->.*?<!-- /CREW -->", lambda m: f"<!-- CREW -->{pins}<!-- /CREW -->", s, flags=re.S)
     s = re.sub(r"<!-- SHOP -->.*?<!-- /SHOP -->", lambda m: f"<!-- SHOP -->{shop}<!-- /SHOP -->", s, flags=re.S)
     write("index.html", s)
-    print(f"built {len(CREW)} crew pages, {len(SHOP)} shop cards")
+    print(f"built {len(CREW)} crew pages, crew/match/, {len(SHOP)} shop cards")
 
 
 if __name__ == "__main__":

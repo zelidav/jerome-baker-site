@@ -1,0 +1,68 @@
+/* Find your crew (crew/match/, js/match.js) */
+.mx{position:relative;isolation:isolate;overflow:hidden;background-color:var(--blue);color:var(--white);padding-top:64px;padding-bottom:110px;min-height:80vh}
+.mx-h{margin:0;font-size:clamp(56px,10.5vw,160px);line-height:.85;letter-spacing:-.03em;rotate:-2deg;text-shadow:6px 6px 0 var(--ink)}
+.mx-h .y{color:var(--yellow)}
+.mx-lede{max-width:52ch;font-size:18px;line-height:1.5;margin:26px 0 44px;background:var(--ink);padding:14px 18px;rotate:1deg;box-shadow:8px 8px 0 var(--red)}
+.mx-st{position:absolute;z-index:-1;height:auto;filter:drop-shadow(7px 9px 0 rgba(10,10,10,.6));pointer-events:none}
+.mx-st.s1{right:4%;top:28px;width:170px;rotate:8deg}
+.mx-st.s2{left:-30px;top:52%;width:150px;rotate:-10deg;opacity:.9}
+.mx-st.s3{right:-20px;bottom:40px;width:150px;rotate:-6deg;opacity:.9}
+
+/* question card */
+.mx-stage{position:relative}
+.mx-q{max-width:980px}
+.mx-card{background:var(--white);color:var(--ink);border:4px solid var(--ink);box-shadow:12px 12px 0 var(--ink);padding:clamp(18px,3.4vw,36px);rotate:-.6deg}
+.mx-count{margin:0;font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--red)}
+.mx-bar{display:flex;gap:6px;margin:10px 0 0}
+.mx-bar span{flex:1;height:10px;border:2px solid var(--ink);background:var(--white)}
+.mx-bar .done{background:var(--blue)}
+.mx-bar .now{background:var(--yellow)}
+.mx-qh{margin:18px 0 22px;font-family:var(--display);font-weight:900;font-size:clamp(28px,4.6vw,54px);line-height:1;letter-spacing:-.02em;outline:none}
+.mx-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}
+.mx-opt{display:flex;align-items:center;gap:14px;min-height:76px;width:100%;text-align:left;background:var(--bg);color:var(--ink);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);padding:12px 16px;font-family:var(--display);font-weight:800;font-size:18px;line-height:1.2;cursor:pointer;rotate:var(--tilt);transition:transform .15s ease,box-shadow .15s ease}
+.mx-opt:hover{transform:translate(-2px,-2px) rotate(-1deg);box-shadow:9px 9px 0 var(--ink)}
+.mx-opt:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--ink)}
+.mx-opt:focus-visible{outline:4px solid var(--red);outline-offset:3px}
+.mx-opt.picked{box-shadow:6px 6px 0 var(--red);outline:3px solid var(--ink);outline-offset:-8px}
+.mx-key{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;background:var(--ink);color:var(--yellow);font-family:var(--mono);font-weight:700;font-size:15px}
+.mx-back{margin-top:22px;min-height:44px;padding:0 6px;background:none;border:0;color:var(--ink);font-family:var(--display);font-weight:800;font-size:16px;text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+.mx-back:focus-visible{outline:3px solid var(--red);outline-offset:3px}
+
+/* result */
+.mx-result{display:flex;flex-direction:column;gap:44px}
+.mx-hero{display:flex;flex-wrap:wrap;align-items:center;gap:24px 36px;background:var(--cc);border:4px solid var(--ink);box-shadow:12px 12px 0 var(--ink);padding:clamp(18px,3.4vw,40px);rotate:-.4deg}
+.mx-art{flex:1 1 300px;min-width:0;display:flex;justify-content:center}
+.mx-art img{width:min(420px,100%);height:auto;filter:drop-shadow(12px 14px 0 rgba(10,10,10,.6))}
+.mx-copy{flex:1 1 380px;min-width:0}
+.mx-tagline{display:inline-block;margin:0;background:var(--ink);color:var(--yellow);font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.18em;text-transform:uppercase;padding:8px 12px}
+.mx-name{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px 12px;font-family:var(--display);font-weight:900;font-size:clamp(46px,7.4vw,104px);line-height:.9;letter-spacing:-.03em;outline:none}
+.mx-name span{background:var(--white);color:var(--ink);padding:4px 14px;rotate:var(--r,-2deg);box-shadow:5px 5px 0 var(--ink)}
+.mx-type{display:inline-block;margin:20px 0 0;background:var(--yellow);color:var(--ink);border:3px solid var(--ink);padding:8px 14px;font-family:var(--display);font-weight:900;font-size:20px;line-height:1.15;rotate:1deg}
+.mx-from{display:flex;flex-wrap:wrap;align-items:center;gap:10px;width:max-content;max-width:100%;margin:14px 0 0;background:var(--white);color:var(--ink);border:3px solid var(--ink);padding:6px 12px;font-weight:800;font-size:16px;rotate:-1deg}
+.mx-from span{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;background:var(--ink);color:var(--yellow);padding:3px 7px}
+.mx-pct{display:inline-grid;place-items:center;margin:16px 0 0;width:118px;height:118px;border-radius:50%;background:var(--red);color:var(--white);border:4px solid var(--white);box-shadow:6px 6px 0 var(--ink);font-family:var(--display);font-weight:900;font-size:22px;line-height:1;text-align:center;rotate:-8deg;padding:12px}
+.mx-why{margin:20px 0 0;background:var(--white);color:var(--ink);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:16px 18px;font-size:17px;line-height:1.5;rotate:.5deg}
+.mx-why p{margin:0}
+.mx-why .mx-vibes{margin-top:10px;font-size:15px}
+.mx-acts{display:flex;flex-wrap:wrap;gap:16px;margin-top:28px}
+input.mx-link{display:block;width:100%;margin-top:14px;min-height:48px;border:3px solid var(--ink);background:var(--white);color:var(--ink);font:inherit;font-size:15px;padding:0 12px}
+.mx-wear{background:var(--yellow);color:var(--ink);border:4px solid var(--ink);box-shadow:12px 12px 0 var(--ink);padding:clamp(18px,3.4vw,36px);rotate:.4deg}
+.mx-wear h3,.mx-runners h3{margin:0 0 26px;font-size:clamp(28px,4vw,48px);line-height:.95;letter-spacing:-.02em}
+.mx-runners{background:var(--ink);color:var(--white);border:4px solid var(--ink);box-shadow:12px 12px 0 var(--red);padding:clamp(18px,3.4vw,36px) clamp(18px,3.4vw,36px) clamp(30px,4vw,48px)}
+.mx-runners h3{color:var(--yellow)}
+.mx-run{display:flex;flex-wrap:wrap;gap:30px 40px;justify-content:center}
+.mx-run .pin{flex:0 1 220px}
+.mx-run .pin img{height:200px}
+
+@media (max-width:720px){
+  .mx{padding-top:40px}
+  .mx-st.s1{width:110px;top:14px;right:-10px}
+  .mx-st.s2,.mx-st.s3{display:none}
+  .mx-card,.mx-hero,.mx-wear{box-shadow:7px 7px 0 var(--ink)}
+  .mx-runners{box-shadow:7px 7px 0 var(--red)}
+  .mx-opt{min-height:64px;font-size:17px}
+  .mx-pct{width:96px;height:96px;font-size:18px}
+  .mx-run .pin{flex-basis:140px}
+  .mx-run .pin img{height:140px}
+}
+@media (prefers-reduced-motion:reduce){.mx-opt:hover,.mx-opt:active{transform:none}}
