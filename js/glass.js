@@ -279,8 +279,7 @@
     cur = p;
     page.off('hero');
     bSmoke.ps = [];
-    hitter.className = 'hitter';  // a new piece gets a fresh visitor
-    say.classList.remove('on');
+    if (typeof clearActor === 'function') clearActor();  // a new piece gets a fresh visitor
     bImg.src = img(p);
     bImg.alt = `${p.name}, hand-blown Jerome Baker glass`;
     bFill.style.webkitMaskImage = bFill.style.maskImage = `url(${img(p)})`;
@@ -454,60 +453,115 @@
       g.gain.setTargetAtTime(.0001, ctx.currentTime, .04);
       src.stop(ctx.currentTime + .25);
     }
-    return { blip, startGurgle, level, stopGurgle, cough, flick, douse };
+    return { blip, startGurgle, level, stopGurgle, cough, flick, douse, on: () => on };
   })();
 
-  const hitter = $('#bHitter'), say = $('#bSay');
+  /* the crew member who takes the hit: animated (js/crewanim.js), on milk crates if the mouthpiece is high */
+  const say = $('#bSay'), stageEl = $('#bStage');
   const COUGHS = ['*cough* worth it', '*hack* okay. OKAY.', 'smooth. *cough*', 'who cleaned this?? *cough*', 'one more. *wheeze*', '*cough* I need this one'];
-  let hitterOut = 0;
-  function walkUp() {
-    const crew = window.JB_CREW || [];
-    if (!crew.length) return;
-    clearTimeout(hitterOut);
-    const c = crew[(Math.random() * crew.length) | 0];
-    const st = $('#bStage').getBoundingClientRect(), r = bImg.getBoundingClientRect();
+  // recorded-style sounds in assets/sfx, behind the same sound switch
+  const clips = {};
+  const sound = (name) => {
+    if (!Sfx.on()) return;
+    const a = clips[name] || (clips[name] = new Audio(`../assets/sfx/${name}.mp3`));
+    a.currentTime = 0;
+    a.play().catch(() => {});
+  };
+  const hush = (name) => { if (clips[name]) clips[name].pause(); };
+  let actor = null, crates = null, layer = null, run = 0, spot = null;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const actLayer = () => {
+    if (!layer) { layer = document.createElement('div'); layer.className = 'act-layer'; stageEl.appendChild(layer); }
+    return layer;
+  };
+  function clearActor() {
+    run++;
+    if (actor) actor.remove();
+    if (crates) crates.remove();
+    actor = crates = spot = null;
+    say.classList.remove('on');
+  }
+  async function walkUp() {
+    const CA = window.JBCrewAnim;
+    if (!CA || actor) return;
+    const me = ++run;
+    const st = stageEl.getBoundingClientRect(), r = bImg.getBoundingClientRect();
+    const floor = r.bottom - st.top;
     const mx = r.left - st.left + cur.mouth[0] * r.width, my = r.top - st.top + cur.mouth[1] * r.height;
-    const ch = Math.max(150, Math.min(320, r.height * .45));
-    hitter.src = `../assets/crew/${c.img}_m.webp`;
-    hitter.style.setProperty('--ch', ch + 'px');
-    hitter.style.left = Math.min(mx + 4, st.width - ch * .8) + 'px';
-    hitter.style.top = Math.max(8, my - ch * .1) + 'px';
-    hitter.className = 'hitter';
-    void hitter.offsetWidth;
-    hitter.classList.add('in');
-    setTimeout(() => { if (hitter.classList.contains('in')) hitter.classList.add('at'); }, 800);
+    const H = Math.max(150, Math.min(330, r.height * .6));
+    actor = new CA.Actor(actLayer(), CA.humanoids[(Math.random() * CA.humanoids.length) | 0], H);
+    // stand where the hit pose puts their lips on the mouthpiece
+    const f = actor.a.frames.hit, hh = H * f.s, hw = hh * f.w / f.h, m = f.m || [.85, .27];
+    // lips on the near edge of the mouthpiece, not its middle
+    const x = mx - r.width * .06 - (m[0] - .5) * hw, feet = my - m[1] * hh + hh;
+    const lift = floor - feet;
+    spot = { x, feet, floor, hw, lift };
+    if (lift > 8) {
+      // not tall enough: a stack of milk crates appears
+      crates = document.createElement('div');
+      crates.className = 'crates';
+      const n = Math.max(1, Math.round(lift / (H * .24)));
+      crates.innerHTML = '<i></i>'.repeat(n);
+      crates.style.cssText = `left:${x - hw * .38}px;width:${hw * .76}px;top:${feet}px;height:${lift}px`;
+      stageEl.insertBefore(crates, bPiece);  // behind the glass, so the piece stays in view
+      crates.animate([{ translate: `0 -${floor}px` }, { translate: '0 0' }], { duration: 380, easing: 'cubic-bezier(.5,0,.8,1.4)' });
+    }
+    actor.at(-hw, floor);
+    await actor.walk(x - hw * .55, 620);
+    if (me !== run) return;
+    if (lift > 8) await actor.hop(x, feet); else actor.at(x, feet);
+    if (me !== run) return;
+    actor.pose('lean');
+    await wait(140);
+    if (me !== run || !holding) return;
+    actor.pose('hit');
+    sound('lighter');
   }
-  const lighter = $('#bLighter');
-  let flickT = 0;
-  function light_up() {
-    const [bx, by] = cur.base;
-    lighter.style.left = Math.min(96, (bx + cur.bw * .42) * 100) + '%';
-    lighter.style.top = (by * 100 - 14) + '%';
-    lighter.classList.add('on');
-    clearTimeout(flickT);
-    flickT = setTimeout(() => {
-      if (!holding) return;
-      Sfx.flick();
-      lighter.classList.add('lit');
-    }, hitter.classList.contains('at') ? 150 : 650);
-  }
-  function lights_out() {
-    clearTimeout(flickT);
-    Sfx.douse();
-    lighter.classList.remove('lit');
-    setTimeout(() => { if (!holding) lighter.classList.remove('on'); }, 400);
-  }
-  function walkOff(delay) {
-    clearTimeout(hitterOut);
-    hitterOut = setTimeout(() => { hitter.className = 'hitter'; say.classList.remove('on'); }, delay);
+  async function afterHit(took) {
+    const CA = window.JBCrewAnim;
+    if (!actor || !CA) return;
+    const me = ++run, a = actor, s = spot;
+    if (took <= .12) { a.feet !== s.floor && await a.hop(s.x - s.hw * .7, s.floor); await a.walk(-s.hw * 2, 700); if (me === run) clearActor(); return; }
+    a.pose('exhale');
+    const m = a.mouth();
+    if (!calm) bSmoke.burst(m[0], m[1], Math.round(40 + took * 130), 1.4 + took * 1.6);
+    await wait(650);
+    if (me !== run) return;
+    sound('cough');
+    const n = took >= .85 ? 3 : took > .45 ? 2 : 1;
+    for (let i = 0; i < n; i++) {
+      a.pose('cough');
+      a.shake(340, 1);
+      const c = a.mouth();
+      if (!calm) bSmoke.burst(c[0], c[1], 18, 1.3);
+      await wait(380);
+      if (me !== run) return;
+      if (i === 0) speak(COUGHS[(Math.random() * COUGHS.length) | 0]);
+    }
+    if (took >= .85) {
+      // full send: they go over backwards
+      a.pose('dizzy');
+      await a.el.animate([{ translate: '0 0', rotate: '0deg', opacity: 1 }, { translate: `${-s.hw * .9}px ${s.floor - s.feet + 40}px`, rotate: '-80deg', opacity: 0 }], { duration: 900, easing: 'ease-in', fill: 'forwards' }).finished;
+    } else {
+      if (s.lift > 8) await a.hop(s.x - s.hw * .75, s.floor);
+      a.pose('pose');
+      await wait(650);
+      if (me !== run) return;
+      await a.walk(-s.hw * 2, 900);
+    }
+    if (me !== run) return;
+    if (crates) await crates.animate([{ opacity: 1 }, { opacity: 0, translate: '0 20px' }], { duration: 250, fill: 'forwards' }).finished;
+    if (me === run) clearActor();
   }
   function speak(text) {
-    const h = hitter.getBoundingClientRect(), st = $('#bStage').getBoundingClientRect();
+    if (!actor) return;
+    const h = actor.el.getBoundingClientRect(), st = stageEl.getBoundingClientRect();
     say.textContent = text;
     // clear of the sound and close buttons in the top corners
     say.style.left = Math.max(8, Math.min(h.left - st.left + h.width * .3, st.width - 280)) + 'px';
     say.style.top = Math.max(72, h.top - st.top - 56) + 'px';
     say.classList.add('on');
+    setTimeout(() => say.classList.remove('on'), 2000);
   }
 
   /* hold to take a hit: the glass fills with smoke from the base up, bubbles in the water, then you let it go */
@@ -530,8 +584,7 @@
   function tick(now) {
     if (!holding) return;
     setLvl(Math.min(1, (now - t0) / FILL_MS));
-    if (Math.random() < .55) { bubble(); if (Math.random() < .5) Sfx.blip(.45 + lvl * .55); }
-    Sfx.level(lvl);
+    if (Math.random() < .55) bubble();
     // as the chamber fills, smoke starts leaking out the top
     if (lvl > .5 && Math.random() < (lvl - .4) * .7 && !calm) { const m = benchMouth(); bSmoke.puff(m[0], m[1], { ...wisp, size: 18 + lvl * 10 }); }
     raf = requestAnimationFrame(tick);
@@ -544,9 +597,8 @@
     t0 = performance.now() - lvl * FILL_MS;
     hit.classList.add('on');
     $('#bHitLabel').textContent = 'Keep holding';
-    Sfx.startGurgle();
+    sound('rip');
     walkUp();
-    light_up();
     raf = requestAnimationFrame(tick);
   }
   function release(quiet) {
@@ -555,11 +607,10 @@
     cancelAnimationFrame(raf);
     hit.classList.remove('on');
     $('#bHitLabel').textContent = 'Hold to take a hit';
-    Sfx.stopGurgle();
-    lights_out();
+    hush('rip');
     const took = lvl;
-    if (quiet === true) { hitter.className = 'hitter'; say.classList.remove('on'); }
-    if (took <= .12 && quiet !== true) walkOff(200);
+    if (quiet === true) clearActor();
+    else afterHit(took);
     if (took > .12 && quiet !== true) {
       const m = benchMouth();
       if (!calm) {
@@ -568,19 +619,6 @@
         bSmoke.on('exhale', () => benchMouth(), 1.6 + took * 1.6, { size: 30, grow: 1.1, alpha: .55, vy: 2 + took * 1.5, life: 250, spread: 16 });
         setTimeout(() => bSmoke.off('exhale'), 500 + took * 1100);
       }
-      // then the coughing, each one kicking out another cloud
-      const n = took >= .85 ? 3 : took > .45 ? 2 : 1;
-      for (let i = 0; i < n; i++) {
-        setTimeout(() => {
-          if (!bench.open) return;
-          Sfx.cough(.6 + took * .4);
-          const mm = benchMouth();
-          if (!calm) bSmoke.burst(mm[0], mm[1] + 10, 22, 1.4);
-          if (hitter.classList.contains('in')) { hitter.classList.remove('at', 'cough'); void hitter.offsetWidth; hitter.classList.add('cough'); }
-        }, 650 + i * 380);
-      }
-      if (hitter.classList.contains('in')) setTimeout(() => speak(COUGHS[(Math.random() * COUGHS.length) | 0]), 700);
-      walkOff(650 + n * 380 + 1500);
       const p = cur;
       $('#bStatus').textContent = p.status !== 'available'
         ? `${took >= 1 ? 'Full send.' : 'Easy.'} Somebody already owns this one, but the shelf is still stocked.`
