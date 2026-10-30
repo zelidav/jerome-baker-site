@@ -29,6 +29,18 @@
     return c;
   });
 
+  // the same puffs in a cool grey, so smoke still reads on the white store tiles
+  const grays = puffs.map((src) => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    g.drawImage(src, 0, 0);
+    g.globalCompositeOperation = 'source-in';
+    g.fillStyle = 'rgb(120,124,150)';
+    g.fillRect(0, 0, 128, 128);
+    return c;
+  });
+
   class Smoke {
     // world coords: page smoke lives in document coords and scrolls; bench smoke is local to its canvas
     constructor(canvas, { scrolls, cap }) {
@@ -51,7 +63,7 @@
         vx: (Math.random() - .5) * .25 * big, vy: -(o.vy || .55) - Math.random() * .5,
         s: (o.size || 14) * (0.7 + Math.random() * .6), gs: (o.grow || .55) * big,
         a: (o.alpha || .5) * (0.7 + Math.random() * .5), t: 0, life: (o.life || 150) * (0.8 + Math.random() * .4),
-        rot: Math.random() * 6.28, vr: (Math.random() - .5) * .02, img: puffs[(Math.random() * 4) | 0],
+        rot: Math.random() * 6.28, vr: (Math.random() - .5) * .02, img: (o.gray ? grays : puffs)[(Math.random() * 4) | 0],
       });
       this.go();
     }
@@ -109,37 +121,41 @@
   };
   const wisp = { size: 16, grow: .6, alpha: .62, vy: .7, life: 170 };
 
-  /* ---------------------------------------------------------------- the shop */
+  /* ---------------------------------------------------------------- the store */
   const HOST = 'https://jbcustomer.cannacrypted.com';
-  const COLORS = { giant: '#FFF100', le: '#FFFFFF', og: '#05B48F', second: '#FDB514', daily: '#F1F1F1' };
-  const shelfOf = Object.fromEntries(D.shelves.map((s) => [s.key, s]));
+  // one smooth gradient per series, from the brand colors
+  const BANDS = {
+    giant: 'linear-gradient(125deg,#2A3B8E 0%,#4B2C8C 45%,#DA2342 100%)',
+    le: 'linear-gradient(125deg,#0E1A5C 0%,#2A3B8E 50%,#05B48F 100%)',
+    og: 'linear-gradient(125deg,#05B48F 0%,#2A8F9E 45%,#2A3B8E 100%)',
+    second: 'linear-gradient(125deg,#DA2342 0%,#F06A2A 50%,#FDB514 100%)',
+    daily: 'linear-gradient(125deg,#1A1A2E 0%,#2A3B8E 60%,#5266C4 100%)',
+  };
   const sold = (p) => p.status !== 'available';
   const tagOf = (p) => (p.status === 'sold' ? 'Sold' : p.status === 'collected' ? 'In a collection' : '');
-  const luGroups = $('#luGroups'), feats = $('#feats');
-
-  luGroups.innerHTML = D.shelves.map((s) => {
+  const aisles = $('#aisles');
+  const tile = (p, feature) => {
+    const sub = [p.series === 'Limited Edition' || p.series === 'Original Series' || p.series === 'Giant Bong Series' ? p.shape : p.series, p.inches && `${p.inches} in`].filter(Boolean).join(', ');
+    return `<button type="button" class="tile${feature ? ' feature' : ''}${sold(p) ? ' out' : ''}${p.w > p.h * .8 ? ' wide' : ''}" data-id="${p.id}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}">`
+      + `<span class="frame"><span class="pill">${esc(p.edition || '1 of 1')}</span>${sold(p) ? `<span class="pill gone">${tagOf(p)}</span>` : ''}`
+      + `<img class="cut" src="${img(p, !feature)}" alt="" loading="lazy" decoding="async"></span>`
+      + `<span class="t-name">${esc(p.name)}</span><span class="t-sub">${esc(sub)}</span>`
+      + `<span class="t-price">${sold(p) ? `<s>${money(p.price)}</s>` : money(p.price)}</span></button>`;
+  };
+  aisles.innerHTML = D.shelves.map((s) => {
     const ps = D.pieces.filter((p) => p.shelf === s.key);
-    return `<div class="lu-g" data-k="${s.key}"><h3>${esc(s.title)} <span>${ps.length}</span></h3><div class="lu-grid">`
-      + ps.map((p) => `<button type="button" class="lu-t${sold(p) ? ' out' : ''}" data-id="${p.id}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}" title="${esc(p.name)}"><img src="${img(p, true)}" alt="" loading="lazy" decoding="async"></button>`).join('')
-      + '</div></div>';
+    return `<section class="aisle" id="s-${s.key}" data-k="${s.key}" aria-labelledby="h-${s.key}">`
+      + `<div class="band" style="--g:${BANDS[s.key]}"><div class="band-in"><h2 id="h-${s.key}">${esc(s.title)}</h2><p>${esc(s.line)}<span class="ct">${ps.length} pieces</span></p></div></div>`
+      + `<div class="grid">${ps.map((p, i) => tile(p, s.key === 'giant' && i === 0)).join('')}</div></section>`;
   }).join('');
 
-  const feature = (p) => {
-    const sub = [p.series, p.edition || '1 of 1', p.inches && `about ${p.inches} in`].filter(Boolean).join(', ');
-    const buy = sold(p) ? ''
-      : p.online ? `<a class="btn btn-red" href="${p.buy}" target="_blank" rel="noopener">Buy it</a>`
-      : `<a class="btn btn-red" href="mailto:sales@jeromebakerny.com?subject=${encodeURIComponent(`Jerome Baker glass: ${p.name} (${p.id})`)}">Ask to buy</a>`;
-    return `<article class="ft${sold(p) ? ' out' : ''}" id="ft-${p.id}" data-id="${p.id}" data-k="${p.shelf}" data-view="piece">`
-      + `<div class="ft-stage"><div class="lightbox" aria-hidden="true"></div>`
-      + `<img class="ft-img" src="${img(p)}" alt="${esc(p.name)}, hand-blown Jerome Baker glass" width="${Math.round(p.w * 1000 / p.h)}" height="1000" loading="lazy" decoding="async">`
-      + `<div class="loupe" aria-hidden="true"></div></div>`
-      + `<div class="ft-views" role="group" aria-label="Views"><button type="button" data-v="piece" aria-pressed="true">The piece</button><button type="button" data-v="photo" aria-pressed="false">Studio photo</button><button type="button" data-v="zoom">Zoom in</button></div>`
-      + `<h3 class="ft-name">${esc(p.name)}</h3><p class="ft-sub">${esc(sub)}</p>`
-      + `<p class="ft-price${sold(p) ? ' sold' : ''}">${money(p.price)}</p>${sold(p) ? `<p class="ft-note">${tagOf(p)}</p>` : ''}`
-      + `<div class="ft-acts"><button type="button" class="btn btn-yellow" data-hit>Take a hit</button>${buy}<button type="button" class="btn btn-white" data-more>Details</button></div></article>`;
+  const chips = $('#shelfChips');
+  const renderChips = () => {
+    chips.innerHTML = D.shelves.map((s) => {
+      const n = aisles.querySelectorAll(`#s-${s.key} .tile:not([hidden])`).length;
+      return n ? `<a href="#s-${s.key}">${esc(s.title)}<span>${n}</span></a>` : '';
+    }).join('');
   };
-  feats.innerHTML = D.shelves.map((s) => `<div class="ft-shelf" id="s-${s.key}" data-k="${s.key}"><h2>${esc(s.title)}</h2><p>${esc(s.line)}</p></div>`
-    + D.pieces.filter((p) => p.shelf === s.key).map(feature).join('')).join('');
 
   // filters
   let price = 'all';
@@ -147,18 +163,15 @@
   const apply = () => {
     const [lo, hi] = price === 'all' ? [0, Infinity] : price.split('-').map((v, i) => (v === '' ? (i ? Infinity : 0) : Number(v)));
     let shown = 0;
-    D.pieces.forEach((p) => {
+    aisles.querySelectorAll('.tile').forEach((el) => {
+      const p = byId[el.dataset.id];
       const ok = p.price >= lo && p.price < hi && (!only.checked || p.status === 'available');
-      $(`#ft-${p.id}`).hidden = !ok;
-      luGroups.querySelector(`[data-id="${p.id}"]`).hidden = !ok;
+      el.hidden = !ok;
       shown += ok;
     });
-    D.shelves.forEach((s) => {
-      const any = !!feats.querySelector(`.ft[data-k="${s.key}"]:not([hidden])`);
-      $(`#s-${s.key}`).hidden = !any;
-      luGroups.querySelector(`.lu-g[data-k="${s.key}"]`).hidden = !any;
-    });
+    aisles.querySelectorAll('.aisle').forEach((a) => { a.hidden = !a.querySelector('.tile:not([hidden])'); });
     $('#empty').hidden = shown > 0;
+    renderChips();
   };
   $('#priceSeg').addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -174,35 +187,37 @@
   });
   apply();
 
-  // the lineup follows the scroll, and jumps the right column when you pick a piece
-  const lineup = $('#lineup');
-  const mark = (id) => {
-    const p = byId[id];
-    luGroups.querySelectorAll('.lu-t[aria-current]').forEach((t) => t.removeAttribute('aria-current'));
-    const t = luGroups.querySelector(`[data-id="${id}"]`);
-    if (!t) return;
-    t.setAttribute('aria-current', 'true');
-    lineup.style.setProperty('--lu', COLORS[p.shelf]);
-    const box = t.closest('.lu-in, #luGroups');
-    if (box) {
-      const tr = t.getBoundingClientRect(), br = box.getBoundingClientRect();
-      if (tr.top < br.top || tr.bottom > br.bottom) box.scrollTop += tr.top - br.top - br.height / 2;
-      if (tr.left < br.left || tr.right > br.right) box.scrollLeft += tr.left - br.left - br.width / 2;
-    }
+  // hover: smoke off the mouthpiece; rest on it a moment and the studio photo fades in
+  const light = (el, on) => {
+    el.classList.toggle('lit', on);
+    clearTimeout(el._flip);
+    if (!on) el.classList.remove('flip');
+    if (calm) return;
+    if (on) page.on(el, mouthOf(el.querySelector('.cut'), byId[el.dataset.id]), .5, { ...wisp, gray: true });
+    else page.off(el);
   };
-  mark(D.pieces[0].id);
-  const follow = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && mark(e.target.dataset.id)), { rootMargin: '-48% 0px -48% 0px' });
-  feats.querySelectorAll('.ft').forEach((el) => follow.observe(el));
-  luGroups.addEventListener('click', (e) => {
-    const t = e.target.closest('.lu-t');
-    if (!t) return;
-    const el = $(`#ft-${t.dataset.id}`);
-    const offset = coarse || innerWidth <= 900 ? lineup.offsetHeight + 8 : 16;
-    scrollTo({ top: el.getBoundingClientRect().top + scrollY - offset, behavior: calm ? 'auto' : 'smooth' });
-    mark(t.dataset.id);
-  });
+  const flip = (el) => {
+    let ph = el.querySelector('.photo');
+    if (!ph) {
+      ph = document.createElement('img');
+      ph.className = 'photo'; ph.alt = ''; ph.decoding = 'async';
+      ph.src = `${HOST}/piece/${el.dataset.id}/image.jpg`;
+      el.querySelector('.frame').appendChild(ph);
+    }
+    el._flip = setTimeout(() => { if (el.classList.contains('lit')) { page.off(el); el.classList.add('flip'); } }, 1600);
+  };
+  if (coarse) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => light(e.target, e.isIntersecting)), { rootMargin: '-44% 0px -44% 0px' });
+    aisles.querySelectorAll('.tile').forEach((el) => io.observe(el));
+  } else {
+    aisles.addEventListener('pointerover', (e) => { const el = e.target.closest('.tile'); if (el && !el.classList.contains('lit')) { light(el, true); flip(el); } });
+    aisles.addEventListener('pointerout', (e) => { const el = e.target.closest('.tile'); if (el && !el.contains(e.relatedTarget)) light(el, false); });
+  }
+  aisles.addEventListener('focusin', (e) => { const el = e.target.closest('.tile'); if (el) light(el, true); });
+  aisles.addEventListener('focusout', (e) => { const el = e.target.closest('.tile'); if (el) light(el, false); });
+  aisles.addEventListener('click', (e) => { const el = e.target.closest('.tile'); if (el) open(el.dataset.id); });
 
-  // views, zoom and the buttons on each piece
+  // zoom (from the bench)
   const zoomer = $('#zoomer'), zImg = $('#zImg'), zPan = $('#zPan');
   const zoom = (p) => {
     zImg.src = `../assets/glass/${p.id}_z.webp`;
@@ -218,61 +233,8 @@
   zPan.addEventListener('pointermove', (e) => { if (!drag) return; zPan.scrollLeft = drag[2] - (e.clientX - drag[0]); zPan.scrollTop = drag[3] - (e.clientY - drag[1]); });
   zPan.addEventListener('pointerup', () => { drag = null; zPan.classList.remove('drag'); });
 
-  feats.addEventListener('click', (e) => {
-    const ft = e.target.closest('.ft');
-    if (!ft) return;
-    const p = byId[ft.dataset.id];
-    const v = e.target.closest('.ft-views button');
-    if (v) {
-      if (v.dataset.v === 'zoom') { zoom(p); return; }
-      ft.dataset.view = v.dataset.v;
-      ft.querySelectorAll('.ft-views button[aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', b === v));
-      ft.querySelector('.ft-img').src = v.dataset.v === 'photo' ? `${HOST}/piece/${p.id}/image.jpg` : img(p);
-      light(ft, false);
-      return;
-    }
-    if (e.target.closest('[data-hit]')) { open(p.id); $('#bHit').focus(); return; }
-    if (e.target.closest('[data-more]')) { open(p.id); return; }
-    if (e.target.closest('.ft-img') && ft.dataset.view === 'piece') zoom(p);
-  });
-
-  // the loupe: hover the piece and see the glass up close, at full photo resolution
-  if (!coarse) {
-    feats.addEventListener('pointermove', (e) => {
-      const im = e.target.closest('.ft-img');
-      const ft = im && im.closest('.ft');
-      feats.querySelectorAll('.loupe.on').forEach((l) => { if (!ft || !ft.contains(l)) l.classList.remove('on'); });
-      if (!im || ft.dataset.view !== 'piece') return;
-      const p = byId[ft.dataset.id], lp = ft.querySelector('.loupe');
-      const r = im.getBoundingClientRect(), st = im.parentElement.getBoundingClientRect();
-      const x = e.clientX - r.left, y = e.clientY - r.top;
-      const k = Math.max(2, p.zh / r.height);
-      if (lp.dataset.id !== p.id) { lp.style.backgroundImage = `url(../assets/glass/${p.id}_z.webp)`; lp.dataset.id = p.id; }
-      lp.style.backgroundSize = `${r.width * k}px ${r.height * k}px`;
-      lp.style.backgroundPosition = `${115 - x * k}px ${115 - y * k}px`;
-      lp.style.left = (e.clientX - st.left - 115) + 'px';
-      lp.style.top = (e.clientY - st.top - 115) + 'px';
-      lp.classList.add('on');
-    });
-    feats.addEventListener('pointerleave', () => feats.querySelectorAll('.loupe.on').forEach((l) => l.classList.remove('on')));
-  }
-
-  // hover a piece (on phones: scroll it to the middle of the screen) and it starts smoking
-  const light = (el, on) => {
-    el.classList.toggle('lit', on);
-    if (calm) return;
-    if (on && el.dataset.view === 'piece') page.on(el, mouthOf(el.querySelector('.ft-img'), byId[el.dataset.id]), .55, wisp);
-    else page.off(el);
-  };
-  if (coarse) {
-    const io = new IntersectionObserver((es) => es.forEach((e) => light(e.target, e.isIntersecting)), { rootMargin: '-40% 0px -40% 0px' });
-    feats.querySelectorAll('.ft').forEach((el) => io.observe(el));
-  } else {
-    feats.addEventListener('pointerover', (e) => { const el = e.target.closest('.ft-stage') && e.target.closest('.ft'); if (el && !el.classList.contains('lit')) light(el, true); });
-    feats.addEventListener('pointerout', (e) => { const st = e.target.closest('.ft-stage'); if (st && !st.contains(e.relatedTarget)) light(st.closest('.ft'), false); });
-  }
-  const visible = () => [...feats.querySelectorAll('.ft:not([hidden])')].map((el) => el.dataset.id);
-  new IntersectionObserver(([e]) => document.body.classList.toggle('in-shop', e.isIntersecting), { rootMargin: '-50% 0px -50% 0px' }).observe(feats);
+  const visible = () => [...aisles.querySelectorAll('.tile:not([hidden])')].map((el) => el.dataset.id);
+  new IntersectionObserver(([e]) => document.body.classList.toggle('in-shop', e.isIntersecting), { rootMargin: '-50% 0px -50% 0px' }).observe(aisles);
 
   if (coarse) $('#heroHint').textContent = 'Scroll and each piece lights up as it passes. Tap Take a hit and hold it down.';
 
@@ -317,8 +279,7 @@
     cur = p;
     page.off('hero');
     bSmoke.ps = [];
-    hitter.className = 'hitter';  // a new piece gets a fresh visitor
-    say.classList.remove('on');
+    if (typeof clearActor === 'function') clearActor();  // a new piece gets a fresh visitor
     bImg.src = img(p);
     bImg.alt = `${p.name}, hand-blown Jerome Baker glass`;
     bFill.style.webkitMaskImage = bFill.style.maskImage = `url(${img(p)})`;
@@ -360,6 +321,7 @@
     if (!calm) page.on('hero', mouthOf(heroImg, HERO), .32, { ...wisp, size: 16 });
   });
   $('#bClose').onclick = close;
+  $('#bZoom').onclick = () => cur && zoom(cur);
   bench.addEventListener('click', (e) => { if (e.target === bench) close(); });
   const step = (d) => {
     const ids = visible();
@@ -491,60 +453,115 @@
       g.gain.setTargetAtTime(.0001, ctx.currentTime, .04);
       src.stop(ctx.currentTime + .25);
     }
-    return { blip, startGurgle, level, stopGurgle, cough, flick, douse };
+    return { blip, startGurgle, level, stopGurgle, cough, flick, douse, on: () => on };
   })();
 
-  const hitter = $('#bHitter'), say = $('#bSay');
+  /* the crew member who takes the hit: animated (js/crewanim.js), on milk crates if the mouthpiece is high */
+  const say = $('#bSay'), stageEl = $('#bStage');
   const COUGHS = ['*cough* worth it', '*hack* okay. OKAY.', 'smooth. *cough*', 'who cleaned this?? *cough*', 'one more. *wheeze*', '*cough* I need this one'];
-  let hitterOut = 0;
-  function walkUp() {
-    const crew = window.JB_CREW || [];
-    if (!crew.length) return;
-    clearTimeout(hitterOut);
-    const c = crew[(Math.random() * crew.length) | 0];
-    const st = $('#bStage').getBoundingClientRect(), r = bImg.getBoundingClientRect();
+  // recorded-style sounds in assets/sfx, behind the same sound switch
+  const clips = {};
+  const sound = (name) => {
+    if (!Sfx.on()) return;
+    const a = clips[name] || (clips[name] = new Audio(`../assets/sfx/${name}.mp3`));
+    a.currentTime = 0;
+    a.play().catch(() => {});
+  };
+  const hush = (name) => { if (clips[name]) clips[name].pause(); };
+  let actor = null, crates = null, layer = null, run = 0, spot = null;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const actLayer = () => {
+    if (!layer) { layer = document.createElement('div'); layer.className = 'act-layer'; stageEl.appendChild(layer); }
+    return layer;
+  };
+  function clearActor() {
+    run++;
+    if (actor) actor.remove();
+    if (crates) crates.remove();
+    actor = crates = spot = null;
+    say.classList.remove('on');
+  }
+  async function walkUp() {
+    const CA = window.JBCrewAnim;
+    if (!CA || actor) return;
+    const me = ++run;
+    const st = stageEl.getBoundingClientRect(), r = bImg.getBoundingClientRect();
+    const floor = r.bottom - st.top;
     const mx = r.left - st.left + cur.mouth[0] * r.width, my = r.top - st.top + cur.mouth[1] * r.height;
-    const ch = Math.max(150, Math.min(320, r.height * .45));
-    hitter.src = `../assets/crew/${c.img}_m.webp`;
-    hitter.style.setProperty('--ch', ch + 'px');
-    hitter.style.left = Math.min(mx + 4, st.width - ch * .8) + 'px';
-    hitter.style.top = Math.max(8, my - ch * .1) + 'px';
-    hitter.className = 'hitter';
-    void hitter.offsetWidth;
-    hitter.classList.add('in');
-    setTimeout(() => { if (hitter.classList.contains('in')) hitter.classList.add('at'); }, 800);
+    const H = Math.max(150, Math.min(330, r.height * .6));
+    actor = new CA.Actor(actLayer(), CA.humanoids[(Math.random() * CA.humanoids.length) | 0], H);
+    // stand where the hit pose puts their lips on the mouthpiece
+    const f = actor.a.frames.hit, hh = H * f.s, hw = hh * f.w / f.h, m = f.m || [.85, .27];
+    // lips on the near edge of the mouthpiece, not its middle
+    const x = mx - r.width * .06 - (m[0] - .5) * hw, feet = my - m[1] * hh + hh;
+    const lift = floor - feet;
+    spot = { x, feet, floor, hw, lift };
+    if (lift > 8) {
+      // not tall enough: a stack of milk crates appears
+      crates = document.createElement('div');
+      crates.className = 'crates';
+      const n = Math.max(1, Math.round(lift / (H * .24)));
+      crates.innerHTML = '<i></i>'.repeat(n);
+      crates.style.cssText = `left:${x - hw * .38}px;width:${hw * .76}px;top:${feet}px;height:${lift}px`;
+      stageEl.insertBefore(crates, bPiece);  // behind the glass, so the piece stays in view
+      crates.animate([{ translate: `0 -${floor}px` }, { translate: '0 0' }], { duration: 380, easing: 'cubic-bezier(.5,0,.8,1.4)' });
+    }
+    actor.at(-hw, floor);
+    await actor.walk(x - hw * .55, 620);
+    if (me !== run) return;
+    if (lift > 8) await actor.hop(x, feet); else actor.at(x, feet);
+    if (me !== run) return;
+    actor.pose('lean');
+    await wait(140);
+    if (me !== run || !holding) return;
+    actor.pose('hit');
+    sound('lighter');
   }
-  const lighter = $('#bLighter');
-  let flickT = 0;
-  function light_up() {
-    const [bx, by] = cur.base;
-    lighter.style.left = Math.min(96, (bx + cur.bw * .42) * 100) + '%';
-    lighter.style.top = (by * 100 - 14) + '%';
-    lighter.classList.add('on');
-    clearTimeout(flickT);
-    flickT = setTimeout(() => {
-      if (!holding) return;
-      Sfx.flick();
-      lighter.classList.add('lit');
-    }, hitter.classList.contains('at') ? 150 : 650);
-  }
-  function lights_out() {
-    clearTimeout(flickT);
-    Sfx.douse();
-    lighter.classList.remove('lit');
-    setTimeout(() => { if (!holding) lighter.classList.remove('on'); }, 400);
-  }
-  function walkOff(delay) {
-    clearTimeout(hitterOut);
-    hitterOut = setTimeout(() => { hitter.className = 'hitter'; say.classList.remove('on'); }, delay);
+  async function afterHit(took) {
+    const CA = window.JBCrewAnim;
+    if (!actor || !CA) return;
+    const me = ++run, a = actor, s = spot;
+    if (took <= .12) { a.feet !== s.floor && await a.hop(s.x - s.hw * .7, s.floor); await a.walk(-s.hw * 2, 700); if (me === run) clearActor(); return; }
+    a.pose('exhale');
+    const m = a.mouth();
+    if (!calm) bSmoke.burst(m[0], m[1], Math.round(40 + took * 130), 1.4 + took * 1.6);
+    await wait(650);
+    if (me !== run) return;
+    sound('cough');
+    const n = took >= .85 ? 3 : took > .45 ? 2 : 1;
+    for (let i = 0; i < n; i++) {
+      a.pose('cough');
+      a.shake(340, 1);
+      const c = a.mouth();
+      if (!calm) bSmoke.burst(c[0], c[1], 18, 1.3);
+      await wait(380);
+      if (me !== run) return;
+      if (i === 0) speak(COUGHS[(Math.random() * COUGHS.length) | 0]);
+    }
+    if (took >= .85) {
+      // full send: they go over backwards
+      a.pose('dizzy');
+      await a.el.animate([{ translate: '0 0', rotate: '0deg', opacity: 1 }, { translate: `${-s.hw * .9}px ${s.floor - s.feet + 40}px`, rotate: '-80deg', opacity: 0 }], { duration: 900, easing: 'ease-in', fill: 'forwards' }).finished;
+    } else {
+      if (s.lift > 8) await a.hop(s.x - s.hw * .75, s.floor);
+      a.pose('pose');
+      await wait(650);
+      if (me !== run) return;
+      await a.walk(-s.hw * 2, 900);
+    }
+    if (me !== run) return;
+    if (crates) await crates.animate([{ opacity: 1 }, { opacity: 0, translate: '0 20px' }], { duration: 250, fill: 'forwards' }).finished;
+    if (me === run) clearActor();
   }
   function speak(text) {
-    const h = hitter.getBoundingClientRect(), st = $('#bStage').getBoundingClientRect();
+    if (!actor) return;
+    const h = actor.el.getBoundingClientRect(), st = stageEl.getBoundingClientRect();
     say.textContent = text;
     // clear of the sound and close buttons in the top corners
     say.style.left = Math.max(8, Math.min(h.left - st.left + h.width * .3, st.width - 280)) + 'px';
     say.style.top = Math.max(72, h.top - st.top - 56) + 'px';
     say.classList.add('on');
+    setTimeout(() => say.classList.remove('on'), 2000);
   }
 
   /* hold to take a hit: the glass fills with smoke from the base up, bubbles in the water, then you let it go */
@@ -567,8 +584,7 @@
   function tick(now) {
     if (!holding) return;
     setLvl(Math.min(1, (now - t0) / FILL_MS));
-    if (Math.random() < .55) { bubble(); if (Math.random() < .5) Sfx.blip(.45 + lvl * .55); }
-    Sfx.level(lvl);
+    if (Math.random() < .55) bubble();
     // as the chamber fills, smoke starts leaking out the top
     if (lvl > .5 && Math.random() < (lvl - .4) * .7 && !calm) { const m = benchMouth(); bSmoke.puff(m[0], m[1], { ...wisp, size: 18 + lvl * 10 }); }
     raf = requestAnimationFrame(tick);
@@ -581,9 +597,8 @@
     t0 = performance.now() - lvl * FILL_MS;
     hit.classList.add('on');
     $('#bHitLabel').textContent = 'Keep holding';
-    Sfx.startGurgle();
+    sound('rip');
     walkUp();
-    light_up();
     raf = requestAnimationFrame(tick);
   }
   function release(quiet) {
@@ -592,11 +607,10 @@
     cancelAnimationFrame(raf);
     hit.classList.remove('on');
     $('#bHitLabel').textContent = 'Hold to take a hit';
-    Sfx.stopGurgle();
-    lights_out();
+    hush('rip');
     const took = lvl;
-    if (quiet === true) { hitter.className = 'hitter'; say.classList.remove('on'); }
-    if (took <= .12 && quiet !== true) walkOff(200);
+    if (quiet === true) clearActor();
+    else afterHit(took);
     if (took > .12 && quiet !== true) {
       const m = benchMouth();
       if (!calm) {
@@ -605,19 +619,6 @@
         bSmoke.on('exhale', () => benchMouth(), 1.6 + took * 1.6, { size: 30, grow: 1.1, alpha: .55, vy: 2 + took * 1.5, life: 250, spread: 16 });
         setTimeout(() => bSmoke.off('exhale'), 500 + took * 1100);
       }
-      // then the coughing, each one kicking out another cloud
-      const n = took >= .85 ? 3 : took > .45 ? 2 : 1;
-      for (let i = 0; i < n; i++) {
-        setTimeout(() => {
-          if (!bench.open) return;
-          Sfx.cough(.6 + took * .4);
-          const mm = benchMouth();
-          if (!calm) bSmoke.burst(mm[0], mm[1] + 10, 22, 1.4);
-          if (hitter.classList.contains('in')) { hitter.classList.remove('at', 'cough'); void hitter.offsetWidth; hitter.classList.add('cough'); }
-        }, 650 + i * 380);
-      }
-      if (hitter.classList.contains('in')) setTimeout(() => speak(COUGHS[(Math.random() * COUGHS.length) | 0]), 700);
-      walkOff(650 + n * 380 + 1500);
       const p = cur;
       $('#bStatus').textContent = p.status !== 'available'
         ? `${took >= 1 ? 'Full send.' : 'Easy.'} Somebody already owns this one, but the shelf is still stocked.`

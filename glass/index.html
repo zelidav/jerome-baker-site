@@ -24,6 +24,7 @@
 <link rel="stylesheet" href="../css/crew.css">
 <link rel="stylesheet" href="../css/glitch.css">
 <link rel="stylesheet" href="../css/glass.css">
+<link rel="stylesheet" href="../css/antics.css">
 </head>
 <body data-crew-count="2" data-glitch="psycho">
 <a class="skip" href="#main">Skip to content</a>
@@ -56,11 +57,10 @@
 
 <div class="redband" aria-hidden="true"><div class="marq rev"><span>ONE OF ONE ✱ NOTHING HERE GETS MADE TWICE ✱ VERIFIED PROVENANCE ✱ SHIPS FROM THE STUDIO ✱ </span><span>ONE OF ONE ✱ NOTHING HERE GETS MADE TWICE ✱ VERIFIED PROVENANCE ✱ SHIPS FROM THE STUDIO ✱ </span></div></div>
 
-<section class="shop" id="shelves" aria-label="Shop the glass">
-<aside class="lineup" id="lineup" aria-label="The lineup">
-<div class="lu-in">
-<h2 class="lu-h">The lineup</h2>
-<div class="lu-filters">
+<section class="store" id="shelves" aria-label="Shop the glass">
+<div class="sbar" id="sbar">
+<nav class="schips" aria-label="Series" id="shelfChips"></nav>
+<div class="sfilt">
 <div class="seg" role="group" aria-label="Price" id="priceSeg">
 <button type="button" data-p="all" aria-pressed="true">Any price</button>
 <button type="button" data-p="0-100" aria-pressed="false">Under $100</button>
@@ -69,11 +69,9 @@
 </div>
 <label class="avail"><input type="checkbox" id="onlyAvail"> Available only</label>
 </div>
-<div id="luGroups"></div>
-<p class="empty" id="empty" hidden>Nothing at that price. <button type="button" class="linkbtn" id="resetFilters">Show everything</button></p>
 </div>
-</aside>
-<div class="feats" id="feats"></div>
+<div id="aisles"></div>
+<p class="empty" id="empty" hidden>Nothing at that price right now. <button type="button" class="linkbtn" id="resetFilters">Show everything</button></p>
 </section>
 
 <section class="promise pad">
@@ -105,12 +103,11 @@
 <div class="bench-stage" id="bStage">
 <div class="lightbox" aria-hidden="true"></div>
 <canvas class="bench-smoke" id="bSmoke" aria-hidden="true"></canvas>
-<img class="hitter" id="bHitter" alt="" aria-hidden="true">
 <p class="say" id="bSay" aria-hidden="true"></p>
 <button type="button" class="snd" id="bSnd" aria-pressed="true">Sound on</button>
+<button type="button" class="bzoom" id="bZoom">Zoom in</button>
 <div class="bench-piece" id="bPiece">
 <img id="bImg" alt="">
-<div class="lighter" id="bLighter" aria-hidden="true"><i class="flame"></i></div>
 <div class="fill" id="bFill" aria-hidden="true"><div class="fill-smoke"></div><div class="bubbles" id="bBubbles"></div></div>
 </div>
 <button type="button" class="hit" id="bHit"><span class="hit-ring" aria-hidden="true"><span id="bHitLvl"></span></span><span id="bHitLabel">Hold to take a hit</span></button>
@@ -130,7 +127,10 @@
 </dialog>
 
 <script src="../js/glass-data.js"></script>
+<script src="../js/anim-data.js"></script>
+<script src="../js/crewanim.js" defer></script>
 <script src="../js/glass.js" defer></script>
+<script src="../js/antics.js" defer></script>
 <script src="../js/crew-data.js" defer></script>
 <script src="../js/crew.js" defer></script>
 <script src="../js/glitch.js" defer></script>
