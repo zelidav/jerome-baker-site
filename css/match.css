@@ -88,3 +88,13 @@ input.mx-link{display:block;width:100%;margin-top:14px;min-height:48px;border:3p
 .mx-basket .mx-opt{min-height:64px;font-size:16px}
 .mx-basket .mx-key{width:auto;min-width:34px;padding:0 6px}
 @media (max-width:640px){.mx-basket{grid-template-columns:1fr 1fr;gap:12px;padding:18px 12px 26px}.mx-basket .mx-opt{font-size:14px;padding:10px;gap:8px;min-height:84px}.mx-basket .mx-key{min-width:28px;height:28px;font-size:13px}}
+
+/* round 4: the gift basket from the crew, with the picks beside it */
+.mx-basket-wrap{display:grid;grid-template-columns:minmax(220px,.8fr) 1.4fr;gap:22px;align-items:start}
+.mx-basket-art{width:100%;height:auto;position:sticky;top:24px;rotate:-3deg;filter:drop-shadow(8px 10px 0 rgba(10,10,10,.35))}
+.mx-basket-wrap .mx-basket{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+@media (max-width:760px){
+  .mx-basket-wrap{grid-template-columns:1fr}
+  .mx-basket-art{width:min(260px,70%);justify-self:center;position:static}
+  .mx-basket-wrap .mx-basket{grid-template-columns:1fr 1fr}
+}
