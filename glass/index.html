@@ -56,9 +56,11 @@
 
 <div class="redband" aria-hidden="true"><div class="marq rev"><span>ONE OF ONE ✱ NOTHING HERE GETS MADE TWICE ✱ VERIFIED PROVENANCE ✱ SHIPS FROM THE STUDIO ✱ </span><span>ONE OF ONE ✱ NOTHING HERE GETS MADE TWICE ✱ VERIFIED PROVENANCE ✱ SHIPS FROM THE STUDIO ✱ </span></div></div>
 
-<div class="gbar pad" id="gbar">
-<nav class="gchips" aria-label="Glass shelves" id="shelfChips"></nav>
-<div class="gfilters">
+<section class="shop" id="shelves" aria-label="Shop the glass">
+<aside class="lineup" id="lineup" aria-label="The lineup">
+<div class="lu-in">
+<h2 class="lu-h">The lineup</h2>
+<div class="lu-filters">
 <div class="seg" role="group" aria-label="Price" id="priceSeg">
 <button type="button" data-p="all" aria-pressed="true">Any price</button>
 <button type="button" data-p="0-100" aria-pressed="false">Under $100</button>
@@ -67,10 +69,12 @@
 </div>
 <label class="avail"><input type="checkbox" id="onlyAvail"> Available only</label>
 </div>
+<div id="luGroups"></div>
+<p class="empty" id="empty" hidden>Nothing at that price. <button type="button" class="linkbtn" id="resetFilters">Show everything</button></p>
 </div>
-
-<div id="shelves" class="shelves"></div>
-<p class="empty pad" id="empty" hidden>Nothing on the shelf at that price. <button type="button" class="linkbtn" id="resetFilters">Show everything</button></p>
+</aside>
+<div class="feats" id="feats"></div>
+</section>
 
 <section class="promise pad">
 <div class="wrap promise-grid">
@@ -88,6 +92,12 @@
 </div>
 
 <canvas class="smoke-layer" id="smoke" aria-hidden="true"></canvas>
+
+<dialog class="zoomer" id="zoomer" aria-label="Zoomed in">
+<button type="button" class="bench-x" id="zClose" aria-label="Close zoom">✕</button>
+<p class="z-hint">Drag or scroll to look around</p>
+<div class="z-pan" id="zPan"><img id="zImg" alt=""></div>
+</dialog>
 
 <dialog class="bench" id="bench" aria-labelledby="bName">
 <div class="bench-in">

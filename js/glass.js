@@ -109,30 +109,37 @@
   };
   const wisp = { size: 16, grow: .6, alpha: .62, vy: .7, life: 170 };
 
-  /* ---------------------------------------------------------------- shelves */
-  const shelvesEl = $('#shelves');
-  const card = (p) => {
-    const sold = p.status !== 'available';
-    const label = p.status === 'sold' ? 'Sold' : p.status === 'collected' ? 'In a collection' : money(p.price);
-    return `<button type="button" class="pc${sold ? ' out' : ''}${p.w > p.h * .8 ? ' wide' : ''}" data-id="${p.id}" style="--tilt:${((p.name.length % 7) - 3) * 1.4}deg" aria-label="${esc(p.name)}, ${sold ? label : money(p.price)}">`
-      + `<span class="glow" aria-hidden="true"></span>`
-      + `<img src="${img(p, true)}" alt="" width="${p.w}" height="${p.h}" loading="lazy" decoding="async">`
-      + `<span class="tag${sold ? ' sold' : ''}"><b>${esc(p.name)}</b><span class="pr">${sold ? money(p.price) : label}</span>${sold ? `<small>${label}</small>` : ''}</span></button>`;
-  };
-  shelvesEl.innerHTML = D.shelves.map((s) => {
+  /* ---------------------------------------------------------------- the shop */
+  const HOST = 'https://jbcustomer.cannacrypted.com';
+  const COLORS = { giant: '#FFF100', le: '#FFFFFF', og: '#05B48F', second: '#FDB514', daily: '#F1F1F1' };
+  const shelfOf = Object.fromEntries(D.shelves.map((s) => [s.key, s]));
+  const sold = (p) => p.status !== 'available';
+  const tagOf = (p) => (p.status === 'sold' ? 'Sold' : p.status === 'collected' ? 'In a collection' : '');
+  const luGroups = $('#luGroups'), feats = $('#feats');
+
+  luGroups.innerHTML = D.shelves.map((s) => {
     const ps = D.pieces.filter((p) => p.shelf === s.key);
-    return `<section class="shelf pad" id="s-${s.key}" data-k="${s.key}" aria-labelledby="h-${s.key}">`
-      + `<div class="shelf-head"><h2 id="h-${s.key}"><span>${esc(s.title)}</span></h2><p>${esc(s.line)}</p></div>`
-      + `<div class="case">${ps.map(card).join('')}</div></section>`;
+    return `<div class="lu-g" data-k="${s.key}"><h3>${esc(s.title)} <span>${ps.length}</span></h3><div class="lu-grid">`
+      + ps.map((p) => `<button type="button" class="lu-t${sold(p) ? ' out' : ''}" data-id="${p.id}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}" title="${esc(p.name)}"><img src="${img(p, true)}" alt="" loading="lazy" decoding="async"></button>`).join('')
+      + '</div></div>';
   }).join('');
 
-  const chips = $('#shelfChips');
-  const renderChips = () => {
-    chips.innerHTML = D.shelves.map((s) => {
-      const n = shelvesEl.querySelectorAll(`#s-${s.key} .pc:not([hidden])`).length;
-      return n ? `<a href="#s-${s.key}">${esc(s.title)}<span>${n}</span></a>` : '';
-    }).join('');
+  const feature = (p) => {
+    const sub = [p.series, p.edition || '1 of 1', p.inches && `about ${p.inches} in`].filter(Boolean).join(', ');
+    const buy = sold(p) ? ''
+      : p.online ? `<a class="btn btn-red" href="${p.buy}" target="_blank" rel="noopener">Buy it</a>`
+      : `<a class="btn btn-red" href="mailto:sales@jeromebakerny.com?subject=${encodeURIComponent(`Jerome Baker glass: ${p.name} (${p.id})`)}">Ask to buy</a>`;
+    return `<article class="ft${sold(p) ? ' out' : ''}" id="ft-${p.id}" data-id="${p.id}" data-k="${p.shelf}" data-view="piece">`
+      + `<div class="ft-stage"><div class="lightbox" aria-hidden="true"></div>`
+      + `<img class="ft-img" src="${img(p)}" alt="${esc(p.name)}, hand-blown Jerome Baker glass" width="${Math.round(p.w * 1000 / p.h)}" height="1000" loading="lazy" decoding="async">`
+      + `<div class="loupe" aria-hidden="true"></div></div>`
+      + `<div class="ft-views" role="group" aria-label="Views"><button type="button" data-v="piece" aria-pressed="true">The piece</button><button type="button" data-v="photo" aria-pressed="false">Studio photo</button><button type="button" data-v="zoom">Zoom in</button></div>`
+      + `<h3 class="ft-name">${esc(p.name)}</h3><p class="ft-sub">${esc(sub)}</p>`
+      + `<p class="ft-price${sold(p) ? ' sold' : ''}">${money(p.price)}</p>${sold(p) ? `<p class="ft-note">${tagOf(p)}</p>` : ''}`
+      + `<div class="ft-acts"><button type="button" class="btn btn-yellow" data-hit>Take a hit</button>${buy}<button type="button" class="btn btn-white" data-more>Details</button></div></article>`;
   };
+  feats.innerHTML = D.shelves.map((s) => `<div class="ft-shelf" id="s-${s.key}" data-k="${s.key}"><h2>${esc(s.title)}</h2><p>${esc(s.line)}</p></div>`
+    + D.pieces.filter((p) => p.shelf === s.key).map(feature).join('')).join('');
 
   // filters
   let price = 'all';
@@ -140,15 +147,18 @@
   const apply = () => {
     const [lo, hi] = price === 'all' ? [0, Infinity] : price.split('-').map((v, i) => (v === '' ? (i ? Infinity : 0) : Number(v)));
     let shown = 0;
-    shelvesEl.querySelectorAll('.pc').forEach((el) => {
-      const p = byId[el.dataset.id];
+    D.pieces.forEach((p) => {
       const ok = p.price >= lo && p.price < hi && (!only.checked || p.status === 'available');
-      el.hidden = !ok;
+      $(`#ft-${p.id}`).hidden = !ok;
+      luGroups.querySelector(`[data-id="${p.id}"]`).hidden = !ok;
       shown += ok;
     });
-    shelvesEl.querySelectorAll('.shelf').forEach((s) => { s.hidden = !s.querySelector('.pc:not([hidden])'); });
+    D.shelves.forEach((s) => {
+      const any = !!feats.querySelector(`.ft[data-k="${s.key}"]:not([hidden])`);
+      $(`#s-${s.key}`).hidden = !any;
+      luGroups.querySelector(`.lu-g[data-k="${s.key}"]`).hidden = !any;
+    });
     $('#empty').hidden = shown > 0;
-    renderChips();
   };
   $('#priceSeg').addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -164,25 +174,107 @@
   });
   apply();
 
-  // hover (or, on phones, scroll a piece to the middle of the screen) and it starts smoking
+  // the lineup follows the scroll, and jumps the right column when you pick a piece
+  const lineup = $('#lineup');
+  const mark = (id) => {
+    const p = byId[id];
+    luGroups.querySelectorAll('.lu-t[aria-current]').forEach((t) => t.removeAttribute('aria-current'));
+    const t = luGroups.querySelector(`[data-id="${id}"]`);
+    if (!t) return;
+    t.setAttribute('aria-current', 'true');
+    lineup.style.setProperty('--lu', COLORS[p.shelf]);
+    const box = t.closest('.lu-in, #luGroups');
+    if (box) {
+      const tr = t.getBoundingClientRect(), br = box.getBoundingClientRect();
+      if (tr.top < br.top || tr.bottom > br.bottom) box.scrollTop += tr.top - br.top - br.height / 2;
+      if (tr.left < br.left || tr.right > br.right) box.scrollLeft += tr.left - br.left - br.width / 2;
+    }
+  };
+  mark(D.pieces[0].id);
+  const follow = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && mark(e.target.dataset.id)), { rootMargin: '-48% 0px -48% 0px' });
+  feats.querySelectorAll('.ft').forEach((el) => follow.observe(el));
+  luGroups.addEventListener('click', (e) => {
+    const t = e.target.closest('.lu-t');
+    if (!t) return;
+    const el = $(`#ft-${t.dataset.id}`);
+    const offset = coarse || innerWidth <= 900 ? lineup.offsetHeight + 8 : 16;
+    scrollTo({ top: el.getBoundingClientRect().top + scrollY - offset, behavior: calm ? 'auto' : 'smooth' });
+    mark(t.dataset.id);
+  });
+
+  // views, zoom and the buttons on each piece
+  const zoomer = $('#zoomer'), zImg = $('#zImg'), zPan = $('#zPan');
+  const zoom = (p) => {
+    zImg.src = `../assets/glass/${p.id}_z.webp`;
+    zImg.alt = `${p.name}, close up`;
+    zImg.width = p.zw; zImg.height = p.zh;
+    zoomer.showModal();
+    requestAnimationFrame(() => { zPan.scrollLeft = (zPan.scrollWidth - zPan.clientWidth) / 2; zPan.scrollTop = 0; });
+  };
+  $('#zClose').onclick = () => zoomer.close();
+  zoomer.addEventListener('click', (e) => { if (e.target === zoomer) zoomer.close(); });
+  let drag = null;
+  zPan.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; drag = [e.clientX, e.clientY, zPan.scrollLeft, zPan.scrollTop]; zPan.classList.add('drag'); zPan.setPointerCapture(e.pointerId); });
+  zPan.addEventListener('pointermove', (e) => { if (!drag) return; zPan.scrollLeft = drag[2] - (e.clientX - drag[0]); zPan.scrollTop = drag[3] - (e.clientY - drag[1]); });
+  zPan.addEventListener('pointerup', () => { drag = null; zPan.classList.remove('drag'); });
+
+  feats.addEventListener('click', (e) => {
+    const ft = e.target.closest('.ft');
+    if (!ft) return;
+    const p = byId[ft.dataset.id];
+    const v = e.target.closest('.ft-views button');
+    if (v) {
+      if (v.dataset.v === 'zoom') { zoom(p); return; }
+      ft.dataset.view = v.dataset.v;
+      ft.querySelectorAll('.ft-views button[aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', b === v));
+      ft.querySelector('.ft-img').src = v.dataset.v === 'photo' ? `${HOST}/piece/${p.id}/image.jpg` : img(p);
+      light(ft, false);
+      return;
+    }
+    if (e.target.closest('[data-hit]')) { open(p.id); $('#bHit').focus(); return; }
+    if (e.target.closest('[data-more]')) { open(p.id); return; }
+    if (e.target.closest('.ft-img') && ft.dataset.view === 'piece') zoom(p);
+  });
+
+  // the loupe: hover the piece and see the glass up close, at full photo resolution
+  if (!coarse) {
+    feats.addEventListener('pointermove', (e) => {
+      const im = e.target.closest('.ft-img');
+      const ft = im && im.closest('.ft');
+      feats.querySelectorAll('.loupe.on').forEach((l) => { if (!ft || !ft.contains(l)) l.classList.remove('on'); });
+      if (!im || ft.dataset.view !== 'piece') return;
+      const p = byId[ft.dataset.id], lp = ft.querySelector('.loupe');
+      const r = im.getBoundingClientRect(), st = im.parentElement.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const k = Math.max(2, p.zh / r.height);
+      if (lp.dataset.id !== p.id) { lp.style.backgroundImage = `url(../assets/glass/${p.id}_z.webp)`; lp.dataset.id = p.id; }
+      lp.style.backgroundSize = `${r.width * k}px ${r.height * k}px`;
+      lp.style.backgroundPosition = `${115 - x * k}px ${115 - y * k}px`;
+      lp.style.left = (e.clientX - st.left - 115) + 'px';
+      lp.style.top = (e.clientY - st.top - 115) + 'px';
+      lp.classList.add('on');
+    });
+    feats.addEventListener('pointerleave', () => feats.querySelectorAll('.loupe.on').forEach((l) => l.classList.remove('on')));
+  }
+
+  // hover a piece (on phones: scroll it to the middle of the screen) and it starts smoking
   const light = (el, on) => {
     el.classList.toggle('lit', on);
     if (calm) return;
-    if (on) page.on(el, mouthOf(el.querySelector('img'), byId[el.dataset.id]), .55, wisp);
+    if (on && el.dataset.view === 'piece') page.on(el, mouthOf(el.querySelector('.ft-img'), byId[el.dataset.id]), .55, wisp);
     else page.off(el);
   };
   if (coarse) {
-    const io = new IntersectionObserver((es) => es.forEach((e) => light(e.target, e.isIntersecting)), { rootMargin: '-42% 0px -42% 0px' });
-    shelvesEl.querySelectorAll('.pc').forEach((el) => io.observe(el));
+    const io = new IntersectionObserver((es) => es.forEach((e) => light(e.target, e.isIntersecting)), { rootMargin: '-40% 0px -40% 0px' });
+    feats.querySelectorAll('.ft').forEach((el) => io.observe(el));
   } else {
-    shelvesEl.addEventListener('pointerover', (e) => { const el = e.target.closest('.pc'); if (el && !el.classList.contains('lit')) light(el, true); });
-    shelvesEl.addEventListener('pointerout', (e) => { const el = e.target.closest('.pc'); if (el && !el.contains(e.relatedTarget)) light(el, false); });
+    feats.addEventListener('pointerover', (e) => { const el = e.target.closest('.ft-stage') && e.target.closest('.ft'); if (el && !el.classList.contains('lit')) light(el, true); });
+    feats.addEventListener('pointerout', (e) => { const st = e.target.closest('.ft-stage'); if (st && !st.contains(e.relatedTarget)) light(st.closest('.ft'), false); });
   }
-  shelvesEl.addEventListener('focusin', (e) => { const el = e.target.closest('.pc'); if (el) light(el, true); });
-  shelvesEl.addEventListener('focusout', (e) => { const el = e.target.closest('.pc'); if (el) light(el, false); });
-  shelvesEl.addEventListener('click', (e) => { const el = e.target.closest('.pc'); if (el) open(el.dataset.id); });
+  const visible = () => [...feats.querySelectorAll('.ft:not([hidden])')].map((el) => el.dataset.id);
+  new IntersectionObserver(([e]) => document.body.classList.toggle('in-shop', e.isIntersecting), { rootMargin: '-50% 0px -50% 0px' }).observe(feats);
 
-  if (coarse) $('#heroHint').textContent = 'Scroll and each piece lights up as it passes. Open one and hold it down.';
+  if (coarse) $('#heroHint').textContent = 'Scroll and each piece lights up as it passes. Tap Take a hit and hold it down.';
 
   /* ---------------------------------------------------------------- hero */
   const HERO = byId['JBD-30A28BA0570D'] || D.pieces[0];
@@ -208,7 +300,6 @@
     const c = $('#bSmoke').getBoundingClientRect(), r = bImg.getBoundingClientRect();
     return [r.left - c.left + cur.mouth[0] * r.width, r.top - c.top + cur.mouth[1] * r.height];
   };
-  const visible = () => [...shelvesEl.querySelectorAll('.pc:not([hidden])')].map((el) => el.dataset.id);
 
   function ctas(p) {
     const box = $('#bCtas');

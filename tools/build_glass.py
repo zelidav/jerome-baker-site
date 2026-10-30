@@ -4,7 +4,8 @@ Live data (names, prices, status, copy, buy links) comes from /api/gallery on ev
 Images come from cutouts made once per piece (~/code/jbsite-work/glass/cutouts.py). A piece is only
 published once it has a cutout in assets/glass/, so a new piece in the app waits for its cutout.
 
-Writes js/glass-data.js and assets/glass/<id>.webp (1000px tall) + <id>_t.webp (440px tall)."""
+Writes js/glass-data.js and assets/glass/<id>.webp (1000px tall), <id>_t.webp (440px tall) and
+<id>_z.webp (the cutout at full photo resolution, for the zoom loupe)."""
 import json, os, sys, urllib.request
 from pathlib import Path
 
@@ -35,9 +36,9 @@ def get(url):
 def make_images(pid):
     """Trim the cutout to the glass, save two sizes, and find the mouthpiece and the base."""
     from PIL import Image
-    full, thumb = OUT / f'{pid}.webp', OUT / f'{pid}_t.webp'
+    full, thumb, zoom = OUT / f'{pid}.webp', OUT / f'{pid}_t.webp', OUT / f'{pid}_z.webp'
     src = CUTS / f'{pid}.png'
-    if not full.exists() or (src.exists() and src.stat().st_mtime > full.stat().st_mtime):
+    if not zoom.exists() or (src.exists() and src.stat().st_mtime > zoom.stat().st_mtime):
         if not src.exists():
             return None
         im = Image.open(src).convert('RGBA')
@@ -46,6 +47,7 @@ def make_images(pid):
         for path, h in ((full, 1000), (thumb, 440)):
             w = round(im.width * h / im.height)
             im.resize((w, h), Image.LANCZOS).save(path, 'WEBP', quality=82, method=6)
+        im.save(zoom, 'WEBP', quality=84, method=4)  # never upscaled: the loupe shows real pixels
     im = Image.open(thumb)
     a = im.getchannel('A')
     w, h = im.size
@@ -63,7 +65,9 @@ def make_images(pid):
             widest, wy = s[1] - s[0], y
     base = span(wy) or (0, w)
     r = lambda v: round(v, 3)
-    return {'w': w, 'h': h, 'mouth': [r((top[0] + top[1]) / 2 / w), 0.01],
+    from PIL import Image as _I
+    zw, zh = _I.open(zoom).size
+    return {'w': w, 'h': h, 'zw': zw, 'zh': zh, 'mouth': [r((top[0] + top[1]) / 2 / w), 0.01],
             'base': [r((base[0] + base[1]) / 2 / w), r(wy / h)], 'bw': r(widest / w)}
 
 
