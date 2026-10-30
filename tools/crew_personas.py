@@ -161,7 +161,7 @@ PERSONAS = {
         hates="Knocks on the door at 6 a.m., flashlights, being rushed",
         vibes_with="New Yorkers, crafters, people with a past who turned it around, gentle giants",
         friends=["torch", "honey-pot"], beef=["gray", "peeper"],
-        axes=dict(chaos=-1, crew=-1, night=-1, new=-2, hands=2, roam=-2)),
+        axes=dict(chaos=-1, crew=-1, night=-1, new=-2, hands=2, roam=-1)),
     "jack": dict(
         type="The dark-humored night creature",
         from_="Salem, Massachusetts",
@@ -173,7 +173,7 @@ PERSONAS = {
         hates="Pie season, daylight savings, people who are scared of the dark",
         vibes_with="Goths, Halloween lifers, horror fans, anyone who decorates for October in August",
         friends=["peeper", "the-grin"], beef=["baker-bot"],
-        axes=dict(chaos=0, crew=-1, night=2, new=-2, hands=1, roam=-1)),
+        axes=dict(chaos=0, crew=0, night=2, new=-2, hands=1, roam=-1)),
     "dillo": dict(
         type="The good-time Texan",
         from_="Austin, Texas",
