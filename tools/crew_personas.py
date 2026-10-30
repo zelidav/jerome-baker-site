@@ -200,7 +200,7 @@ PERSONAS = {
         axes=dict(chaos=1, crew=0, night=-2, new=1, hands=2, roam=1)),
     "cy": dict(
         type="The brutally honest critic",
-        from_="Brooklyn, New York",
+        from_="Bushwick, Brooklyn, New York",
         backstory="Born with one eye and 20/20 in it. Ran an eye clinic on Atlantic Avenue that doubled as an art crit. Has the loudest pants in New York and the most honest mouth in the five boroughs.",
         shop_job="Quality control. Inspects every piece before it leaves.",
         vice="Rejects everything. Made Torch cry once. Takes 'a quick look' at the bar and closes it down.",
