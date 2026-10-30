@@ -171,6 +171,37 @@ def match_cta(up, name=None):
             f'<a class="btn btn-yellow" href="{up}crew/match/">Find your crew</a></div></section>\n')
 
 
+def before(c, up):
+    """The crop from the original art, a button that opens the full source with the character outlined."""
+    s = c["src"]
+    mark = ""
+    if s.get("box") and s["box"][2] < 80:
+        x, y, w, h = s["box"]
+        mark = f'<span class="src-mark" style="left:{x}%;top:{y}%;width:{w}%;height:{h}%"></span>'
+    when = f', {s["y"]}' if s.get("y") else ""
+    return (f'<figure class="before"><button type="button" class="before-btn" id="beforeBtn" aria-haspopup="dialog">'
+            f'<img src="{up}assets/{c["ref"]}" alt="{e(c["name"])} before the merch, on the original Jerome Baker art" loading="lazy">'
+            f'<span class="before-hint">Where {e(c["name"])} came from</span></button><p>BEFORE THE MERCH</p></figure>'
+            f'<dialog class="srcbox" id="srcBox" aria-labelledby="srcT"><button type="button" class="srcbox-x" data-close aria-label="Close">✕</button>'
+            f'<div class="src-art"><img src="{up}assets/{s["img"]}" alt="{e(s["t"])}" loading="lazy">{mark}</div>'
+            f'<p class="src-t" id="srcT">{e(s["t"])}{e(when)}</p><p class="src-d">{e(s["d"])}</p></dialog>')
+
+
+def gif_block(c, up):
+    """Their GIF loop, lazy, with download and share."""
+    g = f"assets/gifs/{c['slug']}.gif"
+    if not os.path.exists(os.path.join(ROOT, g)):
+        return ""
+    name = f"{c['slug']}-jerome-baker.gif"
+    return (f'<section class="gif pad"><div class="wrap gif-in">'
+            f'<img src="{up}{g}" alt="{e(c["name"])}, animated" width="480" height="480" loading="lazy" decoding="async">'
+            f'<div><h2 class="display">Take {e(c["name"])} with you.</h2>'
+            f'<p>A loop of {e(c["name"])} doing what {e(c["name"])} does. Put it in the group chat. Nobody will ask questions they want answered.</p>'
+            f'<div class="gif-acts"><a class="btn btn-yellow" href="{up}{g}" download="{name}">Download the GIF</a>'
+            f'<button type="button" class="btn btn-ink" id="gifShare" data-gif="{up}{g}" data-name="{name}">Share the GIF</button></div>'
+            f'<p class="gif-note" id="gifNote" aria-live="polite"></p></div></div></section>\n')
+
+
 def crew_page(c, i):
     up = "../../"
     prev, nxt = CREW[i - 1], CREW[(i + 1) % len(CREW)]
@@ -202,7 +233,7 @@ def crew_page(c, i):
 <dt>Weakness</dt><dd>{e(c['weakness'])}</dd>
 <dt>Wearing</dt><dd>{e(', '.join(MERCH[m][0] for m in c['wear']))}</dd>
 </dl></div>
-<figure class="before"><img src="{up}assets/{c['ref']}" alt="{e(c['name'])} before the merch, on the original Jerome Baker art" loading="lazy"><p>BEFORE THE MERCH</p></figure>
+{before(c, up)}
 </div>
 </section>
 <section class="wearing pad"><div class="wrap">
@@ -216,7 +247,7 @@ def crew_page(c, i):
 <form id="talk"><input id="msg" type="text" maxlength="200" placeholder="Say something to {e(c['name'])}" aria-label="Your message" autocomplete="off"><button class="btn btn-yellow" type="submit">Send</button></form>
 <div class="log" id="log" aria-live="polite"></div>
 </div></section>
-{match_cta(up, c['name'])}<nav class="crew-nav pad" aria-label="More crew">
+{gif_block(c, up)}{match_cta(up, c['name'])}<nav class="crew-nav pad" aria-label="More crew">
 <a href="../{prev['slug']}/"><img src="{up}assets/crew/{prev['img']}_s.webp" alt="" loading="lazy">← {e(prev['name'])}</a>
 <a href="../">The whole crew</a>
 <a href="../{nxt['slug']}/">{e(nxt['name'])} →<img src="{up}assets/crew/{nxt['img']}_s.webp" alt="" loading="lazy"></a>
@@ -230,6 +261,21 @@ def crew_page(c, i):
   const line = document.getElementById('line');
   let k = 0;
   document.getElementById('more').addEventListener('click', () => {{ k = (k + 1) % me.lines.length; line.textContent = me.lines[k]; }});
+  // where they came from: the lightbox with the original art
+  const box = document.getElementById('srcBox');
+  document.getElementById('beforeBtn').addEventListener('click', () => box.showModal());
+  box.addEventListener('click', (ev) => {{ if (ev.target === box || ev.target.closest('[data-close]')) box.close(); }});
+  // the GIF: share the file itself where the phone allows it, otherwise copy the link
+  const gif = document.getElementById('gifShare');
+  if (gif) gif.addEventListener('click', async () => {{
+    const url = new URL(gif.dataset.gif, location.href).href, note = document.getElementById('gifNote');
+    try {{
+      const file = new File([await (await fetch(url)).blob()], gif.dataset.name, {{ type: 'image/gif' }});
+      if (navigator.canShare && navigator.canShare({{ files: [file] }})) {{ await navigator.share({{ files: [file], title: me.name + ', The JB Crew' }}); return; }}
+    }} catch (e) {{ if (e && e.name === 'AbortError') return; }}
+    try {{ await navigator.clipboard.writeText(url); note.textContent = 'Link to the GIF copied. Paste it anywhere.'; }}
+    catch (e) {{ note.textContent = 'Copy this link: ' + url; }}
+  }});
   const log = document.getElementById('log'), msg = document.getElementById('msg');
   const add = (t, who) => {{ const p = document.createElement('p'); p.textContent = t; if (who) p.className = 'them'; log.appendChild(p); }};
   document.getElementById('talk').addEventListener('submit', async (ev) => {{
