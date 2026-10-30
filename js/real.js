@@ -73,7 +73,7 @@
   // rare: the first one somewhere between half a minute and a minute in, then every couple of minutes
   let next = performance.now() + rand(30000, 60000);
   setInterval(() => {
-    if (document.hidden || busy || performance.now() < next) return;
+    if (document.hidden || busy || document.body.classList.contains('sr-calm') || performance.now() < next) return;
     next = performance.now() + rand(80000, 160000);
     now().then((c) => { if (!c) next = performance.now() + 8000; });
   }, 1000);

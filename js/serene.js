@@ -1,66 +1,209 @@
-/* The alter ego. Every 20 to 40 seconds the chaos tears away and a calm museum room shows one piece of
-   glass on a plinth. A few seconds later the room shatters and the chaos is back. "Calm down" calls it
-   on purpose; "Stay in the calm version" keeps it, and "Bring back the chaos" ends it. Needs window.JB_GLASS.
-   With sound (after the visitor's first click or key): elevator muzak under the calm room, a tinny PA
-   "Next floor: streetwear", and a ding as the store appears; the muzak fades out on the way back.
+/* The alter ego. Every 20 to 40 seconds the chaos tears away and the same page shows up normalized:
+   the same sections in the same order, but pale walls, a neat grid, aligned type, the glass and merch in
+   tidy rows and the whole JB Crew standing in a line like a staff photo. A few seconds later it shatters
+   and the chaos is back. "Calm down" calls it on purpose; "Stay in the calm version" keeps it (remembered),
+   "Bring back the chaos" ends it. While it is up, body.sr-calm pauses the antics and the real morph.
+   With sound (after the visitor's first click or key): elevator muzak, a tinny PA "Next floor: streetwear",
+   and a ding as the store appears; the muzak fades out on the way back.
+   Needs window.JB_GLASS and window.JB_CREW; window.JB_ANIM for the animated crew's standing frames.
    Test hook: JBSerene.enter('zigzag' | 'pixels'), JBSerene.leave('shatter' | 'slice'). */
 (() => {
   const D = window.JB_GLASS;
-  if (!D) return;
+  const main = document.querySelector('main');
+  if (!D || !main) return;
   const calmMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const base = document.documentElement.dataset.base || '';
   const money = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const rand = (a, b) => a + Math.random() * (b - a);
+  const byId = Object.fromEntries(D.pieces.map((p) => [p.id, p]));
   const KEY = 'jb-calm';
   const remember = (v) => { try { v ? localStorage.setItem(KEY, '1') : localStorage.removeItem(KEY); } catch (e) { /* storage blocked */ } };
   const stayed = () => { try { return localStorage.getItem(KEY) === '1'; } catch (e) { return false; } };
 
-  // the pieces worth putting on a plinth: available, and the serious ones first
-  const pool = D.pieces.filter((p) => p.status === 'available' && p.price >= 500);
-  let idx = Math.floor(Math.random() * pool.length);
+  /* ---------------------------------------------------------------- building the calm page */
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  };
+  const clean = (n) => (n ? (n.innerText || n.textContent || '').replace(/\s+/g, ' ').trim() : '');
+  const CARDS = '.card, .mcard, .pc, .sc, .pin, .floater, .crew-layer, figure, nav';
+  const outside = (n) => !n.parentElement.closest(CARDS);
+  const link = (a, cls = 'sr-link') => {
+    const x = el('a', cls, clean(a));
+    x.href = a.getAttribute('href');
+    if (a.target) { x.target = a.target; x.rel = 'noopener'; }
+    return x;
+  };
 
-  /* ---------------------------------------------------------------- the calm room */
-  const room = document.createElement('div');
-  room.className = 'sr';
+  // the glass, in tidy rows: name and price under each
+  const glassGrid = (pieces) => {
+    const g = el('div', 'sr-grid sr-glass');
+    pieces.forEach((p) => {
+      const a = el('a', 'sr-item');
+      a.href = `${base}glass/#p=${p.id}`;
+      const fig = el('span', 'sr-frame');
+      const im = el('img');
+      im.src = `${base}assets/glass/${p.id}_t.webp`;
+      im.alt = p.name;
+      im.loading = 'lazy';
+      fig.append(im);
+      a.append(fig, el('span', 'sr-iname', p.name), el('span', 'sr-iprice', p.status === 'available' ? money(p.price) : p.status === 'sold' ? 'Sold' : 'In a collection'));
+      g.append(a);
+    });
+    return g;
+  };
+  // the merch cards on the page, tidied: product photo, name, price
+  const merchGrid = (cards) => {
+    const g = el('div', 'sr-grid sr-merch');
+    cards.forEach((c) => {
+      const pic = c.querySelector('.pic img') || [...c.querySelectorAll('img')].find((i) => !i.classList.contains('worn'));
+      if (!pic) return;
+      const a = el('a', 'sr-item');
+      a.href = c.getAttribute('href') || '#';
+      const fig = el('span', 'sr-frame');
+      const im = el('img');
+      im.src = pic.currentSrc || pic.src;
+      im.alt = pic.alt || '';
+      im.loading = 'lazy';
+      fig.append(im);
+      const pr = c.querySelector('.pr, .price');
+      a.append(fig, el('span', 'sr-iname', clean(c.querySelector('h3'))), el('span', 'sr-iprice', clean(pr)));
+      g.append(a);
+    });
+    return g;
+  };
+  // the whole crew in one even line, same height, facing forward: the staff photo
+  const staff = () => {
+    const crew = window.JB_CREW || [];
+    const anim = window.JB_ANIM || {};
+    const row = el('div', 'sr-staff');
+    crew.forEach((c) => {
+      const f = el('figure', 'sr-member');
+      const im = el('img');
+      im.src = anim[c.slug] ? `${base}assets/anim/${anim[c.slug].img}/stand.webp` : `${base}assets/crew/${c.img}_m.webp`;
+      im.alt = c.name;
+      im.loading = 'lazy';
+      f.append(im, el('figcaption', null, c.name));
+      row.append(f);
+    });
+    return row;
+  };
+
+  // one calm section for each section of the page, in the same order
+  const mirror = (sec, i) => {
+    const out = el('section', 'sr-sec');
+    out.dataset.i = i;
+    const isStore = sec.id === 'shelves' || sec.classList.contains('store');
+    const isCrew = sec.id === 'crew' || !!sec.querySelector('.pin');
+    // a heading-less wall of crew stickers is decoration: the staff photo lives in the crew section
+    const collage = !sec.querySelector('h1, h2, h3, p') && sec.querySelectorAll('img[src*="assets/crew/"]').length >= 3;
+    if (collage && hasCrew) return null;
+    const h = isStore ? null : [...sec.querySelectorAll('h1, h2')].find(outside) || sec.querySelector('.tt-stage') || [...sec.querySelectorAll('h3')].find(outside);
+    const kicker = sec.querySelector('.tt-eyebrow');
+    if (kicker && kicker !== h) out.append(el('p', 'sr-kicker', clean(kicker)));
+    if (h) out.append(el(i === 0 ? 'h1' : 'h2', 'sr-h', clean(h)));
+    else if (isStore) out.append(el('h2', 'sr-h', sec.getAttribute('aria-label') || 'The glass'));
+    const paras = [...sec.querySelectorAll('p, .tt-sub')].filter((p) => outside(p) && !p.querySelector('a.btn') && clean(p) && !p.closest('[aria-hidden="true"], .sbar, .empty, [hidden], .hint'));
+    if (!isStore) paras.slice(0, 2).forEach((p) => out.append(el('p', 'sr-p', clean(p))));
+
+    // what the section actually holds
+    const glassLinks = [...sec.querySelectorAll('a[href*="#p=JBD-"]')].map((a) => (a.getAttribute('href').match(/#p=(JBD-[A-F0-9]+)/) || [])[1]).filter((id, k, all) => id && byId[id] && all.indexOf(id) === k);
+    const merch = [...sec.querySelectorAll('a.mcard')];
+    if (isStore) {
+      D.shelves.forEach((s) => {
+        const ps = D.pieces.filter((p) => p.shelf === s.key);
+        if (!ps.length) return;
+        out.append(el('h3', 'sr-sub', s.title), glassGrid(ps));
+      });
+    } else if (glassLinks.length) {
+      out.append(glassGrid(glassLinks.map((id) => byId[id])));
+    } else if (merch.length) {
+      out.append(merchGrid(merch));
+    } else if (isCrew || collage) {
+      if (!h) out.append(el('h2', 'sr-h', 'The JB Crew'));
+      out.append(staff());
+    }
+    const story = sec.querySelector('ol.story');
+    if (story) {
+      const ol = el('ol', 'sr-time');
+      story.querySelectorAll('li').forEach((li) => {
+        const row = el('li');
+        row.append(el('span', 'sr-year', clean(li.querySelector('b'))), el('span', null, clean(li.querySelector('span'))));
+        ol.append(row);
+      });
+      out.append(ol);
+    }
+    const ul = [...sec.querySelectorAll('ul')].find((u) => outside(u) && u.querySelector('li b'));
+    if (ul) {
+      const list = el('ul', 'sr-list');
+      ul.querySelectorAll('li').forEach((li) => {
+        const row = el('li');
+        const b = li.querySelector('b');
+        row.append(el('b', null, clean(b)), el('span', null, clean(li).replace(clean(b), '').trim()));
+        list.append(row);
+      });
+      out.append(list);
+    }
+    // photographs of the room and the work, framed and level
+    const photos = [...sec.querySelectorAll('figure img, .disc img')].filter((im) => !/assets\/(crew|cut|anim)\//.test(im.getAttribute('src') || ''));
+    if (photos.length && !glassLinks.length && !merch.length && !isStore) {
+      const g = el('div', 'sr-photos');
+      photos.slice(0, 3).forEach((p) => { const f = el('span', 'sr-frame'); const im = el('img'); im.src = p.currentSrc || p.src; im.alt = p.alt || ''; im.loading = 'lazy'; f.append(im); g.append(f); });
+      out.append(g);
+    }
+    const links = [...sec.querySelectorAll('a.btn')].filter(outside).slice(0, 2);
+    if (links.length) {
+      const row = el('div', 'sr-links');
+      links.forEach((a) => row.append(link(a)));
+      out.append(row);
+    }
+    return out.childElementCount ? out : null;
+  };
+
+  const room = el('div', 'sr');
   room.hidden = true;
   room.setAttribute('role', 'dialog');
   room.setAttribute('aria-label', 'Jerome Baker, calm version');
-  room.innerHTML = `
-<div class="sr-top"><span class="sr-brand">Jerome Baker</span><nav class="sr-nav" aria-label="Calm version"><span>Glass</span><span>Merch</span><span>Provenance</span><span>Visit</span></nav><button type="button" class="sr-snd" aria-pressed="true">Sound on</button></div>
-<div class="sr-room">
-  <div class="sr-exhibit"><img class="sr-piece" alt=""><div class="sr-plinth" aria-hidden="true"></div></div>
-  <div class="sr-card">
-    <p class="sr-kicker"></p>
-    <h2 class="sr-name"></h2>
-    <p class="sr-meta"></p>
-    <p class="sr-price"></p>
-    <a class="sr-buy" target="_blank" rel="noopener"></a>
-    <div class="sr-arrows" hidden><button type="button" data-d="-1" aria-label="Previous piece">‹</button><button type="button" data-d="1" aria-label="Next piece">›</button></div>
-  </div>
-</div>
-<div class="sr-foot"><span>Hand-blown since 1991. Each piece is one of one.</span><button type="button" class="sr-stay"></button></div>`;
+  const top = el('header', 'sr-top');
+  const brand = el('a', 'sr-brand', 'Jerome Baker');
+  brand.href = base || './';
+  const nav = el('nav', 'sr-nav');
+  nav.setAttribute('aria-label', 'Calm version');
+  [['Glass', 'glass/'], ['Merch', 'shop/'], ['The Crew', 'crew/'], ['Visit', 'travel/']].forEach(([t, href]) => { const a = el('a', null, t); a.href = base + href; nav.append(a); });
+  const snd = el('button', 'sr-snd', 'Sound on');
+  snd.type = 'button';
+  top.append(brand, nav, snd);
+  const body = el('div', 'sr-body');
+  const foot = el('footer', 'sr-foot');
+  const stay = el('button', 'sr-stay');
+  stay.type = 'button';
+  foot.append(el('span', null, 'Hand-blown since 1991. Each piece is one of one.'), stay);
+  room.append(top, body, foot);
   document.body.appendChild(room);
-  const $ = (s) => room.querySelector(s);
 
-  const show = (p) => {
-    const img = $('.sr-piece');
-    img.src = `${base}assets/glass/${p.id}.webp`;
-    img.alt = `${p.name}, hand-blown Jerome Baker glass`;
-    $('.sr-kicker').textContent = (p.series || 'Glass').toUpperCase();
-    $('.sr-name').textContent = p.name;
-    $('.sr-meta').textContent = [p.edition || '1 of 1', p.inches && `${p.inches} inches`, 'Borosilicate glass'].filter(Boolean).join(' · ');
-    $('.sr-price').textContent = money(p.price);
-    const buy = $('.sr-buy');
-    buy.textContent = p.online ? 'Buy' : 'Inquire';
-    buy.href = p.online ? p.buy : `mailto:sales@jeromebakerny.com?subject=${encodeURIComponent(`${p.name} (${p.id})`)}`;
+  let sections = [], hasCrew = false;
+  const build = () => {
+    sections = [...main.querySelectorAll(':scope > section')];
+    hasCrew = sections.some((s) => s.id === 'crew' || s.querySelector('.pin'));
+    const parts = sections.map(mirror).filter(Boolean);
+    if (!hasCrew && window.JB_CREW) {
+      // pages without a crew section still get the staff, lined up at the end
+      const s = el('section', 'sr-sec');
+      s.append(el('h2', 'sr-h', 'The JB Crew'), el('p', 'sr-p', 'The staff. Every one of them is on the clock.'), staff());
+      parts.push(s);
+    }
+    body.replaceChildren(...parts);
   };
-  room.querySelector('.sr-arrows').addEventListener('click', (e) => {
-    const b = e.target.closest('button');
-    if (!b) return;
-    idx = (idx + Number(b.dataset.d) + pool.length) % pool.length;
-    show(pool[idx]);
-  });
+  // land on the same part of the page the visitor was looking at
+  const sync = () => {
+    const mid = innerHeight / 2;
+    const i = sections.findIndex((s) => { const r = s.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid; });
+    const target = body.querySelector(`.sr-sec[data-i="${Math.max(0, i)}"]`);
+    room.scrollTop = target && i > 0 ? target.offsetTop - top.offsetHeight : 0;
+  };
 
   /* ---------------------------------------------------------------- sound */
   const SND = 'jb-calm-sound';
@@ -135,10 +278,9 @@
       });
     });
   }
-  const sndBtn = $('.sr-snd');
-  const paintSnd = () => { sndBtn.setAttribute('aria-pressed', soundOn); sndBtn.textContent = soundOn ? 'Sound on' : 'Sound off'; };
+  const paintSnd = () => { snd.setAttribute('aria-pressed', soundOn); snd.textContent = soundOn ? 'Sound on' : 'Sound off'; };
   paintSnd();
-  sndBtn.addEventListener('click', () => {
+  snd.addEventListener('click', () => {
     soundOn = !soundOn;
     try { localStorage.setItem(SND, soundOn ? 'on' : 'off'); } catch (e) { /* storage blocked */ }
     paintSnd();
@@ -168,7 +310,7 @@
     };
     requestAnimationFrame(frame);
   });
-  // square blocks that blink in at random until the room is whole
+  // square blocks that blink in at random until the page is whole
   const pixels = (ms) => new Promise((done) => {
     const size = Math.max(48, Math.round(Math.min(W(), H()) / 9));
     const cols = Math.ceil(W() / size), rows = Math.ceil(H() / size);
@@ -186,8 +328,9 @@
   });
 
   /* ---------------------------------------------------------------- ways out */
-  // copies of the room cut into pieces, each flying off on its own
+  // copies of the calm page, cut into pieces, each flying off on its own
   const blowApart = async (shapes, fling, ms) => {
+    const at = room.scrollTop;
     const shards = shapes.map((clip) => {
       const s = room.cloneNode(true);
       s.removeAttribute('role'); s.removeAttribute('aria-label'); s.setAttribute('aria-hidden', 'true');
@@ -195,6 +338,7 @@
       s.style.clipPath = clip;
       s.querySelectorAll('button,a').forEach((x) => x.setAttribute('tabindex', '-1'));
       document.body.appendChild(s);
+      s.scrollTop = at;
       return s;
     });
     room.hidden = true;
@@ -231,8 +375,7 @@
     }, 520);
   };
   const flash = async () => {
-    const f = document.createElement('div');
-    f.className = 'sr-flash';
+    const f = el('div', 'sr-flash');
     document.body.appendChild(f);
     await f.animate([{ opacity: .9 }, { opacity: 0 }], { duration: 260 }).finished;
     f.remove();
@@ -240,17 +383,22 @@
 
   /* ---------------------------------------------------------------- the moments */
   let busy = false, mode = 'chaos', holdT = 0, ins = 0, outs = 0;
-  const label = () => { $('.sr-stay').textContent = mode === 'calm' ? 'Bring back the chaos' : 'Stay in the calm version'; };
-  const lock = (on) => { document.documentElement.style.overflow = on ? 'hidden' : ''; };
+  const label = () => { stay.textContent = mode === 'calm' ? 'Bring back the chaos' : 'Stay in the calm version'; };
+  // the page underneath stops scrolling, and the antics and the real morph stand down
+  const lock = (on) => {
+    document.documentElement.style.overflow = on ? 'hidden' : '';
+    document.body.classList.toggle('sr-calm', on);
+  };
 
   async function enter(kind) {
     if (busy || !room.hidden) return;
     busy = true;
-    show(pool[idx = (idx + 1) % pool.length]);
+    build();
     document.body.classList.add('sr-jolt');
     await wait(220);
     document.body.classList.remove('sr-jolt');
     room.hidden = false;
+    sync();
     lock(true);
     music(true);
     announce();
@@ -279,28 +427,24 @@
     holdT = setTimeout(() => { if (mode === 'chaos') leave(); }, rand(2500, 3800));
   }
 
-  $('.sr-stay').addEventListener('click', async () => {
+  stay.addEventListener('click', async () => {
     if (mode === 'chaos') {
-      // keep it: no more timer, add a way to browse the pieces
+      // keep it: no more timer
       mode = 'calm';
       clearTimeout(holdT);
       remember(true);
-      room.querySelector('.sr-arrows').hidden = false;
       label();
     } else {
       mode = 'chaos';
       remember(false);
-      room.querySelector('.sr-arrows').hidden = true;
       await leave('shatter');
       schedule();
     }
   });
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && !room.hidden && mode === 'chaos') leave(); });
 
-  const call = document.createElement('button');
+  const call = el('button', 'sr-call', 'Calm down');
   call.type = 'button';
-  call.className = 'sr-call';
-  call.textContent = 'Calm down';
   call.addEventListener('click', moment);
   document.body.appendChild(call);
 
@@ -316,11 +460,7 @@
   if (stayed()) {
     // they chose calm last time: open straight into it
     mode = 'calm';
-    show(pool[idx]);
-    room.hidden = false;
-    room.querySelector('.sr-arrows').hidden = false;
-    lock(true);
-    label();
+    addEventListener('load', () => { build(); room.hidden = false; lock(true); label(); }, { once: true });
   } else {
     next = performance.now() + rand(9000, 14000);
   }

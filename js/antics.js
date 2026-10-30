@@ -239,7 +239,7 @@
   let next = performance.now() + rand(20000, 35000);
   setInterval(() => {
     const dlg = document.querySelector(P.dialog);
-    if (document.hidden || running || (dlg && dlg.open) || performance.now() < next) return;
+    if (document.hidden || running || (dlg && dlg.open) || document.body.classList.contains('sr-calm') || performance.now() < next) return;
     run(null, 'list').then((ran) => { next = performance.now() + (ran ? rand(45000, 90000) : 5000); });
   }, 1000);
   // in the detail view: a good chance, a few seconds after it opens
@@ -247,7 +247,7 @@
   if (dlg) {
     new MutationObserver(() => {
       if (!dlg.open || Math.random() > .45) return;
-      setTimeout(() => { if (dlg.open && !P.busy()) run(null, 'detail'); }, rand(2800, 5000));
+      setTimeout(() => { if (dlg.open && !P.busy() && !document.body.classList.contains('sr-calm')) run(null, 'detail'); }, rand(2800, 5000));
     }).observe(dlg, { attributes: true, attributeFilter: ['open'] });
   }
 })();
