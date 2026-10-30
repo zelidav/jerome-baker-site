@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="../css/site.css">
 <link rel="stylesheet" href="../css/crew.css">
 <link rel="stylesheet" href="../css/glitch.css">
+<link rel="stylesheet" href="hotshop/fx.css">
 <style>
 body{background:var(--ink)}
 .topbar nav a[aria-current]{color:var(--yellow)}
@@ -39,11 +40,6 @@ section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333
 .issue h2{margin:0 0 6px;font-family:var(--display);font-weight:900;font-size:clamp(40px,6vw,84px);line-height:.9;letter-spacing:-.02em;color:var(--white)}
 .issue h2 .no{color:var(--yellow);margin-right:10px}
 .issue .blurb{color:#cfcfcf;max-width:56ch;font-size:16px;line-height:1.5;margin:10px 0 28px}
-.panels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
-.panels a{display:block;border:4px solid var(--white);box-shadow:8px 8px 0 var(--red);background:#222;transition:transform .15s ease}
-.panels a:nth-child(even){rotate:.8deg}.panels a:nth-child(odd){rotate:-.6deg}
-.panels a:hover{transform:scale(1.03)}
-.panels img{width:100%;height:auto;aspect-ratio:900/1125;display:block}
 .acts{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px}
 .acts .btn{font-size:16px;min-height:44px;padding:0 18px}
 .next{padding-top:72px;padding-bottom:96px;color:var(--white);text-align:center}
@@ -58,11 +54,9 @@ section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333
 .gate .row{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
 .gate small{display:block;margin-top:16px;font-size:13px;line-height:1.45}
 #strips[hidden]{display:none}
-@media (max-width:900px){.panels{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:520px){.panels{grid-template-columns:1fr}.panels a{rotate:0deg!important}}
 </style>
 </head>
-<body data-crew-count="3" data-glitch="8bit">
+<body data-glitch="8bit">
 <a class="skip" href="#main">Skip to content</a>
 <div class="page">
 <header class="topbar pad"><a href="../" aria-label="Jerome Baker home"><img src="../assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a><nav aria-label="Main"><a href="../#glass">Glass</a> <a href="../shop/">Ritual merch</a> <a href="../crew/">The JB Crew</a> <a href="./" aria-current="page">The Hot Shop</a> <a href="../travel/" style="color:#FFF100">Travel guide</a></nav></header>
@@ -116,31 +110,31 @@ section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333
 </div>
 </div>
 
+<script src="hotshop/issues.js"></script>
 <script>
 (() => {
-  const ISSUES = [
-    { n: 1, slug: 'hot-shop-01', title: 'The Hot Shop Opens', blurb: 'Day one. One sign. Help wanted. Every lunatic on the booth wall shows up for the job.',
-      alt: ['Outside the Hot Shop at night, a line of applicants: Crude swigging motor oil, Major Tom-Tom floating, Lil\' Lucky smoking, Chomps on his board.',
-            'Torch interviews Major Tom-Tom, who floats upside down eating cereal.',
-            'Enlightened Ed hugs the furnace, tripping. Torch tells him the fire doesn\'t do payroll.',
-            'Minute four: Chomps bites a pipe in half, Crude spills oil everywhere, Torch hires everybody anyway.'] },
-    { n: 2, slug: 'hot-shop-02', title: 'First Shift', blurb: 'Shift starts at eight. The crew does not.',
-      alt: ['8 a.m. Torch alone in the empty shop.', '11:40 a.m. Crude hungover on motor oil, Tom-Tom with empty donut boxes.',
-            '11:52 a.m. Chomps and Dillo brawl over a blowpipe, molten glass flying.', '12:15 p.m. Torch pounds on the one bathroom door. Ed and Mama Cobra are busy.'] },
-    { n: 3, slug: 'hot-shop-03', title: 'Quality Control', blurb: 'Fresh out of the kiln, still 900 degrees. Somebody has to test it. Somebody volunteers.',
-      alt: ['Lil\' Lucky and Chomps scheme over a red-hot fresh pipe.', 'Major Tom-Tom reports for quality control.',
-            'Tom-Tom takes a rip off the red-hot glass. FSSSSHHHH.', 'Tom-Tom, face burned black, gives a thumbs up: hits smooth.'] },
-  ];
+  const ISSUES = window.HOTSHOP || [];
   const strips = document.getElementById('strips');
   const gate = document.getElementById('gate');
   const show = () => {
     gate.hidden = true;
     if (strips.childElementCount) return;
+    const fxHtml = (f) => {
+      const pos = `left:${f.x}%;top:${f.y}%;--s:${f.s || 20}%;--dx:${f.dx || 8}%`;
+      if (f.t === 'fire') return `<span class="fire" style="${pos}"><i></i><i></i><i></i></span>`;
+      if (f.t === 'heat') return `<span class="heat" style="${pos}"></span>`;
+      return `<span class="smoke ${f.t === 'smoke' ? '' : f.t}" style="${pos}"><i></i><i></i><i></i><i></i></span>`;
+    };
     strips.innerHTML = ISSUES.map((s) => `<section class="issue pad" id="issue-${s.n}"><div class="wrap">
 <h2><span class="no">#${s.n}</span>${s.title}</h2><p class="blurb">${s.blurb}</p>
-<div class="panels">${[1, 2, 3, 4].map((i) => `<a href="hotshop/${s.slug}-${i}.webp" target="_blank" rel="noopener"><img src="hotshop/${s.slug}-${i}.webp" alt="Panel ${i}: ${s.alt[i - 1].replace(/"/g, '&quot;')}" width="900" height="1125" loading="lazy" decoding="async"></a>`).join('')}</div>
-<div class="acts"><button class="btn btn-yellow" type="button" data-share="${s.n}">Share #${s.n}</button><a class="btn btn-ink" href="hotshop/${s.slug}-share.jpg" download>Save the page</a></div>
+<div class="hs-strip" role="group" aria-label="The Hot Shop #${s.n}, ${s.title}">${s.panels.map((p, i) => `<div class="pn${p.shake ? ' shake' : ''}">
+<img src="hotshop/${p.img}" alt="Panel ${i + 1}: ${p.alt.replace(/"/g, '&quot;')}" width="900" height="1200" loading="lazy" decoding="async">
+<div class="fx" aria-hidden="true">${p.flash ? '<span class="flash"></span>' : ''}${(p.fx || []).map(fxHtml).join('')}</div></div>`).join('')}</div>
+<div class="acts"><button class="btn btn-yellow" type="button" data-share="${s.n}">Share #${s.n}</button><a class="btn btn-ink" href="hotshop/${s.slug}-strip.jpg" download>Save the strip</a></div>
 </div></section>`).join('');
+    // motion runs only while a panel is on screen
+    const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('live', e.isIntersecting)), { threshold: 0.35 });
+    strips.querySelectorAll('.pn').forEach((p) => io.observe(p));
     strips.hidden = false;
     if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
   };
@@ -150,7 +144,7 @@ section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333
   strips.addEventListener('click', async (e) => {
     const b = e.target.closest('[data-share]');
     if (!b) return;
-    const s = ISSUES[b.dataset.share - 1];
+    const s = ISSUES.find((x) => x.n == b.dataset.share);
     const url = location.origin + location.pathname + '#issue-' + s.n;
     try {
       if (navigator.share) await navigator.share({ title: 'The Hot Shop #' + s.n + ': ' + s.title, text: '21+ only.', url });
@@ -159,8 +153,6 @@ section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333
   });
 })();
 </script>
-<script src="../js/crew-data.js"></script>
-<script src="../js/crew.js" defer></script>
 <script src="../js/glitch.js" defer></script>
 </body>
 </html>
