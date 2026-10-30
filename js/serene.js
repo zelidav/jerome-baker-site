@@ -5,6 +5,10 @@
    "Bring back the chaos" ends it. While it is up, body.sr-calm pauses the antics and the real morph.
    With sound (after the visitor's first click or key): elevator muzak, a tinny PA "Next floor: streetwear",
    and a ding as the store appears; the muzak fades out on the way back.
+   The visit is an elevator ride (about ten seconds): "Going up", then the page glides to the glass floor
+   ("Next floor: bongs", ding), holds, glides to the merch floor ("Next floor: streetwear", ding), holds,
+   and snaps back to the chaos. Scrolling, clicking or a key during the ride stops the gliding; the ride
+   still ends on time unless they chose to stay.
    Needs window.JB_GLASS and window.JB_CREW; window.JB_ANIM for the animated crew's standing frames.
    Test hook: JBSerene.enter('zigzag' | 'pixels'), JBSerene.leave('shatter' | 'slice'). */
 (() => {
@@ -189,6 +193,23 @@
     sections = [...main.querySelectorAll(':scope > section')];
     hasCrew = sections.some((s) => s.id === 'crew' || s.querySelector('.pin'));
     const parts = sections.map(mirror).filter(Boolean);
+    if (!parts.some((x) => x.querySelector('.sr-merch')) && window.JB_CREW) {
+      const seen = new Set(), items = [];
+      window.JB_CREW.forEach((c) => (c.wear || []).forEach((m) => { if (!seen.has(m.id)) { seen.add(m.id); items.push(m); } }));
+      const s = el('section', 'sr-sec');
+      const g = el('div', 'sr-grid sr-merch');
+      items.slice(0, 10).forEach((m) => {
+        const a = el('a', 'sr-item');
+        a.href = `${base}shop/#p=${encodeURIComponent(m.slug)}`;
+        const f = el('span', 'sr-frame'), im = el('img');
+        im.src = `${base}assets/merch/${m.id}.webp`; im.alt = m.name; im.loading = 'lazy';
+        f.append(im);
+        a.append(f, el('span', 'sr-iname', m.name), el('span', 'sr-iprice', money(m.price)));
+        g.append(a);
+      });
+      s.append(el('h2', 'sr-h', 'Ritual merch'), el('p', 'sr-p', 'Real gear, shipping now.'), g);
+      parts.push(s);
+    }
     if (!hasCrew && window.JB_CREW) {
       // pages without a crew section still get the staff, lined up at the end
       const s = el('section', 'sr-sec');
@@ -197,13 +218,51 @@
     }
     body.replaceChildren(...parts);
   };
-  // land on the same part of the page the visitor was looking at
-  const sync = () => {
-    const mid = innerHeight / 2;
-    const i = sections.findIndex((s) => { const r = s.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid; });
-    const target = body.querySelector(`.sr-sec[data-i="${Math.max(0, i)}"]`);
-    room.scrollTop = target && i > 0 ? target.offsetTop - top.offsetHeight : 0;
+  // the floors of the ride: the glass (the first series group when the page has them, else the biggest
+  // glass section), then the first merch section
+  const floors = () => {
+    const glass = [...body.querySelectorAll('.sr-glass')].sort((a, b) => b.childElementCount - a.childElementCount)[0];
+    const sub = body.querySelector('.sr-sub');
+    const merch = body.querySelector('.sr-merch');
+    return [glass && { line: 'bongs', at: sub || glass.closest('.sr-sec') }, merch && { line: 'floor', at: merch.closest('.sr-sec') }].filter(Boolean);
   };
+  const yOf = (at) => Math.max(0, Math.min(at.offsetTop - top.offsetHeight - (at.classList.contains('sr-sub') ? 28 : -1), room.scrollHeight - room.clientHeight));
+  // a smooth glide that a visitor can interrupt at any point
+  let glideRaf = 0;
+  const glide = (to, ms) => new Promise((done) => {
+    cancelAnimationFrame(glideRaf);
+    const from = room.scrollTop, t0 = performance.now();
+    if (calmMotion || Math.abs(to - from) < 2) { room.scrollTop = to; done(); return; }
+    const frame = (now) => {
+      if (!riding) { done(); return; }
+      const k = Math.min(1, (now - t0) / ms), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      room.scrollTop = from + (to - from) * e;
+      if (k < 1) glideRaf = requestAnimationFrame(frame); else done();
+    };
+    glideRaf = requestAnimationFrame(frame);
+  });
+  const HOLD = 3600;
+  let riding = false, rideId = 0;
+  const log = [];
+  const cue = (what) => log.push({ what, t: Math.round(performance.now()), y: Math.round(room.scrollTop) });
+  async function ride() {
+    const id = ++rideId;
+    riding = true;
+    const alive = () => riding && id === rideId && !room.hidden;
+    await wait(900);
+    for (const f of floors()) {
+      if (!alive()) return;
+      cue('glide:' + f.line);
+      await glide(yOf(f.at), 1300);
+      if (!alive()) return;
+      ding();
+      announce(f.line, .45);
+      cue('arrive:' + f.line);
+      await wait(HOLD);
+    }
+  }
+  // a visitor taking the wheel ends the ride's gliding (never their own scrolling)
+  ['wheel', 'touchstart', 'pointerdown', 'keydown'].forEach((t) => room.addEventListener(t, () => { if (riding) { riding = false; cancelAnimationFrame(glideRaf); cue('visitor'); } }, { passive: true }));
 
   /* ---------------------------------------------------------------- sound */
   const SND = 'jb-calm-sound';
@@ -246,9 +305,9 @@
     muzak = { src, g };
   }
   // the PA: the voice squeezed through a cheap ceiling speaker
-  async function announce() {
+  async function announce(name = 'floor', delay = .15) {
     const c = audioCtx();
-    const buf = c && await load('floor');
+    const buf = c && await load(name);
     if (!buf) return;
     const src = c.createBufferSource(), hp = c.createBiquadFilter(), lp = c.createBiquadFilter(), sh = c.createWaveShaper(), g = c.createGain();
     hp.type = 'highpass'; hp.frequency.value = 500;
@@ -259,7 +318,7 @@
     g.gain.value = .9;
     src.buffer = buf;
     src.connect(hp).connect(lp).connect(sh).connect(g).connect(c.destination);
-    src.start(c.currentTime + .15);
+    src.start(c.currentTime + delay);
   }
   // the elevator ding: two soft bell tones, high then low
   function ding() {
@@ -398,10 +457,11 @@
     await wait(220);
     document.body.classList.remove('sr-jolt');
     room.hidden = false;
-    sync();
+    room.scrollTop = 0;
     lock(true);
     music(true);
-    announce();
+    announce('up');
+    cue('enter');
     if (calmMotion) await room.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400 }).finished;
     else await (kind === 'pixels' || (!kind && ins % 2) ? pixels(650) : zigzag(520));
     ding();
@@ -413,7 +473,10 @@
     if (busy || room.hidden) return;
     busy = true;
     clearTimeout(holdT);
+    riding = false;
+    cancelAnimationFrame(glideRaf);
     music(false);
+    cue('leave');
     if (calmMotion) { await room.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 400 }).finished; room.hidden = true; }
     else { flash(); await (kind === 'slice' || (!kind && outs % 2) ? slice() : shatter()); }
     outs++;
@@ -422,9 +485,11 @@
   }
   // the automatic kind: in, a few seconds of calm, then back out
   async function moment() {
+    if (busy || !room.hidden) return;
     await enter();
-    if (mode !== 'chaos') return;
-    holdT = setTimeout(() => { if (mode === 'chaos') leave(); }, rand(2500, 3800));
+    ride();
+    const total = 900 + floors().length * (1300 + HOLD);
+    holdT = setTimeout(() => { if (mode === 'chaos') leave(); }, total);
   }
 
   stay.addEventListener('click', async () => {
@@ -432,6 +497,7 @@
       // keep it: no more timer
       mode = 'calm';
       clearTimeout(holdT);
+      riding = false;
       remember(true);
       label();
     } else {
@@ -464,5 +530,5 @@
   } else {
     next = performance.now() + rand(9000, 14000);
   }
-  window.JBSerene = { enter, leave, moment };
+  window.JBSerene = { enter, leave, moment, log };
 })();
