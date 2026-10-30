@@ -4,7 +4,7 @@ window.HOTSHOP = [
   "n": 1,
   "slug": "hot-shop-01",
   "title": "The Hot Shop Opens",
-  "blurb": "Opening night. One sign. Help wanted. Every degenerate on the booth wall shows up for the job.",
+  "blurb": "Torch hangs a HELP WANTED sign. Tom-Tom shows up already airborne, Crude drinks the motor oil and Ed climbs into the glory hole. Four minutes in, the shelf is gone.",
   "panels": [
    {
     "img": "hot-shop-01-1.webp",
@@ -100,7 +100,7 @@ window.HOTSHOP = [
   "n": 2,
   "slug": "hot-shop-02",
   "title": "First Shift",
-  "blurb": "Shift starts at eight. The crew does not. Then the van shows up.",
+  "blurb": "Shift starts at eight. Torch is the only one there. At 11:40 the crew drives the van through the wall, somebody takes molten glass to the face, and the bathroom door blows off with Ed and Mama Cobra still inside.",
   "panels": [
    {
     "img": "hot-shop-02-1.webp",
@@ -189,7 +189,7 @@ window.HOTSHOP = [
   "n": 3,
   "slug": "hot-shop-03",
   "title": "Quality Control",
-  "blurb": "Fresh out of the kiln, still 900 degrees. Somebody has to test it. The space monkey volunteers.",
+  "blurb": "A pipe comes out of the kiln at 900 degrees. Somebody has to test it. Tom-Tom volunteers. Lucky and Chomps film the whole thing.",
   "panels": [
    {
     "img": "hot-shop-03-1.webp",

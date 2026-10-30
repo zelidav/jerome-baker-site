@@ -257,7 +257,7 @@ def crew_index():
 <section class="crew pad">
 <div class="wrap">
 <h1 class="display" style="margin:0;font-size:clamp(64px,11vw,170px);line-height:.85;letter-spacing:-.03em;rotate:-2deg;text-shadow:6px 6px 0 #0A0A0A">The JB<br><span style="color:#FFF100">Crew.</span></h1>
-<p class="lede">They came off the booth wall, the box art and the old posters. They got dressed in real JB merch. Now they float around the site doing whatever they want. Grab one. Throw it. Tap one to say hi. Every crew member has a page, and every page is weird in its own way.</p>
+<p class="lede">Twenty characters off the booth wall, the box art and the old posters. They got dressed in real JB merch and stopped taking direction. Now they float around the site doing whatever they want. Grab one and throw it. Tap one and it talks back. Every one of them has a page and a rap sheet.</p>
 <p class="find-inline"><a class="btn btn-yellow" href="../crew/match/">Find your crew</a><span>Eight questions. We match you to the one who gets you.</span></p>
 <div class="pinboard">{pins}</div>
 </div>
