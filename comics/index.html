@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en" data-base="../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Hot Shop. Jerome Baker</title>
+<meta name="description" content="The Hot Shop: a 21+ Jerome Baker comic. The shop opened. Everybody got hired. That was the mistake.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0A0A0A">
+<meta property="og:title" content="The Hot Shop. A Jerome Baker comic (21+)">
+<meta property="og:description" content="The shop opened. Everybody got hired. That was the mistake.">
+<meta property="og:image" content="https://jeromebaker.cannacrypted.com/assets/icons/og.jpg">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" href="../assets/icons/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png">
+<link rel="manifest" href="../site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/site.css">
+<link rel="stylesheet" href="../css/crew.css">
+<link rel="stylesheet" href="../css/glitch.css">
+<style>
+body{background:var(--ink)}
+.topbar nav a[aria-current]{color:var(--yellow)}
+.mast{position:relative;padding-top:64px;padding-bottom:72px;color:var(--white);border-bottom:4px solid var(--yellow)}
+.mast .wash{position:absolute;inset:0;background:var(--ink);opacity:.82;z-index:0}
+.mast .wrap{position:relative;z-index:2}
+.mast h1{margin:0;font-family:var(--display);font-weight:900;font-size:clamp(64px,13vw,190px);line-height:.82;letter-spacing:-.03em;color:var(--yellow);text-shadow:8px 8px 0 var(--red)}
+.mast .kicker{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.2em;color:var(--red);background:var(--yellow);display:inline-block;padding:6px 10px;rotate:-2deg;margin-bottom:18px}
+.mast p{max-width:48ch;font-size:19px;line-height:1.5;margin:24px 0 0;font-weight:600}
+.rating{display:inline-flex;align-items:center;gap:10px;margin-top:22px;border:3px solid var(--red);padding:8px 12px;font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.14em;color:var(--white)}
+.rating b{background:var(--red);color:var(--white);padding:4px 8px;font-size:16px}
+.cast{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.cast a{display:flex;align-items:center;gap:8px;background:var(--white);color:var(--ink);text-decoration:none;font-weight:800;font-size:14px;padding:4px 12px 4px 4px;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--red);rotate:var(--t,0deg)}
+.cast a img{width:40px;height:40px;object-fit:contain}
+.cast a:hover{background:var(--yellow)}
+section.issue{padding-top:72px;padding-bottom:72px;border-bottom:4px dashed #333}
+.issue h2{margin:0 0 6px;font-family:var(--display);font-weight:900;font-size:clamp(40px,6vw,84px);line-height:.9;letter-spacing:-.02em;color:var(--white)}
+.issue h2 .no{color:var(--yellow);margin-right:10px}
+.issue .blurb{color:#cfcfcf;max-width:56ch;font-size:16px;line-height:1.5;margin:10px 0 28px}
+.panels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.panels a{display:block;border:4px solid var(--white);box-shadow:8px 8px 0 var(--red);background:#222;transition:transform .15s ease}
+.panels a:nth-child(even){rotate:.8deg}.panels a:nth-child(odd){rotate:-.6deg}
+.panels a:hover{transform:scale(1.03)}
+.panels img{width:100%;height:auto;aspect-ratio:900/1125;display:block}
+.acts{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px}
+.acts .btn{font-size:16px;min-height:44px;padding:0 18px}
+.next{padding-top:72px;padding-bottom:96px;color:var(--white);text-align:center}
+.next h2{font-family:var(--display);font-weight:900;font-size:clamp(36px,6vw,72px);line-height:.9;margin:0}
+.next p{color:#cfcfcf;margin:14px auto 0;max-width:46ch}
+/* the 21+ wall */
+.gate{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:16px;background:rgba(10,10,10,.92);backdrop-filter:blur(8px)}
+.gate[hidden]{display:none}
+.gate .card{background:var(--yellow);color:var(--ink);border:4px solid var(--ink);box-shadow:14px 14px 0 var(--red);padding:28px;max-width:520px;rotate:-1deg}
+.gate h2{margin:0;font-family:var(--display);font-weight:900;font-size:clamp(34px,6vw,54px);line-height:.92}
+.gate ul{margin:16px 0 0;padding-left:20px;font-weight:700;line-height:1.6}
+.gate .row{display:flex;flex-wrap:wrap;gap:14px;margin-top:22px}
+.gate small{display:block;margin-top:16px;font-size:13px;line-height:1.45}
+#strips[hidden]{display:none}
+@media (max-width:900px){.panels{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.panels{grid-template-columns:1fr}.panels a{rotate:0deg!important}}
+</style>
+</head>
+<body data-crew-count="3" data-glitch="8bit">
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+<header class="topbar pad"><a href="../" aria-label="Jerome Baker home"><img src="../assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a><nav aria-label="Main"><a href="../#glass">Glass</a> <a href="../shop/">Ritual merch</a> <a href="../crew/">The JB Crew</a> <a href="./" aria-current="page">The Hot Shop</a> <a href="../travel/" style="color:#FFF100">Travel guide</a></nav></header>
+
+<main id="main">
+<section class="mast boxbg pad">
+<div class="wash" aria-hidden="true"></div>
+<div class="wrap">
+<span class="kicker">A JEROME BAKER COMIC</span>
+<h1>The Hot<br>Shop</h1>
+<p>Torch opened a glassblowing shop and put up one sign. Every lunatic on the booth wall showed up for the job. He hired all of them. That was the mistake.</p>
+<span class="rating"><b>21+</b> DRINKING · GETTING HIGH · CARTOON VIOLENCE · FILTHY MOUTHS · BATHROOM SITUATIONS</span>
+<div class="cast" aria-label="Starring">
+<a href="../crew/torch/" style="--t:-2deg"><img src="../assets/crew/lion.webp" alt="">Torch</a>
+<a href="../crew/major-tom-tom/" style="--t:1deg"><img src="../assets/crew/chimp.webp" alt="">Major Tom-Tom</a>
+<a href="../crew/chomps/" style="--t:-1deg"><img src="../assets/crew/shark.webp" alt="">Chomps</a>
+<a href="../crew/enlightened-ed/" style="--t:2deg"><img src="../assets/crew/octo.webp" alt="">Enlightened Ed</a>
+<a href="../crew/crude/" style="--t:-2deg"><img src="../assets/crew/crude.webp" alt="">Crude</a>
+<a href="../crew/lil-lucky/" style="--t:1deg"><img src="../assets/crew/devil.webp" alt="">Lil' Lucky</a>
+<a href="../crew/mama-cobra/" style="--t:-1deg"><img src="../assets/crew/cobra.webp" alt="">Mama Cobra</a>
+<a href="../crew/dillo/" style="--t:2deg"><img src="../assets/crew/dillo.webp" alt="">Dillo</a>
+</div>
+</div>
+</section>
+
+<div id="strips" hidden></div>
+
+<section class="next pad">
+<h2><span style="color:#FFF100">#4</span> is on the bench.</h2>
+<p>Somebody calls the cops. Public Enemy No. 1 gets arrested for something he didn't do. Again.</p>
+</section>
+</main>
+
+<footer class="pad" style="background:#0A0A0A;color:#BDBDBD;padding-top:40px;padding-bottom:calc(80px + env(safe-area-inset-bottom));font-size:14px;border-top:4px solid #DA2342">© 2026 Jerome Baker Designs. Adults 21+ only. The Hot Shop is fiction, the crew is fictional, and nobody should do any of this. Hot glass burns. Don't put your face on it.</footer>
+</div>
+
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+<div class="card">
+<h2 id="gateTitle">Hold up. This one's for grown-ups.</h2>
+<ul>
+<li>21+ only, and not safe for work</li>
+<li>Booze, weed, tripping and bad decisions</li>
+<li>Cartoon violence, including a face on hot glass</li>
+<li>Filthy language and implied hookups</li>
+</ul>
+<div class="row">
+<button class="btn btn-red" id="gateYes" type="button">I'm 21+. Show me.</button>
+<a class="btn btn-ink" href="../">Get me out</a>
+</div>
+<small>It's a cartoon. Nobody in it is real, and none of it is advice. Hot glass is hundreds of degrees. Seriously, don't.</small>
+</div>
+</div>
+
+<script>
+(() => {
+  const ISSUES = [
+    { n: 1, slug: 'hot-shop-01', title: 'The Hot Shop Opens', blurb: 'Day one. One sign. Help wanted. Every lunatic on the booth wall shows up for the job.',
+      alt: ['Outside the Hot Shop at night, a line of applicants: Crude swigging motor oil, Major Tom-Tom floating, Lil\' Lucky smoking, Chomps on his board.',
+            'Torch interviews Major Tom-Tom, who floats upside down eating cereal.',
+            'Enlightened Ed hugs the furnace, tripping. Torch tells him the fire doesn\'t do payroll.',
+            'Minute four: Chomps bites a pipe in half, Crude spills oil everywhere, Torch hires everybody anyway.'] },
+    { n: 2, slug: 'hot-shop-02', title: 'First Shift', blurb: 'Shift starts at eight. The crew does not.',
+      alt: ['8 a.m. Torch alone in the empty shop.', '11:40 a.m. Crude hungover on motor oil, Tom-Tom with empty donut boxes.',
+            '11:52 a.m. Chomps and Dillo brawl over a blowpipe, molten glass flying.', '12:15 p.m. Torch pounds on the one bathroom door. Ed and Mama Cobra are busy.'] },
+    { n: 3, slug: 'hot-shop-03', title: 'Quality Control', blurb: 'Fresh out of the kiln, still 900 degrees. Somebody has to test it. Somebody volunteers.',
+      alt: ['Lil\' Lucky and Chomps scheme over a red-hot fresh pipe.', 'Major Tom-Tom reports for quality control.',
+            'Tom-Tom takes a rip off the red-hot glass. FSSSSHHHH.', 'Tom-Tom, face burned black, gives a thumbs up: hits smooth.'] },
+  ];
+  const strips = document.getElementById('strips');
+  const gate = document.getElementById('gate');
+  const show = () => {
+    gate.hidden = true;
+    if (strips.childElementCount) return;
+    strips.innerHTML = ISSUES.map((s) => `<section class="issue pad" id="issue-${s.n}"><div class="wrap">
+<h2><span class="no">#${s.n}</span>${s.title}</h2><p class="blurb">${s.blurb}</p>
+<div class="panels">${[1, 2, 3, 4].map((i) => `<a href="hotshop/${s.slug}-${i}.webp" target="_blank" rel="noopener"><img src="hotshop/${s.slug}-${i}.webp" alt="Panel ${i}: ${s.alt[i - 1].replace(/"/g, '&quot;')}" width="900" height="1125" loading="lazy" decoding="async"></a>`).join('')}</div>
+<div class="acts"><button class="btn btn-yellow" type="button" data-share="${s.n}">Share #${s.n}</button><a class="btn btn-ink" href="hotshop/${s.slug}-share.jpg" download>Save the page</a></div>
+</div></section>`).join('');
+    strips.hidden = false;
+    if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
+  };
+  try { if (sessionStorage.getItem('jbHotShop21') === '1') show(); } catch (e) {}
+  if (!gate.hidden) document.getElementById('gateYes').focus();
+  document.getElementById('gateYes').onclick = () => { try { sessionStorage.setItem('jbHotShop21', '1'); } catch (e) {} show(); };
+  strips.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-share]');
+    if (!b) return;
+    const s = ISSUES[b.dataset.share - 1];
+    const url = location.origin + location.pathname + '#issue-' + s.n;
+    try {
+      if (navigator.share) await navigator.share({ title: 'The Hot Shop #' + s.n + ': ' + s.title, text: '21+ only.', url });
+      else { await navigator.clipboard.writeText(url); b.textContent = 'Link copied'; setTimeout(() => (b.textContent = 'Share #' + s.n), 1800); }
+    } catch (err) {}
+  });
+})();
+</script>
+<script src="../js/crew-data.js"></script>
+<script src="../js/crew.js" defer></script>
+<script src="../js/glitch.js" defer></script>
+</body>
+</html>
