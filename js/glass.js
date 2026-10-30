@@ -201,7 +201,7 @@
   /* ---------------------------------------------------------------- the bench */
   const bench = $('#bench');
   const bImg = $('#bImg'), bFill = $('#bFill'), bPiece = $('#bPiece'), hit = $('#bHit');
-  const bSmoke = new Smoke($('#bSmoke'), { scrolls: false, cap: 520 });
+  const bSmoke = new Smoke($('#bSmoke'), { scrolls: false, cap: 900 });
   let cur = null;
 
   const benchMouth = () => {
@@ -280,6 +280,129 @@
     if (e.key === 'ArrowRight') step(1);
   });
 
+  /* sound, made in the browser: water bubbling while you pull, a cough when you let go. Only ever after a press. */
+  const Sfx = (() => {
+    let ctx, noise, gurgle = null;
+    let on = true;
+    try { on = localStorage.getItem('jb-glass-sound') !== 'off'; } catch (e) { /* storage blocked */ }
+    const btn = $('#bSnd');
+    const paint = () => { btn.setAttribute('aria-pressed', on); btn.textContent = on ? 'Sound on' : 'Sound off'; };
+    paint();
+    btn.onclick = () => {
+      on = !on;
+      paint();
+      try { localStorage.setItem('jb-glass-sound', on ? 'on' : 'off'); } catch (e) { /* storage blocked */ }
+      if (!on) stopGurgle();
+    };
+    const ac = () => {
+      if (!on) return null;
+      if (!ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        ctx = new AC();
+        noise = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+        const d = noise.getChannelData(0);
+        for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      }
+      if (ctx.state === 'suspended') ctx.resume();
+      return ctx;
+    };
+    const env = (g, t, peak, a, d) => {
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + a);
+      g.gain.exponentialRampToValueAtTime(.0001, t + a + d);
+    };
+    // one bubble: a sine that pops upward in pitch
+    function blip(v) {
+      const c = ac();
+      if (!c) return;
+      const t = c.currentTime, o = c.createOscillator(), g = c.createGain();
+      const f = 170 + Math.random() * 420;
+      o.frequency.setValueAtTime(f, t);
+      o.frequency.exponentialRampToValueAtTime(f * (1.8 + Math.random()), t + .07);
+      env(g, t, .18 * v, .006, .08);
+      o.connect(g).connect(c.destination);
+      o.start(t); o.stop(t + .1);
+    }
+    // the low rumble of water under the bubbles
+    function startGurgle() {
+      const c = ac();
+      if (!c || gurgle) return;
+      const src = c.createBufferSource(), lp = c.createBiquadFilter(), g = c.createGain(), lfo = c.createOscillator(), depth = c.createGain();
+      src.buffer = noise; src.loop = true;
+      lp.type = 'lowpass'; lp.frequency.value = 320; lp.Q.value = 8;
+      lfo.frequency.value = 11; depth.gain.value = 140;
+      lfo.connect(depth).connect(lp.frequency);
+      g.gain.value = .0001;
+      g.gain.setTargetAtTime(.05, c.currentTime, .1);
+      src.connect(lp).connect(g).connect(c.destination);
+      src.start(); lfo.start();
+      gurgle = { src, lfo, g };
+    }
+    function level(v) { if (gurgle) gurgle.g.gain.setTargetAtTime(.04 + v * .12, ctx.currentTime, .1); }
+    function stopGurgle() {
+      if (!gurgle) return;
+      const { src, lfo, g } = gurgle;
+      gurgle = null;
+      g.gain.setTargetAtTime(.0001, ctx.currentTime, .05);
+      src.stop(ctx.currentTime + .3); lfo.stop(ctx.currentTime + .3);
+    }
+    // a cough: a rough burst of breath with a bit of voice under it
+    function cough(strength) {
+      const c = ac();
+      if (!c) return;
+      const t = c.currentTime;
+      const src = c.createBufferSource(), bp = c.createBiquadFilter(), g = c.createGain();
+      src.buffer = noise;
+      bp.type = 'bandpass'; bp.frequency.value = 650 + Math.random() * 350; bp.Q.value = .9;
+      env(g, t, .7 * strength, .012, .26);
+      src.connect(bp).connect(g).connect(c.destination);
+      src.start(t, Math.random() * .5); src.stop(t + .35);
+      const o = c.createOscillator(), vf = c.createBiquadFilter(), vg = c.createGain();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(155 + Math.random() * 45, t);
+      o.frequency.exponentialRampToValueAtTime(100, t + .22);
+      vf.type = 'bandpass'; vf.frequency.value = 520; vf.Q.value = 1.4;
+      env(vg, t, .16 * strength, .01, .2);
+      o.connect(vf).connect(vg).connect(c.destination);
+      o.start(t); o.stop(t + .26);
+    }
+    return { blip, startGurgle, level, stopGurgle, cough };
+  })();
+
+  const hitter = $('#bHitter'), say = $('#bSay');
+  const COUGHS = ['*cough* worth it', '*hack* okay. OKAY.', 'smooth. *cough*', 'who cleaned this?? *cough*', 'one more. *wheeze*', '*cough* I need this one'];
+  let hitterOut = 0;
+  function walkUp() {
+    const crew = window.JB_CREW || [];
+    if (!crew.length || hitter.classList.contains('in')) return;
+    clearTimeout(hitterOut);
+    const c = crew[(Math.random() * crew.length) | 0];
+    const st = $('#bStage').getBoundingClientRect(), r = bImg.getBoundingClientRect();
+    const mx = r.left - st.left + cur.mouth[0] * r.width, my = r.top - st.top + cur.mouth[1] * r.height;
+    const ch = Math.max(150, Math.min(320, r.height * .45));
+    hitter.src = `../assets/crew/${c.img}_m.webp`;
+    hitter.style.setProperty('--ch', ch + 'px');
+    hitter.style.left = Math.min(mx + 4, st.width - ch * .8) + 'px';
+    hitter.style.top = Math.max(8, my - ch * .1) + 'px';
+    hitter.className = 'hitter';
+    void hitter.offsetWidth;
+    hitter.classList.add('in');
+    setTimeout(() => { if (hitter.classList.contains('in')) hitter.classList.add('at'); }, 800);
+  }
+  function walkOff(delay) {
+    clearTimeout(hitterOut);
+    hitterOut = setTimeout(() => { hitter.className = 'hitter'; say.classList.remove('on'); }, delay);
+  }
+  function speak(text) {
+    const h = hitter.getBoundingClientRect(), st = $('#bStage').getBoundingClientRect();
+    say.textContent = text;
+    // clear of the sound and close buttons in the top corners
+    say.style.left = Math.max(8, Math.min(h.left - st.left + h.width * .3, st.width - 280)) + 'px';
+    say.style.top = Math.max(72, h.top - st.top - 56) + 'px';
+    say.classList.add('on');
+  }
+
   /* hold to take a hit: the glass fills with smoke from the base up, bubbles in the water, then you let it go */
   let holding = false, lvl = 0, t0 = 0, raf = 0, drain = 0;
   const FILL_MS = 2600;
@@ -300,8 +423,10 @@
   function tick(now) {
     if (!holding) return;
     setLvl(Math.min(1, (now - t0) / FILL_MS));
-    if (Math.random() < .55) bubble();
-    if (lvl >= 1 && Math.random() < .3 && !calm) { const m = benchMouth(); bSmoke.puff(m[0], m[1], wisp); }
+    if (Math.random() < .55) { bubble(); if (Math.random() < .5) Sfx.blip(.45 + lvl * .55); }
+    Sfx.level(lvl);
+    // as the chamber fills, smoke starts leaking out the top
+    if (lvl > .5 && Math.random() < (lvl - .4) * .7 && !calm) { const m = benchMouth(); bSmoke.puff(m[0], m[1], { ...wisp, size: 18 + lvl * 10 }); }
     raf = requestAnimationFrame(tick);
   }
   function press(e) {
@@ -312,6 +437,8 @@
     t0 = performance.now() - lvl * FILL_MS;
     hit.classList.add('on');
     $('#bHitLabel').textContent = 'Keep holding';
+    Sfx.startGurgle();
+    walkUp();
     raf = requestAnimationFrame(tick);
   }
   function release(quiet) {
@@ -320,10 +447,31 @@
     cancelAnimationFrame(raf);
     hit.classList.remove('on');
     $('#bHitLabel').textContent = 'Hold to take a hit';
+    Sfx.stopGurgle();
     const took = lvl;
+    if (quiet === true) { hitter.className = 'hitter'; say.classList.remove('on'); }
+    if (took <= .12 && quiet !== true) walkOff(200);
     if (took > .12 && quiet !== true) {
       const m = benchMouth();
-      if (!calm) bSmoke.burst(m[0], m[1], Math.round(30 + took * 110), 1.4 + took * 1.6);
+      if (!calm) {
+        // the exhale: a burst, then a column that keeps pouring out the top
+        bSmoke.burst(m[0], m[1], Math.round(60 + took * 200), 1.6 + took * 1.8);
+        bSmoke.on('exhale', () => benchMouth(), 1.6 + took * 1.6, { size: 30, grow: 1.1, alpha: .55, vy: 2 + took * 1.5, life: 250, spread: 16 });
+        setTimeout(() => bSmoke.off('exhale'), 500 + took * 1100);
+      }
+      // then the coughing, each one kicking out another cloud
+      const n = took >= .85 ? 3 : took > .45 ? 2 : 1;
+      for (let i = 0; i < n; i++) {
+        setTimeout(() => {
+          if (!bench.open) return;
+          Sfx.cough(.6 + took * .4);
+          const mm = benchMouth();
+          if (!calm) bSmoke.burst(mm[0], mm[1] + 10, 22, 1.4);
+          if (hitter.classList.contains('in')) { hitter.classList.remove('at', 'cough'); void hitter.offsetWidth; hitter.classList.add('cough'); }
+        }, 650 + i * 380);
+      }
+      if (hitter.classList.contains('in')) setTimeout(() => speak(COUGHS[(Math.random() * COUGHS.length) | 0]), 700);
+      walkOff(650 + n * 380 + 1500);
       const p = cur;
       $('#bStatus').textContent = p.status !== 'available'
         ? `${took >= 1 ? 'Full send.' : 'Easy.'} Somebody already owns this one, but the shelf is still stocked.`
