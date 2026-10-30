@@ -31,6 +31,7 @@
     if (!k || img.dataset.real) return;
     busy++;
     img.dataset.real = '1';
+    dispatchEvent(new CustomEvent('jb-real', { detail: 'start' }));
     await Promise.all(preload(k));
     const keep = { src: img.src, srcset: img.srcset, h: img.style.height, w: img.style.width, fit: img.style.objectFit };
     const r = img.getBoundingClientRect();
@@ -40,11 +41,17 @@
     img.style.objectFit = 'contain';
     img.style.objectPosition = 'bottom';
     img.removeAttribute('srcset');
-    const glitch = () => img.animate([
-      { filter: 'none', translate: '0 0' },
-      { filter: 'drop-shadow(6px 0 0 #DA2342) drop-shadow(-6px 0 0 #05B48F) contrast(1.6)', translate: '4px -2px' },
-      { filter: 'hue-rotate(90deg) saturate(3)', translate: '-5px 2px' },
-      { filter: 'none', translate: '0 0' }], { duration: 260, easing: 'steps(4)' }).finished;
+    // a quick flicker and jolt; no color filters, so nothing gets stuck tinted on slow phones
+    const glitch = async () => {
+      const a = img.animate([
+        { opacity: 1, translate: '0 0', scale: '1 1' },
+        { opacity: .2, translate: '6px -3px', scale: '1.04 .96' },
+        { opacity: 1, translate: '-6px 3px', scale: '.97 1.03' },
+        { opacity: .4, translate: '3px 0', scale: '1 1' },
+        { opacity: 1, translate: '0 0', scale: '1 1' }], { duration: 280, easing: 'steps(5)' });
+      await a.finished.catch(() => {});
+      a.cancel();
+    };
     await glitch();
     img.src = frame(k, 'stare');
     await wait(1100);
@@ -57,8 +64,10 @@
     img.src = keep.src;
     if (keep.srcset) img.srcset = keep.srcset;
     img.style.width = keep.w; img.style.height = keep.h; img.style.objectFit = keep.fit; img.style.objectPosition = '';
+    img.style.filter = '';
     delete img.dataset.real;
     busy--;
+    dispatchEvent(new CustomEvent('jb-real', { detail: 'end' }));
   }
 
   const candidates = () => [...document.querySelectorAll('img')].filter((i) => who(i) && onScreen(i) && !i.dataset.real);
@@ -74,7 +83,8 @@
   const crewPage = /\/crew\/(?!match\/)[a-z0-9-]+\/?$/.test(location.pathname);
   if (crewPage) {
     setTimeout(() => {
-      const hero = [...document.querySelectorAll('.cp-hero img')].find((i) => who(i) && onScreen(i));
+      // the hero can be taller than the screen; it only has to be in view
+      const hero = [...document.querySelectorAll('.cp-hero img')].find((i) => { const r = i.getBoundingClientRect(); return who(i) && r.width > 50 && r.top < innerHeight && r.bottom > 0; });
       if (hero && !busy) morph(hero);
     }, rand(2000, 3000));
   }

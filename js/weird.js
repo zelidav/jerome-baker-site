@@ -121,9 +121,13 @@
       }, { passive: true });
     },
     dark() {
-      const d = el('span', 'inset:0;background:#000;pointer-events:none');
+      const d = el('span', 'inset:0;background:#000;pointer-events:none;transition:opacity .35s');
       fx.style.zIndex = 69; fx.appendChild(d);
-      const loop = () => { const m = `radial-gradient(circle 190px at ${ptr.x}px ${ptr.y}px,transparent 0,transparent 60%,#000 100%)`; d.style.webkitMaskImage = m; d.style.maskImage = m; d.style.background = 'rgba(0,0,0,.94)'; requestAnimationFrame(loop); };
+      // a wide beam: about a third of the screen, never smaller than a phone's width allows
+      const r = () => Math.max(260, Math.min(innerWidth, innerHeight) * .42);
+      const loop = () => { const m = `radial-gradient(circle ${r()}px at ${ptr.x}px ${ptr.y}px,transparent 0,transparent 55%,#000 100%)`; d.style.webkitMaskImage = m; d.style.maskImage = m; d.style.background = 'rgba(0,0,0,.94)'; requestAnimationFrame(loop); };
+      // when he turns real (js/real.js), the lights come on
+      addEventListener('jb-real', (e) => { d.style.opacity = e.detail === 'start' ? '0' : '1'; });
       loop();
     },
     roll() {
