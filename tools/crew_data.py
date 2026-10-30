@@ -40,7 +40,7 @@ MERCH = {
 SHOP = [824, 852, 7622, 1070, 672, 1310, 7426, 6752, 252, 272, 667, 1302, 7220, 7354]
 
 CREW = [
-    dict(slug="torch", img="lion", name="Torch", title="The lion on the torch", weird="flame", color="#DA2342",
+    dict(slug="torch", img="lion", name="Torch", title="The lion on the torch, since day one", weird="flame", color="#DA2342",
          ref="cut/lion.webp", wear=[824],
          doing="Pulling a glass bubble off a blowpipe. On a skateboard.",
          bio="Torch has been in the little window on the booth wall since the first show, flame up, hat on. He blows glass on a skateboard because standing still is for vases. Hood stays down. Fire code.",
