@@ -8,46 +8,48 @@
   // kind: 'scale' renders as a slider over the answers in order, 'basket' as a pile of things to grab.
   const QUESTIONS = [
     { q: 'On a scale of 1 to 10, how high are you right now?', kind: 'scale', a: [
-      { t: 'Stone sober. Designated driver energy', n: { chaos: -2, night: -2, new: -1, hands: 1 } },
-      { t: "Had a sip of somebody's drink", n: { chaos: -2, night: -2, crew: 1, roam: -1 } },
-      { t: 'One hit, to be polite', n: { crew: 1, chaos: -2, hands: 1, roam: 1, night: -1 } },
-      { t: 'Mellow. Snacks are being considered', n: { roam: -1, hands: 1, crew: -1, chaos: -1 } },
-      { t: 'Laughing at the microwave', n: { chaos: 1, crew: 1, night: -1 } },
-      { t: 'Forgot what I walked in here for', n: { chaos: 1, roam: 1, hands: -2, crew: 1 } },
-      { t: 'The couch has absorbed me', n: { roam: -2, night: 1, crew: -1, chaos: -1 } },
-      { t: 'Talking to the dog like it owes me money', n: { chaos: 1, crew: -1, night: 1, roam: -1 } },
-      { t: 'I can hear colors', n: { new: 2, chaos: 1, night: 1, crew: -1 } },
-      { t: 'Orbiting. Send snacks to the moon', n: { chaos: 1, roam: 2, new: 2, night: 1 } }
+      { t: 'Sober. Judging everyone in this chat', n: { chaos: -2, night: -2, new: -2, hands: 1, roam: -1 } },
+      { t: 'Licked a gummy. Regretting it already', n: { chaos: -2, night: -1, crew: 2, hands: -1, new: -1, roam: 1 } },
+      { t: "One hit. Telling everybody it's hitting", n: { crew: 1, chaos: -2, hands: -1, night: -1, roam: 1 } },
+      { t: 'Mellow. The fridge and I are talking again', n: { roam: -2, hands: 1, night: 1, chaos: -1 } },
+      { t: 'Laughing at a traffic cone', n: { chaos: 1, crew: 2, roam: 1, new: 1 } },
+      { t: "Googled 'how long does a high last.' Twice", n: { chaos: 1, hands: -2, new: 1, night: -1 } },
+      { t: 'One with the couch. The couch is winning', n: { roam: -2, night: 1, crew: -1, chaos: -2, hands: 1 } },
+      { t: 'Arguing with the dog. Losing', n: { chaos: 1, crew: -1, night: 1, roam: -1 } },
+      { t: 'Met God. She was mid', n: { new: 2, chaos: 1, night: 2, crew: -1 } },
+      { t: 'Left my body. It took the car', n: { chaos: 1, roam: 2, new: 2, night: 1, hands: 1 } }
     ] },
-    { q: 'The crime your friends think you are most likely to commit?', a: [
-      { t: "Arson. “It was an accident.” It wasn't", n: { chaos: 2, hands: 1, night: 1, crew: -1 } },
-      { t: 'Tax fraud, with color-coded spreadsheets', n: { hands: -2, chaos: -1, crew: -1 } },
-      { t: 'Grand theft golf cart', n: { roam: 1, chaos: 1, crew: 1 } },
-      { t: 'Indecent exposure at a wedding', n: { crew: 2, night: 1, chaos: 1, new: 1, roam: 1, hands: -1 } },
-      { t: 'Running a poker game in the basement', n: { night: 2, crew: 1, roam: -2, hands: -1, new: -1 } },
-      { t: 'Smuggling something weird across a border', n: { roam: 2, new: 1, crew: -1, night: -1 } },
-      { t: 'Stealing a museum piece for the vibes', n: { new: -2, hands: 1, night: 1, crew: -2, roam: -1 } },
-      { t: 'Starting a cult. By accident', n: { crew: 2, hands: -2, new: 1 } }
+    { q: 'What crime are your friends sure you will do time for?', a: [
+      { t: 'Arson. You "just wanted to see it go up"', n: { chaos: 1, hands: 1, night: 1, crew: -1 } },
+      { t: "Insurance fraud. You've faked a neck brace before", n: { hands: -1, chaos: -1, crew: -1, new: -2, roam: -1 } },
+      { t: "Grand theft forklift. You didn't need it. You wanted it", n: { roam: 2, chaos: 1, hands: 1, night: -1 } },
+      { t: 'Public nudity at a funeral. Respectfully', n: { crew: 2, night: 1, chaos: 1, new: 1, roam: 1, hands: -1 } },
+      { t: 'Running a cockroach racing ring out of the basement', n: { night: 2, crew: 1, roam: -2, hands: -1, new: -1 } },
+      { t: 'Smuggling frogs across a border. In your pants', n: { roam: 2, new: 1, crew: -2, night: -1 } },
+      { t: 'Stealing a priceless painting to hang over the toilet', n: { new: -2, hands: 1, night: 1, crew: -1, roam: -1 } },
+      { t: 'Starting a cult. You charge a cover', n: { crew: 2, hands: -2, new: 1, chaos: -1 } }
     ] },
-    { q: 'Freak scale. Where do you land?', kind: 'scale', a: [
-      { t: 'Missionary. Lights off. Socks on', n: { chaos: -2, new: -2, night: -2, hands: 1, roam: -1 } },
-      { t: 'Lights on. Wild', n: { chaos: -1, new: -1, crew: 1 } },
-      { t: 'Handcuffs from a gas station', n: { chaos: 1, new: 2, roam: 1 } },
-      { t: 'The neighbors have filed a complaint', n: { night: 2, crew: 2, chaos: 1 } },
-      { t: 'Owns a sex swing and a label maker for it', n: { hands: 2, new: 1, roam: -1, chaos: -1, night: -1 } },
-      { t: 'Banned from a Renaissance Faire. Twice', n: { roam: 1, new: -1, chaos: 1, crew: 1 } },
-      { t: 'Your safe word has a safe word', n: { chaos: 2, new: 1, night: 2, crew: -1 } }
+    { q: "Freak scale. Be honest, nobody's watching. (We're watching.)", kind: 'scale', a: [
+      { t: 'Missionary. Lights off. Socks on. Done by the commercial break', n: { chaos: -2, new: -1, night: -2, hands: 2 } },
+      { t: 'Lights on. Eye contact. Practically an animal', n: { chaos: -1, new: -1, crew: 1 } },
+      { t: 'Handcuffs from a gas station. Lost the key in ten minutes', n: { chaos: 1, new: 1, roam: 1, hands: 1, night: -1 } },
+      { t: 'The neighbors know your name, and they say it the way you do', n: { night: 2, crew: 2, chaos: 2, roam: 1, hands: -1 } },
+      { t: 'Owns a sex swing. And a stud finder for it', n: { hands: 2, new: 1, roam: -1, night: -1, chaos: -1 } },
+      { t: 'Banned from two hot tubs and a bowling alley', n: { roam: 2, chaos: 1, crew: 1, new: -1 } },
+      { t: "There's a clown costume in your closet, and it isn't for parties", n: { chaos: 2, new: 1, night: 1, crew: -1, roam: -1 } }
     ] },
-    { q: 'Somebody left a basket on the table. Grab one.', kind: 'basket', a: [
-      { t: 'A fat joint', i: 'J', n: { crew: 2, roam: -1, new: -1 } },
-      { t: 'A dab off a JB rig, obviously', i: 'D', n: { new: 1, hands: 2, chaos: 1 } },
-      { t: 'A shroom chocolate', i: 'S', n: { roam: 2, new: 1, crew: -2 } },
-      { t: 'A sheet of acid', i: 'A', n: { new: 2, chaos: 2, night: 1, crew: 1 } },
-      { t: "A gummy. You'll take two", i: 'G', n: { roam: -2, night: 2, chaos: -1, new: -1, crew: -1 } },
-      { t: 'Whippets', i: 'W', n: { chaos: 1, hands: -2, new: -2 } },
-      { t: 'A forty and a scratch-off', i: '40', n: { new: -2, crew: 2, hands: -1, chaos: 1 } },
-      { t: 'The mystery baggie from the bathroom', i: '?', n: { night: 1, chaos: 1, crew: -2 } },
-      { t: 'Just coffee. Black', i: 'C', n: { night: -2, chaos: -1, hands: 1 } }
+    { q: 'The crew left you a gift basket. Grab one thing.', kind: 'basket', a: [
+      { t: 'A fat joint. Classic. Coward', i: 'J', n: { crew: 2, roam: -1, new: -2, chaos: -1 } },
+      { t: 'The dab rig. You brought your own torch', i: 'D', n: { new: 1, hands: 1, chaos: 1 } },
+      { t: 'The mushrooms. See you in six hours', i: 'M', n: { roam: 2, new: 2, crew: -1, hands: 1 } },
+      { t: 'The acid sheet. All twenty smiley faces', i: 'A', n: { new: 1, chaos: 2, night: 1 } },
+      { t: "The rainbow brownie. Nobody knows what's in it", i: 'B', n: { crew: 2, chaos: 1, roam: -2 } },
+      { t: 'The gummy bears. The whole bag. "It\'s not hitting"', i: 'G', n: { roam: -2, night: 1, chaos: -1, new: -1 } },
+      { t: 'The pills. Unmarked. Bold', i: 'P', n: { chaos: 1, crew: -1, hands: -1, roam: 1 } },
+      { t: "The baggie of white powder. It's baking soda. Probably", i: 'X', n: { night: 2, chaos: 1, new: 1, hands: -2 } },
+      { t: 'The whippets. Squeaky voice, zero regrets', i: 'W', n: { chaos: 1, hands: -2, new: -2, night: -1 } },
+      { t: 'The purple cough syrup. Everything in slow motion', i: 'S', n: { night: 1, roam: -2, chaos: -1, new: -1, crew: -1 } },
+      { t: "The mystery baggie. You don't ask questions", i: '?', n: { night: 1, chaos: 1, crew: -1, roam: 1 } }
     ] }
   ];
 
@@ -144,11 +146,13 @@
         h('button', { type: 'button', class: 'btn btn-red mx-lock', onclick: () => pick(Number(range.value)) }, 'Lock it in'));
     } else {
       const basket = Q.kind === 'basket';
+      const art = basket ? h('img', { class: 'mx-basket-art', src: base + 'assets/quiz/basket.webp', alt: 'A gift basket from the crew, wrapped in cellophane, stuffed with joints, a dab rig, mushrooms, acid, a rainbow brownie, gummy bears, pills, a baggie of white powder, whippets, cough syrup and a mystery baggie. The tag says not for sale.', width: 684, height: 900, decoding: 'async' }) : null;
       body = h('div', { class: 'mx-opts' + (basket ? ' mx-basket' : ''), role: 'group', 'aria-label': Q.q }, Q.a.map((a, ai) => h('button', {
         type: 'button', class: 'mx-opt' + (answers[qi] === ai ? ' picked' : ''),
         style: `--bg:${COLORS[ai % 4]};--tilt:${TILTS[(ai + qi) % 4]}`,
         onclick: () => pick(ai)
       }, h('span', { class: 'mx-key', 'aria-hidden': 'true' }, basket ? a.i : String(ai + 1)), a.t)));
+      if (art) body = h('div', { class: 'mx-basket-wrap' }, art, body);
     }
     const card = h('div', { class: 'mx-card mx-q' },
       h('p', { class: 'mx-count' }, `Question ${qi + 1} of ${QUESTIONS.length}`),
@@ -259,8 +263,8 @@
     answers = [];
     if (grown) { showQuestion(0); return; }
     swap(h('div', { class: 'mx-card mx-gate' },
-      h('h2', { class: 'mx-qh', tabindex: '-1' }, 'Four questions. None of them are about your star sign.'),
-      h('p', null, 'How high you are, what your friends think you would get arrested for, how much of a freak you are, and what you grab out of the basket. Adults 21 and up only.'),
+      h('h2', { class: 'mx-qh', tabindex: '-1' }, 'Four questions. Do not let your mom take this quiz.'),
+      h('p', null, 'How high you are, what you will get arrested for, how much of a freak you are, and what you grab out of the gift basket. Adults 21 and up. Lie if you want. We can tell.'),
       h('div', { class: 'mx-acts' },
         h('button', { type: 'button', class: 'btn btn-red', onclick: () => { grown = true; try { sessionStorage.setItem('jbMatch21', '1'); } catch (e) {} showQuestion(0); } }, "I'm 21+. Ask me"),
         h('a', { class: 'btn btn-ink', href: base + 'crew/' }, 'Just show me the crew'))), null);
