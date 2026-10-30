@@ -105,7 +105,7 @@ def head(title, desc, up, extra=""):
 
 def topbar(up):
     return (f'<header class="topbar pad"><a href="{up}" aria-label="Jerome Baker home"><img src="{up}assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a>'
-            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
+            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}comics/">The Hot Shop</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
 
 
 def scripts(up, weird=False):
