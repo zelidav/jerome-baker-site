@@ -65,7 +65,7 @@
       const who = pick(crew);
       for (let i = 0; i < n; i++) {
         const img = new Image();
-        img.src = '../assets/crew/' + who.img + '.webp';
+        img.src = '../assets/crew/' + who.img + '_s.webp';
         img.alt = '';
         img.style.cssText = `width:${size}px;transform:rotate(${i * 360 / n}deg) translateY(-${r}vmin) rotate(${i % 2 ? 180 : 0}deg)`;
         m.appendChild(img);
@@ -78,7 +78,7 @@
     // swap who's in the rings now and then
     setInterval(() => {
       if (paused()) return;
-      fx.querySelectorAll('.mandala').forEach((m) => { const who = pick(crew); m.querySelectorAll('img').forEach((i) => { i.src = '../assets/crew/' + who.img + '.webp'; }); });
+      fx.querySelectorAll('.mandala').forEach((m) => { const who = pick(crew); m.querySelectorAll('img').forEach((i) => { i.src = '../assets/crew/' + who.img + '_s.webp'; }); });
     }, 26000);
   };
   const melt = () => body.classList.add('melting');

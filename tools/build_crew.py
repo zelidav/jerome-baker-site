@@ -64,7 +64,7 @@ def check_personas():
 def merch_card(mid, up, i, worn=True):
     name, price, slug = MERCH[mid]
     who = WEARER.get(mid)
-    badge = (f'<img class="worn" src="{up}assets/crew/{who["img"]}.webp" alt="" loading="lazy">' if worn and who else "")
+    badge = (f'<img class="worn" src="{up}assets/crew/{who["img"]}_s.webp" alt="" loading="lazy">' if worn and who else "")
     return (f'<a class="mcard" href="{up}shop/#p={slug}" style="--bg:{CARD_BG[i % 6]};--tilt:{TILTS[i % 6]}">'
             f'{badge}<span class="pic"><img src="{up}assets/merch/{mid}.webp" alt="{e(name)}" loading="lazy" decoding="async"></span>'
             f'<span class="meta"><span><h3>{e(name)}</h3><span class="go">SHOP IT →</span></span><span class="pr">${price}</span></span></a>')
@@ -72,7 +72,7 @@ def merch_card(mid, up, i, worn=True):
 
 def pin(c, up, i):
     return (f'<a class="pin" href="{up}crew/{c["slug"]}/" style="--tilt:{TILTS[i % 6]}">'
-            f'<img src="{up}assets/crew/{c["img"]}.webp" alt="{e(c["name"])}, {e(c["doing"])}" loading="lazy" decoding="async">'
+            f'<img src="{up}assets/crew/{c["img"]}_m.webp" alt="{e(c["name"])}, {e(c["doing"])}" loading="lazy" decoding="async">'
             f'<span class="tape">{e(c["name"])}<small>{e(c["title"])}</small></span></a>')
 
 
@@ -105,7 +105,7 @@ def head(title, desc, up, extra=""):
 
 def topbar(up):
     return (f'<header class="topbar pad"><a href="{up}" aria-label="Jerome Baker home"><img src="{up}assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a>'
-            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}comics/">The Hot Shop</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
+            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}comics/">The Hot Shop</a> <a href="{up}#made">The story</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
 
 
 def scripts(up, weird=False):
@@ -114,13 +114,30 @@ def scripts(up, weird=False):
             + (f'<script src="{up}js/weird.js" defer></script>\n' if weird else ""))
 
 
-FOOT = '<footer class="pad" style="background:#0A0A0A;color:#BDBDBD;padding-top:40px;padding-bottom:calc(80px + env(safe-area-inset-bottom));font-size:14px">© 2026 Jerome Baker Designs. Adults 21+ only. The crew is fictional. The merch is real.</footer>'
+CREW_NOTE = "The crew is fictional. The merch is real."
+
+
+def site_footer(up, note=CREW_NOTE):
+    """The one footer for home, crew pages and comics (the shop keeps its own contact-heavy one).
+    index.html and comics/index.html get it through their <!-- FOOT --> markers."""
+    links = [("#glass", "Glass"), ("shop/", "Ritual merch"), ("crew/", "The JB Crew"), ("crew/match/", "Find your crew"),
+             ("comics/", "The Hot Shop"), ("#made", "The story"), ("travel/", "Travel guide")]
+    nav = "".join(f'<li><a href="{up}{h}">{t}</a></li>' for h, t in links)
+    return (f'<footer class="site-foot pad"><div class="sf-cols">'
+            f'<img src="{up}assets/cut/tealjbd.webp" alt="JBD" width="200" height="122" loading="lazy" class="sf-mark">'
+            f'<div><b>Say hi</b><a href="mailto:info@jeromebakerny.com">info@jeromebakerny.com</a>'
+            f'<b>Wholesale</b><a href="mailto:sales@jeromebakerny.com">sales@jeromebakerny.com</a></div>'
+            f'<div><b>Explore</b><ul>{nav}</ul></div>'
+            f'<div><b>Follow</b><a href="https://www.instagram.com/jerome_baker" target="_blank" rel="noopener">@jerome_baker</a>'
+            f'<b>Find the glass</b><a href="https://jeromebaker.com/" target="_blank" rel="noopener">jeromebaker.com</a>'
+            f'<b>Shop merch</b><a href="{up}shop/">Ritual merch</a></div></div>'
+            f'<p class="sf-legal">© 2026 Jerome Baker Designs. Adults 21+ only. {note}</p></footer>')
 
 
 def mate(slug, up, k):
     m = BY_SLUG[slug]
     return (f'<a class="mate" href="{up}crew/{slug}/" style="--tilt:{TILTS[k % 6]}">'
-            f'<img src="{up}assets/crew/{m["img"]}.webp" alt="" loading="lazy" decoding="async"><span>{e(m["name"])}</span></a>')
+            f'<img src="{up}assets/crew/{m["img"]}_s.webp" alt="" loading="lazy" decoding="async"><span>{e(m["name"])}</span></a>')
 
 
 def who_block(c, up):
@@ -200,12 +217,12 @@ def crew_page(c, i):
 <div class="log" id="log" aria-live="polite"></div>
 </div></section>
 {match_cta(up, c['name'])}<nav class="crew-nav pad" aria-label="More crew">
-<a href="../{prev['slug']}/"><img src="{up}assets/crew/{prev['img']}.webp" alt="" loading="lazy">← {e(prev['name'])}</a>
+<a href="../{prev['slug']}/"><img src="{up}assets/crew/{prev['img']}_s.webp" alt="" loading="lazy">← {e(prev['name'])}</a>
 <a href="../">The whole crew</a>
-<a href="../{nxt['slug']}/">{e(nxt['name'])} →<img src="{up}assets/crew/{nxt['img']}.webp" alt="" loading="lazy"></a>
+<a href="../{nxt['slug']}/">{e(nxt['name'])} →<img src="{up}assets/crew/{nxt['img']}_s.webp" alt="" loading="lazy"></a>
 </nav>
 </main>
-{FOOT}
+{site_footer(up)}
 </div>
 {scripts(up, weird=True)}<script>
 (() => {{
@@ -246,7 +263,7 @@ def crew_index():
 </div>
 </section>
 {match_cta(up)}</main>
-{FOOT}
+{site_footer(up)}
 </div>
 {scripts(up)}</body>
 </html>
@@ -262,9 +279,9 @@ def match_page():
 {topbar(up)}
 <main id="main">
 <section class="mx pad dots">
-<img class="mx-st s1" src="{up}assets/crew/lion.webp" alt="" aria-hidden="true" width="160" height="160">
-<img class="mx-st s2" src="{up}assets/crew/cobra.webp" alt="" aria-hidden="true" width="150" height="150">
-<img class="mx-st s3" src="{up}assets/crew/bot.webp" alt="" aria-hidden="true" width="140" height="140">
+<img class="mx-st s1" src="{up}assets/crew/lion_s.webp" alt="" aria-hidden="true" width="160" height="160">
+<img class="mx-st s2" src="{up}assets/crew/cobra_s.webp" alt="" aria-hidden="true" width="150" height="150">
+<img class="mx-st s3" src="{up}assets/crew/bot_s.webp" alt="" aria-hidden="true" width="140" height="140">
 <div class="wrap">
 <h1 class="display mx-h"><span>Find your</span><br><span class="y">crew.</span></h1>
 <p class="mx-lede">Twenty characters came off the Jerome Baker wall. One of them is basically you. Answer eight quick questions and we'll tell you who, and what they wear.</p>
@@ -274,7 +291,7 @@ def match_page():
 </div>
 </section>
 </main>
-{FOOT}
+{site_footer(up)}
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 {scripts(up)}<script src="{up}js/match.js" defer></script>
@@ -288,6 +305,12 @@ def write(path, text):
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
+
+
+def fill_footer(s, up, note):
+    if "<!-- FOOT -->" not in s:
+        raise SystemExit("missing <!-- FOOT --> markers")
+    return re.sub(r"<!-- FOOT -->.*?<!-- /FOOT -->", lambda m: f"<!-- FOOT -->{site_footer(up, note)}<!-- /FOOT -->", s, flags=re.S)
 
 
 def main():
@@ -314,7 +337,12 @@ def main():
     shop = "".join(merch_card(m, "", i) for i, m in enumerate(SHOP))
     s = re.sub(r"<!-- CREW -->.*?<!-- /CREW -->", lambda m: f"<!-- CREW -->{pins}<!-- /CREW -->", s, flags=re.S)
     s = re.sub(r"<!-- SHOP -->.*?<!-- /SHOP -->", lambda m: f"<!-- SHOP -->{shop}<!-- /SHOP -->", s, flags=re.S)
+    s = fill_footer(s, "", "Glass shop opens soon. Streetwear ships now from Ritual Merch.")
     write("index.html", s)
+    cp = os.path.join(ROOT, "comics", "index.html")
+    if os.path.exists(cp):
+        write("comics/index.html", fill_footer(open(cp, encoding="utf-8").read(), "../",
+              "The Hot Shop is fiction. Nobody should do any of this. Hot glass burns."))
     print(f"built {len(CREW)} crew pages, crew/match/, {len(SHOP)} shop cards")
 
 

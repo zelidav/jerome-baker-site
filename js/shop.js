@@ -18,6 +18,8 @@
   const strainOf = (p) => (p.name.match(/Indica|Sativa|Hybrid/) || [])[0] ||
     (/Red\b/.test(p.name) ? 'Indica' : /Yellow\b/.test(p.name) ? 'Sativa' : /Green\b/.test(p.name) ? 'Hybrid' : '');
   const TILTS = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg'];
+  // cards use the 480px thumbnail (built next to each photo); the product view loads the full 900px one
+  const thumb = (src) => src.replace(/\.webp$/, '_t.webp');
 
   const card = (p, i) => {
     const { title, sub } = split(p.name);
@@ -25,8 +27,8 @@
     const c = D.crew[p.crew];
     const bg = st ? STRAIN[st][0] : ['#FFFFFF', '#FDB514', '#F1F1F1'][i % 3];
     return `<button type="button" class="pcard" data-slug="${esc(p.slug)}" style="--bg:${bg};--tilt:${TILTS[i % TILTS.length]}" aria-label="${esc(p.name)}, ${money(p.price)}">
-<span class="pic">${p.imgs[1] ? `<img class="alt" src="${base}${p.imgs[1]}" alt="" loading="lazy" decoding="async">` : ''}<img class="main" src="${base}${p.imgs[0]}" alt="" loading="lazy" decoding="async"></span>
-${c ? `<img class="worn" src="${base}assets/crew/${c.img}.webp" alt="" loading="lazy">` : ''}
+<span class="pic">${p.imgs[1] ? `<img class="alt" src="${base}${thumb(p.imgs[1])}" alt="" loading="lazy" decoding="async">` : ''}<img class="main" src="${base}${thumb(p.imgs[0])}" alt="" loading="lazy" decoding="async"></span>
+${c ? `<img class="worn" src="${base}assets/crew/${c.img}_s.webp" alt="" loading="lazy">` : ''}
 ${st ? `<span class="strain" style="--sc:${STRAIN[st][1]}">${st.toUpperCase()}</span>` : ''}
 ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
 <span class="meta"><h3>${esc(title)}</h3>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}<span class="row"><span class="pr">${money(p.price)}</span><span class="go">${p.attrs.length ? 'PICK SIZE →' : 'GET IT →'}</span></span></span>
@@ -73,7 +75,7 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
     }[st.sort];
     list = list.slice().sort(cmp);
     grid.innerHTML = list.length ? list.map(card).join('') :
-      `<div class="empty" style="grid-column:1/-1"><img src="${base}assets/crew/peeper.webp" alt="">Peeper looked everywhere. Nothing matches that. <button type="button" class="clear" data-clear>Clear the filters</button></div>`;
+      `<div class="empty" style="grid-column:1/-1"><img src="${base}assets/crew/peeper_s.webp" alt="">Peeper looked everywhere. Nothing matches that. <button type="button" class="clear" data-clear>Clear the filters</button></div>`;
     $('count').textContent = `SHOWING ${list.length} OF ${D.items.length}` + (st.cat ? ` · ${st.cat.toUpperCase()}` : '');
     document.querySelectorAll('#cats button').forEach((b) => b.classList.toggle('on', b.dataset.cat === st.cat));
     document.querySelectorAll('.subnav a').forEach((a) => a.classList.toggle('on', a.dataset.cat === st.cat));
@@ -146,7 +148,7 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
 <div class="pd-crumb"><a href="#collection" data-close>RITUAL MERCH</a>${firstCat ? ` / <a href="#cat=${slugify(firstCat[0])}" data-close>${esc(firstCat[0].toUpperCase())}</a>` : ''} / ${esc(title.toUpperCase())}</div>
 <div class="pd-main">
 <div class="pd-gal"><div class="pd-big"><img id="pdImg" src="${base}${p.imgs[0]}" alt="${esc(p.name)}"></div>
-${p.imgs.length > 1 ? `<div class="pd-thumbs">${p.imgs.map((s, i) => `<button type="button" data-img="${i}" class="${i ? '' : 'on'}" aria-label="Photo ${i + 1}"><img src="${base}${s}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}</div>
+${p.imgs.length > 1 ? `<div class="pd-thumbs">${p.imgs.map((s, i) => `<button type="button" data-img="${i}" class="${i ? '' : 'on'}" aria-label="Photo ${i + 1}"><img src="${base}${thumb(s)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}</div>
 <div class="pd-info">
 <h2 id="pdTitle">${esc(title)}</h2>${sub ? `<span class="sub">${esc(sub.toUpperCase())}</span>` : ''}
 <span class="pd-price">${money(p.price)}</span>
@@ -155,7 +157,7 @@ ${p.attrs.map((a) => `<div class="opt" data-attr="${esc(a.name)}"><h4>${esc(a.na
 <div class="buy"><div class="qty"><button type="button" data-q="-1" aria-label="One less">−</button><output id="pdQty">1</output><button type="button" data-q="1" aria-label="One more">+</button></div>
 <a class="btn btn-red" id="pdBuy" target="_blank" rel="noopener">Add to cart</a></div>
 <p class="pd-note" id="pdNote"></p>
-${c ? `<a class="wornby" href="${base}crew/${p.crew}/" style="--wc:${c.color}"><img src="${base}assets/crew/${c.img}.webp" alt=""><span><small>WORN BY</small><b>${esc(c.name)}</b></span></a>` : ''}
+${c ? `<a class="wornby" href="${base}crew/${p.crew}/" style="--wc:${c.color}"><img src="${base}assets/crew/${c.img}_s.webp" alt=""><span><small>WORN BY</small><b>${esc(c.name)}</b></span></a>` : ''}
 </div></div>
 ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="grid">${rec.map(card).join('')}</div></div>` : ''}`;
 

@@ -110,7 +110,7 @@
     kids.flat().forEach((x) => { if (x != null && x !== false) el.append(x.nodeType ? x : String(x)); });
     return el;
   };
-  const img = (c, cls) => h('img', { class: cls || '', src: base + 'assets/crew/' + c.img + '.webp', alt: '', width: 400, height: 400, decoding: 'async' });
+  const img = (c, cls) => h('img', { class: cls || '', src: base + 'assets/crew/' + c.img + '_m.webp', alt: '', width: 400, height: 400, decoding: 'async' });
 
   let answers = [];
 

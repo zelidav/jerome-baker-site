@@ -91,3 +91,14 @@ img.sticker{height:auto}
 /* watermark */
 .watermark{position:absolute;inset:0;pointer-events:none;z-index:40;overflow:hidden}
 .watermark img{position:absolute;height:auto}
+
+/* the shared footer (tools/build_crew.py site_footer) */
+.site-foot{background:var(--ink);color:#BDBDBD;padding-top:56px;padding-bottom:calc(104px + env(safe-area-inset-bottom));font-size:14px;line-height:1.7;position:relative;z-index:41;border-top:4px solid var(--red)}
+.site-foot .sf-cols{display:flex;flex-wrap:wrap;gap:32px 56px;justify-content:space-between;align-items:flex-start;max-width:1344px;margin:0 auto}
+.site-foot .sf-mark{width:200px;height:auto;rotate:-4deg}
+.site-foot b{display:block;color:var(--yellow);font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin:14px 0 2px}
+.site-foot b:first-child{margin-top:0}
+.site-foot a{color:var(--white);text-decoration:none;display:inline-block;padding:4px 0}
+.site-foot a:hover{color:var(--yellow)}
+.site-foot ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px}
+.site-foot .sf-legal{max-width:1344px;margin:36px auto 0;padding-top:18px;border-top:2px dotted #444;font-size:12px;color:#9d9d9d}
