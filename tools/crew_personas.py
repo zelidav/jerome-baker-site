@@ -164,7 +164,7 @@ PERSONAS = {
         axes=dict(chaos=-1, crew=-1, night=-1, new=-2, hands=2, roam=-1)),
     "jack": dict(
         type="The dark-humored night creature",
-        from_="Salem, Massachusetts",
+        from_="Salem, Massachusetts (test)",
         backstory="Got carved every October for decades and decided it was his turn. Only carves watermelons. Lights his own way, which is handy because he keeps tripping the breakers.",
         shop_job="Electrician and lighting.",
         vice="Blows the fuse every shift. Pranks the night crew. Has been 'just stepping out for a smoke' since Tuesday.",
