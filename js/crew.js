@@ -177,4 +177,12 @@
 
   // someone says something every so often, unprompted
   setInterval(() => { if (!document.hidden && !reduce) { const b = pick(bodies); if (!b.held) say(b, { kind: 'chat' }, 2400); } }, 9000);
+
+  // now and then one of them turns real for a few seconds (js/real.js)
+  if (!reduce && !document.body.hasAttribute('data-no-real')) {
+    const s = document.createElement('script');
+    s.src = base + 'js/real.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  }
 })();
