@@ -105,7 +105,7 @@ def head(title, desc, up, extra=""):
 
 def topbar(up):
     return (f'<header class="topbar pad"><a href="{up}" aria-label="Jerome Baker home"><img src="{up}assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a>'
-            f'<nav aria-label="Main"><a href="{up}#glass">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}comics/">The Hot Shop</a> <a href="{up}#made">The story</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
+            f'<nav aria-label="Main"><a href="{up}glass/">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}comics/">The Hot Shop</a> <a href="{up}#made">The story</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
 
 
 def scripts(up, weird=False):
@@ -119,8 +119,8 @@ CREW_NOTE = "The crew is fictional. The merch is real."
 
 def site_footer(up, note=CREW_NOTE):
     """The one footer for home, crew pages and comics (the shop keeps its own contact-heavy one).
-    index.html and comics/index.html get it through their <!-- FOOT --> markers."""
-    links = [("#glass", "Glass"), ("shop/", "Ritual merch"), ("crew/", "The JB Crew"), ("crew/match/", "Find your crew"),
+    index.html, comics/ and glass/ get it through their <!-- FOOT --> markers."""
+    links = [("glass/", "Glass"), ("shop/", "Ritual merch"), ("crew/", "The JB Crew"), ("crew/match/", "Find your crew"),
              ("comics/", "The Hot Shop"), ("#made", "The story"), ("travel/", "Travel guide")]
     nav = "".join(f'<li><a href="{up}{h}">{t}</a></li>' for h, t in links)
     return (f'<footer class="site-foot pad"><div class="sf-cols">'
@@ -337,12 +337,16 @@ def main():
     shop = "".join(merch_card(m, "", i) for i, m in enumerate(SHOP))
     s = re.sub(r"<!-- CREW -->.*?<!-- /CREW -->", lambda m: f"<!-- CREW -->{pins}<!-- /CREW -->", s, flags=re.S)
     s = re.sub(r"<!-- SHOP -->.*?<!-- /SHOP -->", lambda m: f"<!-- SHOP -->{shop}<!-- /SHOP -->", s, flags=re.S)
-    s = fill_footer(s, "", "Glass shop opens soon. Streetwear ships now from Ritual Merch.")
+    s = fill_footer(s, "", "Glass ships from the studio with its provenance record. Streetwear ships from Ritual Merch.")
     write("index.html", s)
     cp = os.path.join(ROOT, "comics", "index.html")
     if os.path.exists(cp):
         write("comics/index.html", fill_footer(open(cp, encoding="utf-8").read(), "../",
               "The Hot Shop is fiction. Nobody should do any of this. Hot glass burns."))
+    gp = os.path.join(ROOT, "glass", "index.html")
+    if os.path.exists(gp):
+        write("glass/index.html", fill_footer(open(gp, encoding="utf-8").read(), "../",
+              "Every piece is one of one. Prices and availability come live from the studio."))
     print(f"built {len(CREW)} crew pages, crew/match/, {len(SHOP)} shop cards")
 
 

@@ -1,0 +1,104 @@
+"""Build the Glass Showcase data from the jbglass app.
+
+Live data (names, prices, status, copy, buy links) comes from /api/gallery on every run.
+Images come from cutouts made once per piece (~/code/jbsite-work/glass/cutouts.py). A piece is only
+published once it has a cutout in assets/glass/, so a new piece in the app waits for its cutout.
+
+Writes js/glass-data.js and assets/glass/<id>.webp (1000px tall) + <id>_t.webp (440px tall)."""
+import json, os, sys, urllib.request
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+OUT = ROOT / 'assets' / 'glass'
+CUTS = Path(os.path.expanduser('~/code/jbsite-work/glass/cut'))
+HOST = 'https://jbcustomer.cannacrypted.com'
+SKIP_CATS = ('Drop Merch', 'Display Fixtures')
+
+# shelves, in page order: (key, title, line, match)
+SHELVES = [
+    ('giant', 'Giant bongs', 'Four feet of glass, pulled by a team of fifteen. One of each, ever.', lambda p: p['shape_code'] == 'GBG'),
+    ('le', 'Limited Edition', 'The crown pieces. Wig-wag, millies, knuckles and marbles, worked at the bench and signed off as one of one.', lambda p: p['series'] == 'Limited Edition' and p['category'] == 'Signature Glass'),
+    ('og', 'Original Series', 'The fifteen-inch Baker silhouette that started it. Fumed bulb, straight tube, built to hit and built to last.', lambda p: p['series'] == 'Original Series'),
+    ('second', 'Second Life', 'Worked tubes rebuilt into cork-top jars. Each one was something else first.', lambda p: p['category'] == 'Second Life Series'),
+    ('daily', 'Everyday glass', 'The pieces you actually reach for. Beakers, tubes, jars, Clearboys and the Skeeter lunch boxes.', lambda p: True),
+]
+# nominal height in inches, for the size line in the piece view
+HEIGHT = {'GBG': 44, 'LEB': 15, 'OSB': 15, 'SPC': 15, 'CUJ': 7, 'BKR': 12, 'STR': 12, 'JRL': 5, 'JRS': 3}
+
+
+def get(url):
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (jb-site build)'})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        return r.read()
+
+
+def make_images(pid):
+    """Trim the cutout to the glass, save two sizes, and find the mouthpiece and the base."""
+    from PIL import Image
+    full, thumb = OUT / f'{pid}.webp', OUT / f'{pid}_t.webp'
+    src = CUTS / f'{pid}.png'
+    if not full.exists() or (src.exists() and src.stat().st_mtime > full.stat().st_mtime):
+        if not src.exists():
+            return None
+        im = Image.open(src).convert('RGBA')
+        a = im.getchannel('A').point(lambda v: 255 if v > 40 else 0)
+        im = im.crop(a.getbbox())
+        for path, h in ((full, 1000), (thumb, 440)):
+            w = round(im.width * h / im.height)
+            im.resize((w, h), Image.LANCZOS).save(path, 'WEBP', quality=82, method=6)
+    im = Image.open(thumb)
+    a = im.getchannel('A')
+    w, h = im.size
+    px = a.load()
+
+    def span(y):
+        xs = [x for x in range(w) if px[x, y] > 128]
+        return (xs[0], xs[-1]) if xs else None
+
+    top = next((s for s in (span(y) for y in range(0, h // 10)) if s), (0, w))
+    widest, wy = 0, h - 1
+    for y in range(int(h * .6), h):
+        s = span(y)
+        if s and s[1] - s[0] > widest:
+            widest, wy = s[1] - s[0], y
+    base = span(wy) or (0, w)
+    r = lambda v: round(v, 3)
+    return {'w': w, 'h': h, 'mouth': [r((top[0] + top[1]) / 2 / w), 0.01],
+            'base': [r((base[0] + base[1]) / 2 / w), r(wy / h)], 'bw': r(widest / w)}
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    gallery = json.loads(get(HOST + '/api/gallery'))
+    pieces, missing = [], []
+    for p in gallery:
+        if not p.get('has_image') or (p.get('category') or '').startswith(SKIP_CATS):
+            continue
+        pid = p['provenance_id']
+        img = make_images(pid)
+        if not img:
+            missing.append(f"{p['name']} ({pid})")
+            continue
+        shelf = next(k for k, _, _, match in SHELVES if match(p))
+        status = {'available': 'available', 'sold': 'sold'}.get(p['status'], 'collected')
+        pieces.append({
+            'id': pid, 'name': p['name'], 'shelf': shelf, 'series': p.get('series') or '', 'shape': p.get('shape') or '',
+            'price': p.get('price') or 0, 'status': status, 'online': bool(p.get('online_sale')),
+            'edition': p.get('edition') or '', 'inches': HEIGHT.get(p.get('shape_code') or ''),
+            'desc': (p.get('description') or '').strip(),
+            'buy': f'{HOST}/buy/{pid}', 'verify': f'{HOST}/c/piece/{pid}?prov=1', **img})
+    order = {k: i for i, (k, *_) in enumerate(SHELVES)}
+    rank = {'available': 0, 'sold': 1, 'collected': 2}
+    pieces.sort(key=lambda x: (order[x['shelf']], rank[x['status']], -x['price'], x['name']))
+    shelves = [{'key': k, 'title': t, 'line': l} for k, t, l, _ in SHELVES if any(x['shelf'] == k for x in pieces)]
+    data = {'shelves': shelves, 'pieces': pieces}
+    (ROOT / 'js' / 'glass-data.js').write_text(
+        '/* generated by tools/build_glass.py from the jbglass app. Do not edit by hand. */\n'
+        'window.JB_GLASS = ' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n', encoding='utf-8')
+    print(f'{len(pieces)} pieces on {len(shelves)} shelves')
+    if missing:
+        print('waiting for a cutout (run jbsite-work/glass/cutouts.py):', ', '.join(missing), file=sys.stderr)
+
+
+if __name__ == '__main__':
+    main()

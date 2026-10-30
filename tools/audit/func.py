@@ -82,6 +82,31 @@ with sync_playwright() as p:
     pg.goto(BASE + 'crew/match/#gray', wait_until='load'); pg.wait_for_timeout(1000)
     check('quiz: shared #slug link shows that result', 'Gray' in pg.inner_text('main'))
 
+    # ---- glass
+    pg.goto(BASE + 'glass/', wait_until='load'); pg.wait_for_timeout(1200)
+    n = pg.locator('.pc').count()
+    check('glass: shelves render', n >= 40 and pg.locator('.shelf').count() >= 4, str(n))
+    check('glass: real prices on tags', pg.locator('.pc .tag .pr').first.inner_text().startswith('$'))
+    pg.click('#priceSeg button[data-p="0-100"]'); pg.wait_for_timeout(200)
+    cheap = pg.evaluate("[...document.querySelectorAll('.pc:not([hidden])')].every(e => JB_GLASS.pieces.find(p => p.id === e.dataset.id).price < 100)")
+    check('glass: price filter', cheap and pg.locator('.pc:not([hidden])').count() > 0)
+    pg.click('#priceSeg button[data-p="all"]'); pg.wait_for_timeout(200)
+    pg.locator('.pc').first.hover(); pg.wait_for_timeout(900)
+    check('glass: hover smokes', pg.evaluate("document.querySelector('.pc.lit') !== null"))
+    pg.goto(BASE + 'glass/#p=JBD-5BE3DA25CD0F', wait_until='load'); pg.wait_for_timeout(1200)
+    check('glass: deep link opens the piece', pg.locator('#bench[open]').count() == 1 and 'Nazarre' in pg.locator('#bName').inner_text())
+    hb = pg.locator('#bHit').bounding_box()
+    pg.mouse.move(hb['x'] + 20, hb['y'] + 20); pg.mouse.down(); pg.wait_for_timeout(1500)
+    lvl = float(pg.evaluate("getComputedStyle(document.querySelector('#bFill')).getPropertyValue('--lvl')") or 0)
+    pg.mouse.up(); pg.wait_for_timeout(400)
+    check('glass: hold fills the glass', lvl > .3, f'{lvl:.2f}')
+    buy = pg.locator('#bBuy').get_attribute('href') or ''
+    check('glass: buy goes to the provenance checkout', buy.startswith('https://jbcustomer.cannacrypted.com/buy/JBD-5BE3DA25CD0F'), buy)
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(200)
+    check('glass: closing clears the link', pg.evaluate('location.hash') == '')
+    pg.goto(BASE, wait_until='load')
+    check('home: glass cards link to pieces', pg.locator('#glass a[href^="glass/#p="]').count() >= 10)
+
     # ---- comics
     pg.goto(BASE + 'comics/?f=1', wait_until='load'); pg.wait_for_timeout(1000)
     check('comics: 21+ gate shown, strips not loaded', pg.locator('#gate:not([hidden])').count() == 1 and pg.locator('.pn').count() == 0)
@@ -101,7 +126,7 @@ with sync_playwright() as p:
     # ---- studio
     r = pg.request.get(STUDIO + 'guide'); check('studio: guide page', r.status == 200, str(r.status))
     r = pg.request.get(STUDIO + 'api/me'); check('studio: API needs login', r.status == 401, str(r.status))
-    r = pg.request.get(STUDIO + 'p/main/'); check('studio: previews need login', r.status == 401, str(r.status))
+    r = pg.request.get(STUDIO + 'p/main/'); check('studio: unsigned previews refused', r.status in (401, 404), str(r.status))
 
     check('no uncaught JS errors across the run', not errs, '; '.join(errs[:3]))
     b.close()
