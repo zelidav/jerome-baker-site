@@ -53,7 +53,10 @@
       svg.setAttribute('width', 0); svg.setAttribute('height', 0); svg.style.position = 'absolute';
       svg.innerHTML = '<filter id="wob"><feTurbulence id="turb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="22"/></filter>';
       document.body.appendChild(svg);
-      main.style.filter = 'url(#wob)';
+      // phones can't run a displacement filter over the whole (very tall) page: Safari paints it black,
+      // so there only the hero wobbles
+      const target = matchMedia('(max-width: 760px)').matches ? (document.querySelector('.cp-hero') || main) : main;
+      target.style.filter = 'url(#wob)';
       const turb = svg.querySelector('#turb');
       const tick = (t) => { turb.setAttribute('baseFrequency', `${0.010 + 0.004 * Math.sin(t / 1300)} ${0.018 + 0.006 * Math.cos(t / 1700)}`); requestAnimationFrame(tick); };
       requestAnimationFrame(tick);
