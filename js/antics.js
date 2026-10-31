@@ -1,11 +1,11 @@
 /* Crew antics on the shopping pages. Every so often an animated crew member walks in and messes with a
    product on screen: grabs it and runs, slowly strokes the glass, tries it on, or grabs it and gets popped by
-   Torch, who puts it back. Rare on the list, likelier once a piece or product is open.
+   Torch, who puts it back. Every 12-20s on the list; in an open piece or product, again every 7-12s. Everyone gets a turn before anyone repeats.
    Needs js/anim-data.js + js/crewanim.js. Test hook: JBAntics.run('snatch' | 'stroke' | 'tryon' | 'bust'). */
 (() => {
   const CA = window.JBCrewAnim;
   if (!CA || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const { Actor, humanoids, wait, preload } = CA;
+  const { Actor, humanoids, wait, preload, cast } = CA;
   const base = document.documentElement.dataset.base || '';
   const pick = (a) => a[(Math.random() * a.length) | 0];
   const rand = (a, b) => a + Math.random() * (b - a);
@@ -20,13 +20,7 @@
 
   /* ---------------------------------------------------------------- sound (same switch as the glass bench) */
   const soundOn = () => { try { return localStorage.getItem('jb-glass-sound') !== 'off'; } catch (e) { return true; } };
-  const clips = {};
-  const sound = (name) => {
-    if (!soundOn()) return;
-    const a = clips[name] || (clips[name] = new Audio(`${base}assets/sfx/${name}.mp3`));
-    a.currentTime = 0;
-    a.play().catch(() => {});
-  };
+  const sound = (name) => { if (soundOn()) CA.play(name); };
 
   /* ---------------------------------------------------------------- stage helpers */
   const layerIn = (host) => {
@@ -81,7 +75,7 @@
     // grabs it and runs
     async snatch(t, host, layer, W) {
       const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
-      const a = new Actor(layer, pick(humanoids.filter((s) => s !== 'torch')), H);
+      const a = new Actor(layer, cast(['torch']), H);
       const fromLeft = b.x + b.w / 2 > W / 2;
       a.at(fromLeft ? -H * .5 : W + H * .5, floor);
       await a.walk(fromLeft ? b.x - H * .2 : b.x + b.w + H * .2, 1100);
@@ -103,7 +97,7 @@
     // slowly, lovingly strokes the glass
     async stroke(t, host, layer, W) {
       const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
-      const a = new Actor(layer, pick(humanoids), H);
+      const a = new Actor(layer, cast(), H);
       const left = b.x + b.w / 2 > W / 2;
       a.at(left ? -H * .5 : W + H * .5, floor);
       await a.walk(left ? b.x - H * .12 : b.x + b.w + H * .12, 1100);
@@ -119,7 +113,7 @@
     // tries it on
     async tryon(t, host, layer, W) {
       const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
-      const a = new Actor(layer, pick(humanoids), H);
+      const a = new Actor(layer, cast(), H);
       const fromLeft = b.x + b.w / 2 > W / 2;
       a.at(fromLeft ? -H * .5 : W + H * .5, floor);
       await a.walk(fromLeft ? b.x - H * .2 : b.x + b.w + H * .2, 1100);
@@ -143,7 +137,7 @@
     async bust(t, host, layer, W) {
       const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
       const fromLeft = b.x + b.w / 2 > W / 2;
-      const thief = new Actor(layer, pick(humanoids.filter((s) => s !== 'torch')), H);
+      const thief = new Actor(layer, cast(['torch']), H);
       const torch = new Actor(layer, 'torch', H * 1.05);
       thief.at(fromLeft ? -H * .5 : W + H * .5, floor);
       torch.at(fromLeft ? W + H : -H, floor);
@@ -197,10 +191,12 @@
     a.el.style.translate = '';
   }
   const WEIGHTS = [['snatch', 3], ['tryon', 3], ['bust', 2], ['stroke', 2]];
+  let lastBit = '';
   const choose = () => {
-    let r = Math.random() * WEIGHTS.reduce((s, [, w]) => s + w, 0);
-    for (const [k, w] of WEIGHTS) if ((r -= w) < 0) return k;
-    return 'snatch';
+    const ws = WEIGHTS.filter(([k]) => k !== lastBit);
+    let r = Math.random() * ws.reduce((s, [, w]) => s + w, 0);
+    for (const [k, w] of ws) if ((r -= w) < 0) return (lastBit = k);
+    return (lastBit = ws[0][0]);
   };
 
   /* ---------------------------------------------------------------- when */
@@ -235,19 +231,23 @@
   window.JBAntics = { run };
   humanoids.slice(0, 2).forEach(preload);
 
-  // on the list: rarely, and only when the tab is open and nothing else is going on
-  let next = performance.now() + rand(20000, 35000);
+  // on the list: regularly, a different crew member each time, only when the tab is open and nothing else is going on
+  let next = performance.now() + rand(5000, 9000);
   setInterval(() => {
     const dlg = document.querySelector(P.dialog);
-    if (document.hidden || running || (dlg && dlg.open) || performance.now() < next) return;
-    run(null, 'list').then((ran) => { next = performance.now() + (ran ? rand(45000, 90000) : 5000); });
+    if (document.hidden || running || (dlg && dlg.open) || document.body.classList.contains('dock-open') || performance.now() < next) return;
+    run(null, 'list').then((ran) => { next = performance.now() + (ran ? rand(12000, 20000) : 3000); });
   }, 1000);
-  // in the detail view: a good chance, a few seconds after it opens
+  // in the detail view: soon after it opens, then again and again while it stays open
   const dlg = document.querySelector(P.dialog);
   if (dlg) {
-    new MutationObserver(() => {
-      if (!dlg.open || Math.random() > .45) return;
-      setTimeout(() => { if (dlg.open && !P.busy()) run(null, 'detail'); }, rand(2800, 5000));
-    }).observe(dlg, { attributes: true, attributeFilter: ['open'] });
+    let loop = 0;
+    const again = (me, ms) => setTimeout(async () => {
+      if (me !== loop || !dlg.open) return;
+      const ran = !P.busy() && !document.hidden && await run(null, 'detail');
+      again(me, ran ? rand(7000, 12000) : 2500);
+    }, ms);
+    new MutationObserver(() => { loop++; if (dlg.open) again(loop, rand(1500, 3000)); })
+      .observe(dlg, { attributes: true, attributeFilter: ['open'] });
   }
 })();
