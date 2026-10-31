@@ -156,6 +156,29 @@ export class ClothSim {
     this.grab = null;
   }
 
+  /** JB: scrunch the whole cloth into a ball around its centre; the constraints burst it back open. */
+  crumple(amount = 0.82) {
+    const p = this.positions, n = this.count;
+    let cx = 0, cy = 0, cz = 0;
+    for (let i = 0; i < n; i++) { cx += p[i * 3]; cy += p[i * 3 + 1]; cz += p[i * 3 + 2]; }
+    cx /= n; cy /= n; cz /= n;
+    const k = 1 - amount, j = Math.max(this.width, this.height) * 0.06;
+    for (let i = 0; i < n; i++) {
+      p[i * 3] = cx + (p[i * 3] - cx) * k + (Math.random() - 0.5) * j;
+      p[i * 3 + 1] = cy + (p[i * 3 + 1] - cy) * k + (Math.random() - 0.5) * j;
+      p[i * 3 + 2] = cz + (p[i * 3 + 2] - cz) * k + (Math.random() - 0.5) * j * 2;
+    }
+    this.prev.set(p);
+    this.grab = null;
+  }
+
+  /** JB: pull every point a fraction t of the way back to the starting pose (call per frame to snap back). */
+  settle(t: number) {
+    const p = this.positions, r = this.rest;
+    for (let i = 0; i < p.length; i++) p[i] += (r[i] - p[i]) * t;
+    this.prev.set(p);
+  }
+
   /** Give a random gentle impulse — a "poke" from nowhere. */
   poke(strength = 0.5) {
     const p = this.positions;

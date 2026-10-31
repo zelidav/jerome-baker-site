@@ -14,6 +14,7 @@ export interface HoloUniforms {
   uSurfaceOpacity: THREE.IUniform<number>;
   uCavityAmount: THREE.IUniform<number>;
   uCornerRound: THREE.IUniform<number>;
+  uDieCut: THREE.IUniform<number>;
   uClothSize: THREE.IUniform<THREE.Vector2>;
 }
 
@@ -64,6 +65,7 @@ export function createHoloMaterial(surfaceTexture: THREE.Texture): HoloMaterial 
     uSurfaceOpacity: { value: 1.0 },
     uCavityAmount: { value: 0 },
     uCornerRound: { value: 0 },
+    uDieCut: { value: 0 },
     uClothSize: { value: new THREE.Vector2(3, 3) },
   };
 
@@ -96,6 +98,7 @@ export function createHoloMaterial(surfaceTexture: THREE.Texture): HoloMaterial 
       varying float vCavity;
       uniform float uCavityAmount;
       uniform float uCornerRound;
+      uniform float uDieCut;
       uniform vec2 uClothSize;
 
       float holoHash(vec2 p) {
@@ -130,6 +133,8 @@ export function createHoloMaterial(surfaceTexture: THREE.Texture): HoloMaterial 
           // ink reads as dielectric, so pull metalness down where it covers
           vec4 surf = texture2D(uSurfaceMap, vHoloUv);
           float surfA = surf.a * uSurfaceOpacity;
+          // JB die-cut: where the cloth image is see-through, there is no cloth (sticker outlines)
+          if (uDieCut > 0.5 && surf.a < 0.5) discard;
           diffuseColor.rgb = mix(diffuseColor.rgb, surf.rgb, surfA);
           metalnessFactor = mix(metalnessFactor, 0.05, surfA * 0.8);
 

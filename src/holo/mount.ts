@@ -15,6 +15,12 @@ export interface HoloClothOptions {
   pokeOnEnter?: boolean;
   /** no studio background: the page shows through around the cloth */
   transparentBg?: boolean;
+  /** after it's been left alone this long (ms), it eases back to its starting shape; false = stays put */
+  snapBack?: number | false;
+  /** cut the cloth to the cloth image's outline (transparent PNG/WebP stickers) */
+  dieCut?: boolean;
+  /** double-click / double-tap crumples it into a ball */
+  crumpleOnDoubleTap?: boolean;
   /** 'High' | 'Medium' | 'Low' (upstream's performance profiles) */
   performance?: 'High' | 'Medium' | 'Low';
   onReady?: (api: HoloClothHandle) => void;
@@ -23,6 +29,8 @@ export interface HoloClothOptions {
 export interface HoloClothHandle {
   app: HoloApp;
   poke: (strength?: number) => void;
+  crumple: () => void;
+  snapBack: (ms?: number) => Promise<void>;
   setPreset: (name: PresetName) => void;
   setClothImage: (src: string | HTMLImageElement) => Promise<void>;
   addDecal: (src: string | HTMLImageElement) => Promise<void>;
@@ -78,7 +86,7 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
   // engine internals the wrapper needs (TS-private upstream, untouched)
   const raw = app as unknown as {
     renderer: import('three').WebGLRenderer; scene: import('three').Scene; tick: () => void;
-    controls: { enabled: boolean }; holoUniforms: { uRadialFreq: { value: number } }; surface: { decals: Array<{ u: number; v: number; scale: number; rotation: number }>; redraw: () => void };
+    controls: { enabled: boolean }; holoUniforms: { uRadialFreq: { value: number }; uDieCut: { value: number } }; surface: { decals: Array<{ u: number; v: number; scale: number; rotation: number }>; redraw: () => void };
   };
   const canvas = raw.renderer.domElement;
   let preset: PresetName = opts.preset || 'jb-foil';
@@ -87,10 +95,31 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
   const apply = () => {
     const p = structuredClone(PRESETS[preset].params);
     if (opts.performance) p.performance = opts.performance;
+    // over the page there is no backdrop for grain or bloom to sit on; they only tint the empty area
+    if (opts.transparentBg) { p.render.noise = 0; p.render.bloom = 0; }
     app.applyParams(p);
     raw.holoUniforms.uRadialFreq.value = PRESETS[preset].radialFreq;
+    raw.holoUniforms.uDieCut.value = opts.dieCut ? 1 : 0;
     if (opts.transparentBg) { raw.scene.background = null; raw.renderer.setClearColor(0x000000, 0); }
   };
+
+  type Sim = { poke: (n: number) => void; crumple: () => void; settle: (t: number) => void };
+  const sim = () => (app as unknown as { sim: Sim }).sim;
+  // snap back to the starting shape a few seconds after the last touch
+  let idleT = 0;
+  const idle = () => {
+    clearTimeout(idleT);
+    if (opts.snapBack === false || disposed) return;
+    idleT = window.setTimeout(() => handle.snapBack(900), opts.snapBack ?? 3500);
+  };
+  let lastTap = 0;
+  canvas.addEventListener('pointerdown', (e) => {
+    clearTimeout(idleT);
+    if (opts.crumpleOnDoubleTap && e.timeStamp - lastTap < 350) { lastTap = 0; handle.crumple(); return; }
+    lastTap = e.timeStamp;
+  });
+  canvas.addEventListener('pointerup', idle);
+  canvas.addEventListener('pointercancel', idle);
 
   const interactive = opts.interactive !== false;
   raw.controls.enabled = interactive;
@@ -99,7 +128,19 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
 
   const handle: HoloClothHandle = {
     app,
-    poke: (s = 1) => (app as unknown as { sim: { poke: (n: number) => void } }).sim.poke(s),
+    poke: (s = 1) => sim().poke(s),
+    crumple: () => { sim().crumple(); idle(); },
+    snapBack: (ms = 700) => new Promise((done) => {
+      const t0 = performance.now();
+      const go = () => {
+        if (disposed) return done();
+        const k = Math.min(1, (performance.now() - t0) / ms);
+        // ease-out: each frame closes a growing share of what's left
+        sim().settle(k >= 1 ? 1 : 0.06 + 0.25 * k * k);
+        k < 1 ? requestAnimationFrame(go) : done();
+      };
+      go();
+    }),
     setPreset: (name) => {
       preset = name;
       apply();
@@ -109,7 +150,7 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
     addDecal: async (src) => { const img = await load(src); if (!disposed) app.addDecal(img); },
     pause: () => raw.renderer.setAnimationLoop(null),
     resume: () => { if (!disposed) raw.renderer.setAnimationLoop(raw.tick); },
-    dispose: () => { if (disposed) return; disposed = true; app.dispose(); },
+    dispose: () => { if (disposed) return; disposed = true; clearTimeout(idleT); app.dispose(); },
   };
 
   apply();

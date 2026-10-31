@@ -111,7 +111,8 @@ def topbar(up):
 def scripts(up, weird=False):
     return (f'<script src="{up}js/crew-data.js"></script>\n<script src="{up}js/crew.js" defer></script>\n'
             f'<script src="{up}js/glitch.js" defer></script>\n<script src="{up}js/dock.js" defer></script>\n'
-            + (f'<script src="{up}js/weird.js" defer></script>\n' if weird else ""))
+            # character pages also get the holo sample (js/holo/sample.js, off on the live site)
+            + (f'<script src="{up}js/holo/sample.js" defer></script>\n<script src="{up}js/weird.js" defer></script>\n' if weird else ""))
 
 
 CREW_NOTE = "The crew is fictional. The merch is real."

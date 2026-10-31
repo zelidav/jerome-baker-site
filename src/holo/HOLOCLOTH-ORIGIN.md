@@ -12,4 +12,5 @@ Ours: presets.ts (jb-foil, jb-poster), mount.ts (mountHoloCloth(el, opts), the o
 Any later change to the vendored files gets noted below with the reason.
 
 ## Local changes
-- none yet
+- cloth.ts: added crumple() and settle() (scrunch into a ball; ease back to the starting pose). Nothing existing changed. David OK'd physics changes 2026-10-31.
+- holoMaterial.ts: added a uDieCut uniform (default 0, off) that discards cloth where the cloth image is transparent, so a sticker becomes a die-cut shape. Nothing existing changed.
