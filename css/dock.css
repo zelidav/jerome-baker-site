@@ -1,0 +1,79 @@
+/* the phone menu (js/dock.js): a glass tube on the bottom of the screen, the JB mark as the bowl */
+.dock,.pile{display:none}
+@media (max-width:760px){
+  body.has-dock{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+  /* the tube carries the main links on phones, so the header keeps just the logo (and the cart) */
+  body.has-dock header nav[aria-label="Main"] a:not(.cartbtn){display:none}
+  body.has-dock header nav[aria-label="Main"] li:not(:has(.cartbtn)){display:none}
+  body.has-dock header.top,body.has-dock .topbar{padding-top:8px;padding-bottom:8px}
+  body.has-dock .crew-toggle{bottom:calc(92px + env(safe-area-inset-bottom))}
+  body.has-dock .toast{bottom:calc(100px + env(safe-area-inset-bottom));pointer-events:none}
+  body.has-dock .toast:not(.show){visibility:hidden}
+
+  .dock{display:grid;grid-template-columns:1fr 1fr 76px 1fr 1fr;align-items:end;position:fixed;z-index:72;
+    left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));
+    height:62px;padding:0 6px;font-family:var(--display)}
+  /* borosilicate: clear, a little blue, a hot white highlight along the top */
+  .tube{position:absolute;inset:0;border-radius:31px;overflow:hidden;
+    background:linear-gradient(180deg,rgba(255,255,255,.82),rgba(205,222,255,.7) 40%,rgba(120,140,215,.78) 100%);
+    -webkit-backdrop-filter:blur(18px) saturate(1.4);backdrop-filter:blur(18px) saturate(1.4);
+    border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink),inset 0 -6px 12px rgba(10,10,10,.25)}
+  /* the smoke: fills left to right with the page, fumed gold through amber into cobalt */
+  .tube .fill{position:absolute;inset:0;transform-origin:0 50%;transform:scaleX(.04);transition:transform .25s ease-out;
+    background:radial-gradient(60% 140% at 100% 50%,rgba(255,255,255,.5),transparent 60%),linear-gradient(90deg,rgba(253,181,20,.5),rgba(218,35,66,.45) 55%,rgba(42,59,142,.6));
+    filter:blur(1px)}
+  .tube .shine{position:absolute;left:22px;right:22px;top:5px;height:9px;border-radius:9px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95) 20%,rgba(255,255,255,.6) 70%,transparent)}
+  .tube .bubbles i{position:absolute;bottom:4px;width:var(--s);height:var(--s);border-radius:50%;border:1.5px solid rgba(255,255,255,.9);animation:dockbub .9s ease-out forwards}
+  @keyframes dockbub{to{translate:0 -46px;opacity:0;scale:1.4}}
+
+  .dock .tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:62px;min-width:0;
+    color:var(--ink);text-decoration:none;font-weight:900;font-size:11px;letter-spacing:.01em;-webkit-tap-highlight-color:transparent}
+  .dock .tab svg{width:26px;height:26px;fill:var(--ink);stroke:none;transition:transform .2s ease}
+  .dock .tab svg .ln{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round}
+  .dock .tab img{width:30px;height:30px;object-fit:contain;transition:transform .2s ease}
+  .dock .tab span{transition:opacity .2s ease,max-height .2s ease;max-height:14px;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+  /* where you are: a yellow sticker slapped on the glass */
+  .dock .tab.on::before{content:"";position:absolute;inset:7px 2px;background:var(--yellow);border:2.5px solid var(--ink);rotate:-4deg;z-index:-1;box-shadow:2px 2px 0 var(--ink)}
+  .dock .tab:active svg,.dock .tab:active img{transform:scale(.86) rotate(-8deg)}
+  .dock.tuck .tab span{opacity:0;max-height:0}
+  .dock.tuck .tab svg,.dock.tuck .tab img{transform:scale(1.12)}
+
+  /* the bowl: the JB mark, sitting proud of the tube */
+  .dock .bowl{position:relative;align-self:center;justify-self:center;width:72px;height:72px;margin-top:-26px;border-radius:50%;padding:0;cursor:pointer;
+    background:radial-gradient(circle at 35% 30%,#fff 0 8%,var(--red) 9% 58%,#9e1530 100%);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);
+    display:grid;place-items:center;transition:transform .25s cubic-bezier(.3,1.6,.5,1);-webkit-tap-highlight-color:transparent}
+  .dock .bowl img{width:54px;height:auto;rotate:-6deg;filter:drop-shadow(2px 2px 0 var(--ink))}
+  .dock .bowl::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px dashed rgba(255,241,0,.0);transition:border-color .2s}
+  .dock .bowl[aria-expanded="true"]{transform:rotate(200deg) scale(.92)}
+  .dock .bowl[aria-expanded="true"]::after{border-color:var(--yellow);animation:dockspin 4s linear infinite}
+  @keyframes dockspin{to{rotate:360deg}}
+  .dock .dock-sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;border:0!important;background:none!important;box-shadow:none!important;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+  /* the sticker pile */
+  .pile{display:block;position:fixed;inset:0;z-index:71;padding:calc(env(safe-area-inset-top) + 20px) 16px calc(110px + env(safe-area-inset-bottom));
+    overflow-y:auto;background:rgba(10,10,10,.0);transition:background .3s ease}
+  .pile[hidden]{display:none}
+  .pile.on{background:rgba(10,10,10,.82)}
+  .pile-smoke{position:fixed;left:50%;bottom:40px;width:140vmax;height:140vmax;translate:-50% 50%;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle,rgba(241,241,241,.22),rgba(241,241,241,.06) 40%,transparent 62%);scale:0;transition:scale .5s ease-out}
+  .pile.on .pile-smoke{scale:1}
+  .pile ul{list-style:none;margin:0 auto;padding:0;max-width:420px;display:flex;flex-direction:column;gap:12px}
+  .pile li{rotate:var(--r);opacity:0;translate:0 60vh;transition:translate .42s cubic-bezier(.2,1.4,.4,1) calc(var(--i) * 35ms),opacity .2s ease calc(var(--i) * 35ms)}
+  .pile.on li{opacity:1;translate:0 0}
+  .pile .stk{display:block;padding:12px 18px;border:3px solid var(--ink);box-shadow:5px 5px 0 var(--ink);text-decoration:none;
+    font-family:var(--display);font-weight:900;font-size:28px;line-height:1;letter-spacing:-.02em}
+  .pile .stk small{display:block;margin-top:4px;font-family:var(--body);font-weight:700;font-size:13px;letter-spacing:0;opacity:.85}
+  .pile .stk:active{translate:3px 3px;box-shadow:2px 2px 0 var(--ink)}
+  .pile .blue{background:var(--blue);color:var(--white)}
+  .pile .red{background:var(--red);color:var(--white)}
+  .pile .yellow{background:var(--yellow);color:var(--ink)}
+  .pile .teal{background:var(--teal);color:var(--ink)}
+  .pile .white{background:var(--white);color:var(--ink)}
+  .pile-x{display:block;margin:22px auto 0;min-height:44px;padding:0 18px;background:none;border:2px solid var(--white);color:var(--white);font-family:var(--display);font-weight:800;font-size:15px;cursor:pointer}
+  body.dock-open{overflow:hidden}
+  body.dock-open .crew-toggle,body.dock-open .crew-layer{visibility:hidden}
+}
+@media (max-width:760px) and (prefers-reduced-motion:reduce){
+  .pile li,.pile-smoke,.dock .bowl,.tube .fill{transition:none}
+  .dock .bowl[aria-expanded="true"]::after{animation:none}
+}
