@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en" data-base="../../">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Holo lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* dev-only tuning bench for src/holo presets; runs on localhost only, nothing here is linked from the site */
+:root{--navy:#233671;--yellow:#FCD804;--red:#EC1F28;--ink:#0A0A0A;--paper:#F1F1F1}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0b0c12;color:var(--paper);font:500 14px/1.4 Montserrat,Helvetica,Arial,sans-serif}
+.lab{display:grid;grid-template-columns:1fr 336px;height:100vh}
+#stage{position:relative;min-height:0}
+aside{background:var(--paper);color:var(--ink);overflow-y:auto;padding:16px;border-left:4px solid var(--ink)}
+h1{margin:0 0 16px;font-weight:900;font-size:24px;letter-spacing:-.02em}
+h2{margin:24px 0 8px;font-weight:800;font-size:14px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;min-height:40px;border:3px solid var(--ink);background:#fff;font:800 14px Montserrat,sans-serif;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--yellow)}
+.drop{display:grid;place-items:center;min-height:72px;margin-top:8px;padding:8px;border:3px dashed var(--ink);background:#fff;text-align:center;cursor:pointer;font-weight:700}
+.drop.over{background:var(--yellow)}
+.drop small{display:block;font-weight:500;color:#555}
+label.row{display:grid;grid-template-columns:112px 1fr 48px;align-items:center;gap:8px;margin:4px 0;font-size:12px;font-weight:700}
+label.row input[type=range]{width:100%;accent-color:var(--navy)}
+label.row output{font:700 12px ui-monospace,monospace;text-align:right}
+label.row input[type=color]{width:100%;height:28px;border:2px solid var(--ink);padding:0}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.acts button{min-height:40px;padding:0 16px;border:3px solid var(--ink);background:var(--navy);color:#fff;font:800 13px Montserrat,sans-serif;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+.acts button.alt{background:var(--red)}
+pre{white-space:pre-wrap;font:12px ui-monospace,monospace;background:#fff;border:2px solid var(--ink);padding:8px;max-height:200px;overflow:auto}
+.devonly{display:grid;place-items:center;height:100vh;font-weight:800}
+@media (max-width:760px){.lab{grid-template-columns:1fr;grid-template-rows:55vh auto;height:auto}aside{border-left:0;border-top:4px solid var(--ink)}}
+</style>
+</head>
+<body>
+<div class="lab" id="lab" hidden>
+  <div id="stage"></div>
+  <aside>
+    <h1>Holo lab</h1>
+    <div class="seg" role="group" aria-label="Preset">
+      <button type="button" data-p="jb-foil" aria-pressed="true">jb-foil</button>
+      <button type="button" data-p="jb-poster" aria-pressed="false">jb-poster</button>
+    </div>
+    <h2>Cloth image</h2>
+    <div class="drop" id="dropCloth" tabindex="0">Drop artwork here<small>or click to pick a file</small></div>
+    <h2>Decals</h2>
+    <div class="drop" id="dropDecal" tabindex="0">Drop a logo or sticker<small>each drop adds one, centred</small></div>
+    <h2>Tune</h2>
+    <div id="sliders"></div>
+    <div class="acts">
+      <button type="button" id="poke">Poke</button>
+      <button type="button" id="reset" class="alt">Reset preset</button>
+      <button type="button" id="copy">Copy values</button>
+    </div>
+    <pre id="out" aria-live="polite"></pre>
+  </aside>
+</div>
+<p class="devonly" id="devonly" hidden>Holo lab runs on localhost only.</p>
+<input type="file" id="pick" accept="image/*" hidden>
+<script type="module">
+const local = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+if (!local) {
+  document.getElementById('devonly').hidden = false;
+} else {
+  document.getElementById('lab').hidden = false;
+  await import('../../js/holo/holo.js');
+  const { mountHoloCloth, PRESETS } = window.JBHolo;
+  const $ = (s) => document.querySelector(s);
+  let name = 'jb-foil';
+  let tuned = structuredClone(PRESETS[name].params.material);
+  let radial = PRESETS[name].radialFreq;
+  const holo = mountHoloCloth($('#stage'), { preset: name, clothImage: '../../assets/img/kaleido-a.webp', pokeOnEnter: true });
+  const app = holo.app;
+
+  const SLIDERS = [
+    ['baseColor', 'color'], ['holoIntensity', 0, 4, .01], ['holoScale', 8, 400, 1], ['bandFreq', 0, 2, .01], ['hueShift', 0, 1, .005],
+    ['radialFreq', 0, 2, .01], ['saturation', 0, 1, .01], ['sparkle', 0, 2, .01], ['specTint', 0, 1, .01], ['iridescence', 0, 1, .01],
+    ['roughness', 0, 1, .01], ['metalness', 0, 1, .01], ['clearcoat', 0, 1, .01], ['coatRoughness', 0, 1, .01], ['sheen', 0, 1, .01],
+    ['bump', 0, 3, .01], ['bumpTiling', 1, 12, .5], ['opacity', 0, 1, .01],
+  ];
+  const get = (k) => k === 'radialFreq' ? radial : k === 'opacity' ? PRESETS[name].params.images.opacity : tuned[k];
+  let imgOpacity = PRESETS[name].params.images.opacity;
+  const push = () => {
+    const p = structuredClone(PRESETS[name].params);
+    p.material = { ...tuned };
+    p.images.opacity = imgOpacity;
+    app.applyParams(p);
+    app.holoUniforms.uRadialFreq.value = radial;
+    $('#out').textContent = JSON.stringify({ preset: name, radialFreq: radial, opacity: imgOpacity, material: tuned }, null, 1);
+  };
+  const build = () => {
+    $('#sliders').innerHTML = '';
+    for (const [k, min, max, step] of SLIDERS) {
+      const row = document.createElement('label');
+      row.className = 'row';
+      const v = k === 'opacity' ? imgOpacity : get(k);
+      row.innerHTML = min === 'color'
+        ? `<span>${k}</span><input type="color" value="${v}"><output>${v}</output>`
+        : `<span>${k}</span><input type="range" min="${min}" max="${max}" step="${step}" value="${v}"><output>${(+v).toFixed(2)}</output>`;
+      const inp = row.querySelector('input'), out = row.querySelector('output');
+      inp.addEventListener('input', () => {
+        const val = min === 'color' ? inp.value : +inp.value;
+        out.textContent = min === 'color' ? val : val.toFixed(2);
+        if (k === 'radialFreq') radial = val; else if (k === 'opacity') imgOpacity = val; else tuned[k] = val;
+        push();
+      });
+      $('#sliders').appendChild(row);
+    }
+    push();
+  };
+  const choose = (p) => {
+    name = p;
+    tuned = structuredClone(PRESETS[p].params.material);
+    radial = PRESETS[p].radialFreq;
+    imgOpacity = PRESETS[p].params.images.opacity;
+    document.querySelectorAll('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.p === p)));
+    holo.setPreset(p);
+    build();
+  };
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => choose(b.dataset.p)));
+
+  // drop zones: artwork becomes the cloth, every decal drop adds one on top
+  const fileImg = (file) => new Promise((res) => { const i = new Image(); i.onload = () => res(i); i.src = URL.createObjectURL(file); });
+  let pickFor = null;
+  const zone = (el, use) => {
+    el.addEventListener('dragover', (e) => { e.preventDefault(); el.classList.add('over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('over'));
+    el.addEventListener('drop', async (e) => { e.preventDefault(); el.classList.remove('over'); const f = e.dataTransfer.files[0]; if (f) use(await fileImg(f)); });
+    const open = () => { pickFor = use; $('#pick').click(); };
+    el.addEventListener('click', open);
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+  };
+  $('#pick').addEventListener('change', async (e) => { const f = e.target.files[0]; if (f && pickFor) pickFor(await fileImg(f)); e.target.value = ''; });
+  zone($('#dropCloth'), (img) => { app.setClothImage(img); push(); app.reveal(); });
+  zone($('#dropDecal'), (img) => { app.addDecal(img); });
+
+  $('#poke').addEventListener('click', () => holo.poke(1));
+  $('#reset').addEventListener('click', () => choose(name));
+  $('#copy').addEventListener('click', () => navigator.clipboard?.writeText($('#out').textContent).then(() => { $('#copy').textContent = 'Copied'; setTimeout(() => ($('#copy').textContent = 'Copy values'), 1200); }));
+  build();
+  window.__ready = true;
+}
+</script>
+</body>
+</html>
