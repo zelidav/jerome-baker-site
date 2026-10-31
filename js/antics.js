@@ -1,6 +1,6 @@
 /* Crew antics on the shopping pages. Every so often an animated crew member walks in and messes with a
    product on screen: grabs it and runs, slowly strokes the glass, tries it on, or grabs it and gets popped by
-   Torch, who puts it back. Every 12-20s on the list; in an open piece or product, again every 7-12s. Everyone gets a turn before anyone repeats.
+   Torch, who puts it back. Every 8-14s on the list; in an open piece or product, within a second of opening and again every 4-7s. Everyone gets a turn before anyone repeats.
    Needs js/anim-data.js + js/crewanim.js. Test hook: JBAntics.run('snatch' | 'stroke' | 'tryon' | 'bust'). */
 (() => {
   const CA = window.JBCrewAnim;
@@ -57,6 +57,17 @@
     const a = g.animate([{ transform: `translate(${g._b.x}px,${g._b.y}px)`, width: g._b.w + 'px', height: g._b.h + 'px' },
       { transform: `translate(${b.x}px,${b.y}px)`, width: b.w + 'px', height: b.h + 'px' }], { duration: ms, easing: 'ease-in-out', fill: 'forwards' });
     return a.finished.then(() => { Object.assign(g.style, { width: b.w + 'px', height: b.h + 'px', transform: `translate(${b.x}px,${b.y}px)` }); g._b = { ...b }; a.cancel(); });
+  };
+  const puff = (layer, x, y, n, dir) => {
+    for (let i = 0; i < n; i++) {
+      const p = document.createElement('i');
+      p.className = 'ant-puff';
+      const s = 18 + Math.random() * 30;
+      Object.assign(p.style, { width: s + 'px', height: s + 'px', left: x - s / 2 + 'px', top: y - s / 2 + 'px' });
+      layer.appendChild(p);
+      p.animate([{ opacity: .9, scale: .4, translate: '0 0' }, { opacity: 0, scale: 2.6, translate: `${dir * (30 + Math.random() * 80)}px ${-40 - Math.random() * 90}px` }],
+        { duration: 1400 + Math.random() * 900, delay: i * 70, easing: 'ease-out', fill: 'forwards' }).finished.then(() => p.remove());
+    }
   };
   const restore = (t) => {
     t.style.visibility = '';
@@ -174,6 +185,76 @@
       await torch.walk(fromLeft ? W + H : -H, 1100);
       torch.remove();
     },
+    // walks up and takes a rip off it: lighter, pull, a cloud, a deep cough (glass only)
+    async sesh(t, host, layer, W) {
+      const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
+      const a = new Actor(layer, cast(), H);
+      const left = b.x + b.w / 2 > W / 2;
+      a.at(left ? -H * .5 : W + H * .5, floor);
+      await a.walk(left ? b.x - H * .15 : b.x + b.w + H * .15, 1000);
+      a.face(left).pose('lean');
+      await wait(220);
+      a.pose('hit');
+      sound('lighter');
+      await wait(500);
+      sound('rip');
+      t.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1.25) saturate(1.3)' }, { filter: 'brightness(1)' }], { duration: 1600 });
+      await wait(1600);
+      CA.hush('rip');
+      a.pose('exhale');
+      puff(layer, ...a.mouth(), 7, left ? 1 : -1);
+      await wait(650);
+      sound('cough');
+      for (let i = 0; i < 2; i++) { a.pose('cough'); a.shake(320, 1); puff(layer, ...a.mouth(), 3, left ? 1 : -1); await wait(380); }
+      say(layer, a, pick(['*cough* worth it.', 'Who packed this??', 'Smooth. *hack*', 'I can see sounds.']), 1800);
+      a.pose('dizzy');
+      await wait(900);
+      await a.walk(left ? -H : W + H, 1400);
+      a.remove();
+    },
+    // two of them grab it at once and play tug of war till it snaps back where it was
+    async tug(t, host, layer, W) {
+      const b = box(t, host), H = Math.max(140, Math.min(250, b.h * .72)), floor = b.y + b.h;
+      const l = new Actor(layer, cast(), H), r = new Actor(layer, cast([l.slug]), H);
+      l.at(-H * .5, floor); r.at(W + H * .5, floor);
+      await Promise.all([l.walk(b.x - H * .2, 900), r.walk(b.x + b.w + H * .2, 900)]);
+      l.face(true).pose('reach'); r.face(false).pose('reach');
+      say(layer, l, pick(['I saw it first.', 'Mine.', 'Let go.']), 1400);
+      await wait(500);
+      const g = ghost(layer, t.currentSrc || t.src, b);
+      t.style.visibility = 'hidden';
+      say(layer, r, pick(['Nope.', 'I called it.', 'Over my dead body.']), 1400);
+      for (let i = 0; i < 6; i++) {
+        const d = (i % 2 ? 1 : -1) * Math.min(26, b.w * .12);
+        g.animate([{ translate: '0 0', rotate: '0deg' }, { translate: `${d}px 0`, rotate: `${d / 6}deg` }], { duration: 160, fill: 'forwards' });
+        (i % 2 ? r : l).shake(160, 1);
+        await wait(170);
+      }
+      g.remove();
+      restore(t);
+      l.pose('dizzy'); r.pose('dizzy');
+      l.el.animate([{ translate: '0 0' }, { translate: `${-H * .5}px 0` }], { duration: 300, fill: 'forwards' });
+      r.el.animate([{ translate: '0 0' }, { translate: `${H * .5}px 0` }], { duration: 300, fill: 'forwards' });
+      await wait(700);
+      l.el.getAnimations().forEach((x) => x.cancel()); r.el.getAnimations().forEach((x) => x.cancel());
+      await Promise.all([l.walk(-H, 1000), r.walk(W + H, 1000)]);
+      l.remove(); r.remove();
+    },
+    // gets one good look and passes out
+    async faint(t, host, layer, W) {
+      const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
+      const a = new Actor(layer, cast(), H);
+      const left = b.x + b.w / 2 > W / 2;
+      a.at(left ? -H * .5 : W + H * .5, floor);
+      await a.walk(left ? b.x - H * .25 : b.x + b.w + H * .25, 1000);
+      a.face(left).pose('pose');
+      say(layer, a, pick(['Is it... breathing?', 'Too beautiful.', 'Hold me.', 'I need to sit down.']), 1500);
+      await wait(1300);
+      a.pose('dizzy');
+      await a.shake(300, 2);
+      await a.el.animate([{ rotate: '0deg', opacity: 1 }, { rotate: `${left ? -88 : 88}deg`, opacity: 1, offset: .7 }, { rotate: `${left ? -88 : 88}deg`, opacity: 0 }], { duration: 1500, easing: 'ease-in', fill: 'forwards' }).finished;
+      a.remove();
+    },
   };
   // run with the item overhead: the carry pose bobbing along
   async function runCarry(a, x, ms = 800) {
@@ -190,7 +271,8 @@
     }
     a.el.style.translate = '';
   }
-  const WEIGHTS = [['snatch', 3], ['tryon', 3], ['bust', 2], ['stroke', 2]];
+  // glass gets the sesh; everything gets the rest
+  const WEIGHTS = [['snatch', 3], ['tryon', 3], ['bust', 2], ['stroke', 2], ['tug', 2], ['faint', 2], ...(P.list.includes('.tile') ? [['sesh', 4]] : [])];
   let lastBit = '';
   const choose = () => {
     const ws = WEIGHTS.filter(([k]) => k !== lastBit);
@@ -232,11 +314,11 @@
   humanoids.slice(0, 2).forEach(preload);
 
   // on the list: regularly, a different crew member each time, only when the tab is open and nothing else is going on
-  let next = performance.now() + rand(5000, 9000);
+  let next = performance.now() + rand(3000, 6000);
   setInterval(() => {
     const dlg = document.querySelector(P.dialog);
     if (document.hidden || running || (dlg && dlg.open) || document.body.classList.contains('dock-open') || performance.now() < next) return;
-    run(null, 'list').then((ran) => { next = performance.now() + (ran ? rand(12000, 20000) : 3000); });
+    run(null, 'list').then((ran) => { next = performance.now() + (ran ? rand(8000, 14000) : 2500); });
   }, 1000);
   // in the detail view: soon after it opens, then again and again while it stays open
   const dlg = document.querySelector(P.dialog);
@@ -245,9 +327,9 @@
     const again = (me, ms) => setTimeout(async () => {
       if (me !== loop || !dlg.open) return;
       const ran = !P.busy() && !document.hidden && await run(null, 'detail');
-      again(me, ran ? rand(7000, 12000) : 2500);
+      again(me, ran ? rand(4000, 7000) : 1500);
     }, ms);
-    new MutationObserver(() => { loop++; if (dlg.open) again(loop, rand(1500, 3000)); })
+    new MutationObserver(() => { loop++; if (dlg.open) again(loop, rand(500, 1100)); })
       .observe(dlg, { attributes: true, attributeFilter: ['open'] });
   }
 })();
