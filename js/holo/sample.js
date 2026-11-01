@@ -1,5 +1,5 @@
-/* HOLO_SAMPLE: the holo cloth (js/holo/holo.js, src/holo) on a few spots of the real site, as a test.
-   Off on the live site by default; on at localhost. ?holo=1 / ?holo=0 turns it on or off for the session.
+/* HOLO_SAMPLE: the holo cloth (js/holo/holo.js, src/holo) on a few spots of the real site.
+   On by default; ?holo=0 / ?holo=1 turns it off or on for the session (the kill switch, if a phone misbehaves).
    The three.js bundle only loads when a spot gets near the screen, the render loop pauses when it scrolls away,
    phones get the Low profile, and with no WebGL2 or with reduced motion the page stays exactly as it was. */
 (() => {
@@ -7,12 +7,10 @@
   try { if (q.has('holo')) sessionStorage.setItem('jb-holo', q.get('holo')); } catch (e) { /* storage blocked */ }
   let flag = null;
   try { flag = sessionStorage.getItem('jb-holo'); } catch (e) { /* storage blocked */ }
-  const local = ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
-  const HOLO_SAMPLE = flag != null ? flag !== '0' : local;
-  if (!HOLO_SAMPLE || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const probe = document.createElement('canvas').getContext('webgl2');
-  if (!probe) return;
-  probe.getExtension('WEBGL_lose_context')?.loseContext();
+  const HOLO_SAMPLE = flag != null ? flag !== '0' : true;
+  // the original art stays for reduced motion, data saver and weak devices
+  const weak = (navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 3) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4);
+  if (!HOLO_SAMPLE || weak || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const base = document.documentElement.dataset.base || '';
   const phone = innerWidth < 768;
@@ -33,13 +31,13 @@
   const spots = [];
   const collage = document.querySelector('.hero .collage');
   if (collage) spots.push({
-    host: collage, hint: 'Grab the box. Double-tap to crumple it.',
+    host: collage, hint: phone ? 'Swipe the box sideways. Double-tap to crumple it.' : 'Grab the box. Double-tap to crumple it.',
     opts: { preset: 'jb-poster', clothImage: base + 'assets/img/box.webp' },
   });
   const crewArt = document.querySelector('.cp-hero .art');
   const crewImg = crewArt && crewArt.querySelector('img');
   if (crewImg) spots.push({
-    host: crewArt, hint: 'Twist it. Double-tap to crumple.',
+    host: crewArt, hint: phone ? 'Swipe it sideways. Double-tap to crumple.' : 'Twist it. Double-tap to crumple.',
     opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
   });
   if (!spots.length) return;
@@ -48,30 +46,46 @@
   const loadLib = () => lib || (lib = import(new URL(base + 'js/holo/holo.js', location.href).href).then(() => window.JBHolo));
 
   const start = async (spot) => {
-    const { mountHoloCloth } = await loadLib();
+    spot.holo = true;
+    // no WebGL2, no holo: the art stays (checked here, not on load, because it costs a GPU context)
+    const probe = document.createElement('canvas').getContext('webgl2');
+    if (!probe) { spot.holo = 'off'; return; }
+    probe.getExtension('WEBGL_lose_context')?.loseContext();
+    let mountHoloCloth;
+    try { ({ mountHoloCloth } = await loadLib()); } catch (e) { return; } // the bundle didn't load: the art stays
     const stage = document.createElement('div');
     stage.className = 'holo-stage';
     const hint = document.createElement('p');
     hint.className = 'holo-hint';
     hint.textContent = spot.hint;
     spot.host.append(stage, hint);
-    spot.holo = mountHoloCloth(stage, {
-      ...spot.opts, transparentBg: true, pokeOnEnter: true, crumpleOnDoubleTap: true, snapBack: 3500,
-      performance: phone ? 'Low' : 'High',
-      onReady: () => {
-        spot.host.classList.add('holo-live');
-        stage.classList.add('on');
-        setTimeout(() => (hint.style.opacity = '0'), 5000);
-      },
-    });
+    // if it isn't drawing within 8s, drop it and keep the art
+    const bail = setTimeout(() => { try { spot.holo.dispose(); } catch (e) { /* never mounted */ } stage.remove(); hint.remove(); spot.holo = 'off'; }, 8000);
+    try {
+      spot.holo = mountHoloCloth(stage, {
+        ...spot.opts, transparentBg: true, pokeOnEnter: true, crumpleOnDoubleTap: true, snapBack: 3500,
+        performance: phone ? 'Low' : 'High',
+        touchAction: phone ? 'pan-y' : undefined,
+        onReady: () => {
+          clearTimeout(bail);
+          spot.host.classList.add('holo-live');
+          stage.classList.add('on');
+          setTimeout(() => (hint.style.opacity = '0'), 5000);
+        },
+      });
+    } catch (e) { clearTimeout(bail); stage.remove(); hint.remove(); spot.holo = 'off'; } // no GPU for it: the art stays
   };
 
+  // nothing loads until the visitor does something (move, touch, scroll, key), so it never slows the first paint
+  const engaged = new Promise((go) => ['pointermove', 'pointerdown', 'touchstart', 'scroll', 'keydown', 'wheel']
+    .forEach((ev) => addEventListener(ev, go, { once: true, passive: true })));
   // load when it's near the screen; pause the loop when it isn't
   const near = new IntersectionObserver((entries) => entries.forEach((e) => {
     const spot = spots.find((s) => s.host === e.target);
     if (!spot) return;
-    if (e.isIntersecting && !spot.holo) start(spot);
-    else if (spot.holo) e.isIntersecting ? spot.holo.resume() : spot.holo.pause();
+    spot.seen = e.isIntersecting;
+    if (e.isIntersecting && !spot.holo) engaged.then(() => { if (spot.seen && !spot.holo) start(spot); });
+    else if (spot.holo && spot.holo.pause) e.isIntersecting ? spot.holo.resume() : spot.holo.pause();
   }), { rootMargin: '300px 0px' });
   spots.forEach((s) => near.observe(s.host));
 })();

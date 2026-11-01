@@ -23,6 +23,8 @@ export interface HoloClothOptions {
   crumpleOnDoubleTap?: boolean;
   /** 'High' | 'Medium' | 'Low' (upstream's performance profiles) */
   performance?: 'High' | 'Medium' | 'Low';
+  /** CSS touch-action on the canvas; 'pan-y' lets a phone scroll the page through it (drag sideways to grab). */
+  touchAction?: string;
   onReady?: (api: HoloClothHandle) => void;
 }
 
@@ -123,7 +125,7 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
 
   const interactive = opts.interactive !== false;
   raw.controls.enabled = interactive;
-  canvas.style.touchAction = interactive ? 'none' : 'pan-y';
+  canvas.style.touchAction = opts.touchAction || (interactive ? 'none' : 'pan-y');
   if (!interactive) canvas.style.pointerEvents = 'none';
 
   const handle: HoloClothHandle = {
