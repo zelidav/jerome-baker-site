@@ -79,6 +79,15 @@
   }
   window.JBReal = { now };
 
+  // double-click (or double-tap) any crew sticker that isn't a link and it turns real right away
+  let tap = { t: 0, el: null };
+  addEventListener('pointerdown', (e) => {
+    const img = e.target.closest && e.target.closest('img');
+    if (!img || img.closest('a, button, dialog') || !who(img)) return;
+    if (tap.el === img && e.timeStamp - tap.t < 380) { tap = { t: 0, el: null }; e.preventDefault(); if (!busy) morph(img); }
+    else tap = { t: e.timeStamp, el: img };
+  });
+
   // on a character's own page their hero turns real 2-3 seconds after you land
   const crewPage = /\/crew\/(?!match\/)[a-z0-9-]+\/?$/.test(location.pathname);
   if (crewPage) {

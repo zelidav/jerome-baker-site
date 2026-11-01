@@ -22,6 +22,7 @@
       this.x = 0; this.feet = 0; this.flip = false;
       this.el = document.createElement('img');
       this.el.className = 'actor';
+      this.el._actor = this;
       this.el.alt = '';
       this.el.draggable = false;
       layer.appendChild(this.el);
@@ -35,8 +36,11 @@
       });
     }
     // the hyperreal photo of them (assets/real, same frames as js/real.js): stare, smile, wave, glitch back
-    async real() {
-      if (this.realOn || !this.el.isConnected) return;
+    real() {
+      if (this.realOn || !this.el.isConnected) return this.el._real;
+      return (this.el._real = this._real().finally(() => { this.el._real = null; }));
+    }
+    async _real() {
       const k = this.a.img, frame = (p) => `${base}assets/real/${k}/${p}.webp`;
       this.realOn = true;
       dispatchEvent(new CustomEvent('jb-real', { detail: 'start' }));

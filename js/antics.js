@@ -306,11 +306,22 @@
     const layer = layerIn(host);
     const W = host === document.body ? innerWidth : host.clientWidth;
     try { await BITS[kind || choose()](target, host, layer, W); } catch (e) { target.style.visibility = ''; console.warn('antics', e); }
+    // someone who went real mid-bit finishes before they're cleared away
+    await Promise.all([...layer.children].map((el) => el._real).filter(Boolean));
     layer.replaceChildren();
     running = false;
     return true;
   }
   window.JBAntics = { run };
+
+  // double-tap anywhere on the product while a crew member is on it and they go real (they're small targets)
+  let tap = 0;
+  addEventListener('pointerdown', (e) => {
+    const stage = e.target.closest && e.target.closest(P.stage);
+    const actor = stage && stage.querySelector('.antics .actor');
+    if (!actor || !actor._actor) return;
+    if (e.timeStamp - tap < 380) { tap = 0; actor._actor.real(); } else tap = e.timeStamp;
+  });
   humanoids.slice(0, 2).forEach(preload);
 
   // on the list: regularly, a different crew member each time, only when the tab is open and nothing else is going on

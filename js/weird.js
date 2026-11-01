@@ -185,12 +185,44 @@
       css('@keyframes pop{from{scale:0}}main{animation:breathe2 8s ease-in-out infinite}@keyframes breathe2{50%{scale:1.015}}');
     },
     chomp() {
-      css('.teeth{left:0;right:0;height:52vh;background:repeating-linear-gradient(90deg,#fff 0 70px,#ddd 70px 74px);transition:transform .25s cubic-bezier(.6,0,.4,1)}.teeth.t{top:0;transform:translateY(-100%);border-bottom:14px solid #DA2342;clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}.teeth.b{bottom:0;transform:translateY(100%);border-top:14px solid #DA2342}.shut .teeth{transform:none}');
-      const t = el('span', '', 'teeth t'), b = el('span', '', 'teeth b');
-      fx.style.zIndex = 85; fx.appendChild(t); fx.appendChild(b);
-      let idle;
-      const wake = () => { document.body.classList.remove('shut'); clearTimeout(idle); idle = setTimeout(() => document.body.classList.add('shut'), 4500); };
-      ['pointermove', 'scroll', 'keydown', 'touchstart'].forEach((ev) => addEventListener(ev, wake, { passive: true }));
+      // leave the page alone and The Grin takes bites out of the screen: a jaw snaps shut on an edge and leaves a
+      // chunk missing. Touch, scroll or move and the bites heal.
+      css('.jaw{position:fixed;width:var(--w);height:var(--w);translate:-50% -50%;z-index:86}.jaw i{position:absolute;left:0;right:0;height:46%;background:radial-gradient(circle at 50% 0,#fff 0 58%,transparent 60%) 0 0/calc(var(--w)/7) 100%,#fff;border:4px solid #0A0A0A;transition:transform .14s cubic-bezier(.7,0,1,.6)}.jaw i:first-child{top:0;border-radius:40% 40% 0 0;transform:translateY(-70%);background:radial-gradient(circle at 50% 100%,#fff 0 58%,#0A0A0A 60%) 0 100%/calc(var(--w)/7) 34% repeat-x,#F7E9D7;border-bottom:0}.jaw i:last-child{bottom:0;border-radius:0 0 40% 40%;transform:translateY(70%);background:radial-gradient(circle at 50% 0,#fff 0 58%,#0A0A0A 60%) 0 0/calc(var(--w)/7) 34% repeat-x,#F7E9D7;border-top:0}.jaw.snap i{transform:none}.jaw.gone{opacity:0;transition:opacity .3s}.bite{position:fixed;width:var(--w);height:var(--w);translate:-50% -50%;z-index:84;rotate:var(--r);animation:bite-in .12s ease-out}.bite.heal{scale:0;transition:scale .35s ease-in}@keyframes bite-in{from{scale:.6}}.chomp-shake{animation:chomp-sh .2s}@keyframes chomp-sh{30%{translate:0 6px}60%{translate:0 -3px}}');
+      // a bite: a dark hole with scalloped tooth marks round it and a red gum rim
+      const marks = (r, k) => Array.from({ length: 11 }, (_, i) => { const a = i / 11 * Math.PI * 2; return `<circle cx="${(Math.cos(a) * 41 * k).toFixed(1)}" cy="${(Math.sin(a) * 41 * k).toFixed(1)}" r="${r}"/>`; }).join('');
+      const hole = `<svg viewBox="-62 -62 124 124" width="100%" height="100%"><defs><radialGradient id="void"><stop offset=".55" stop-color="#000"/><stop offset="1" stop-color="#2a2a3a"/></radialGradient></defs><g fill="#fff"><circle r="48"/>${marks(15, 1.06)}</g><g fill="#DA2342"><circle r="45"/>${marks(14, 1.04)}</g><g fill="url(#void)"><circle r="40"/>${marks(12, 1)}</g></svg>`;
+      const bites = [];
+      const spot = () => {
+        const w = innerWidth, h = innerHeight; let e = Math.floor(rnd(0, 4));
+        if (e === 1 && w <= 760) e = 2 + Math.floor(rnd(0, 2)); // the phone dock lives on the bottom edge
+        if (e === 0) return [rnd(.1, .9) * w, 0];
+        if (e === 1) return [rnd(.1, .9) * w, h];
+        if (e === 2) return [0, rnd(.15, .85) * h];
+        return [w, rnd(.15, .85) * h];
+      };
+      const chomp = () => {
+        if (bites.length >= 7) return;
+        const [x, y] = spot(), size = Math.round(rnd(150, 260) * Math.min(1, innerWidth / 900 + .35));
+        const jaw = el('span', `left:${x}px;top:${y}px;--w:${size}px`, 'jaw');
+        jaw.innerHTML = '<i></i><i></i>';
+        fx.appendChild(jaw);
+        requestAnimationFrame(() => requestAnimationFrame(() => jaw.classList.add('snap')));
+        setTimeout(() => {
+          const b = el('span', `left:${x}px;top:${y}px;--w:${size}px;--r:${rnd(0, 360)}deg`, 'bite');
+          b.innerHTML = hole;
+          fx.appendChild(b); bites.push(b);
+          (main || document.body).classList.remove('chomp-shake'); void (main || document.body).offsetWidth; (main || document.body).classList.add('chomp-shake');
+          if (navigator.vibrate) try { navigator.vibrate(18); } catch (err) { /* not allowed */ }
+          jaw.classList.add('gone'); setTimeout(() => jaw.remove(), 320);
+        }, 170);
+      };
+      let idle, loop;
+      const heal = () => { bites.splice(0).forEach((b) => { b.classList.add('heal'); setTimeout(() => b.remove(), 360); }); };
+      const wake = () => {
+        clearTimeout(idle); clearInterval(loop); heal();
+        idle = setTimeout(() => { chomp(); loop = setInterval(chomp, rnd(1600, 2600)); }, 4000);
+      };
+      ['pointermove', 'pointerdown', 'scroll', 'keydown', 'touchstart'].forEach((ev) => addEventListener(ev, wake, { passive: true }));
       wake();
     }
   };
