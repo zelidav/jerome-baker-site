@@ -459,15 +459,9 @@
   /* the crew member who takes the hit: animated (js/crewanim.js), on milk crates if the mouthpiece is high */
   const say = $('#bSay'), stageEl = $('#bStage');
   const COUGHS = ['*cough* worth it', '*hack* okay. OKAY.', 'smooth. *cough*', 'who cleaned this?? *cough*', 'one more. *wheeze*', '*cough* I need this one'];
-  // recorded-style sounds in assets/sfx, behind the same sound switch
-  const clips = {};
-  const sound = (name) => {
-    if (!Sfx.on()) return;
-    const a = clips[name] || (clips[name] = new Audio(`../assets/sfx/${name}.mp3`));
-    a.currentTime = 0;
-    a.play().catch(() => {});
-  };
-  const hush = (name) => { if (clips[name]) clips[name].pause(); };
+  // recorded-style sounds in assets/sfx (shared with the antics, js/crewanim.js), behind the same sound switch
+  const sound = (name) => { if (Sfx.on() && window.JBCrewAnim) JBCrewAnim.play(name); };
+  const hush = (name) => { if (window.JBCrewAnim) JBCrewAnim.hush(name); };
   let actor = null, crates = null, layer = null, run = 0, spot = null;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const actLayer = () => {
@@ -489,7 +483,7 @@
     const floor = r.bottom - st.top;
     const mx = r.left - st.left + cur.mouth[0] * r.width, my = r.top - st.top + cur.mouth[1] * r.height;
     const H = Math.max(150, Math.min(330, r.height * .6));
-    actor = new CA.Actor(actLayer(), CA.humanoids[(Math.random() * CA.humanoids.length) | 0], H);
+    actor = new CA.Actor(actLayer(), CA.cast(), H);
     // stand where the hit pose puts their lips on the mouthpiece
     const f = actor.a.frames.hit, hh = H * f.s, hw = hh * f.w / f.h, m = f.m || [.85, .27];
     // lips on the near edge of the mouthpiece, not its middle
