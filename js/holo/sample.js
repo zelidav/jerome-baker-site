@@ -23,8 +23,10 @@
 .holo-hint{position:absolute;z-index:10;left:50%;bottom:8px;translate:-50% 0;margin:0;padding:6px 12px;background:#0A0A0A;color:#FCD804;font:800 13px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s}
 .holo-stage.on + .holo-hint{opacity:1}
 .collage.holo-live > :not(.holo-stage):not(.holo-hint){visibility:hidden}
-.cp-hero .art.holo-live{min-height:min(620px,92vw)}
-.cp-hero .art.holo-live > img{visibility:hidden}`;
+.holo-sec{background:#233671;color:#fff;padding-top:64px;padding-bottom:64px;border-top:4px solid #DA2342}
+.holo-box{position:relative;flex:0 1 480px;width:min(480px,100%);aspect-ratio:1;max-width:100%}
+.holo-box .holo-hint{bottom:0}
+.holo-sec h2{color:#FFF100}`;
   document.head.appendChild(css);
 
   // the spots: where it goes, and what it shows
@@ -34,12 +36,21 @@
     host: collage, hint: phone ? 'Swipe the box sideways. Double-tap to crumple it.' : 'Grab the box. Double-tap to crumple it.',
     opts: { preset: 'jb-poster', clothImage: base + 'assets/img/box.webp' },
   });
-  const crewArt = document.querySelector('.cp-hero .art');
-  const crewImg = crewArt && crewArt.querySelector('img');
-  if (crewImg) spots.push({
-    host: crewArt, hint: phone ? 'Swipe it sideways. Double-tap to crumple.' : 'Twist it. Double-tap to crumple.',
-    opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
-  });
+  // on a crew page the sticker gets its own section, right after the GIF one (the hero stays the art, so it can still turn real)
+  const crewImg = document.querySelector('.cp-hero .art img');
+  const gif = document.querySelector('section.gif');
+  if (crewImg && gif) {
+    const name = [...document.querySelectorAll('.cp-name span')].map((x) => x.textContent).join(' ') || 'The sticker';
+    const sec = document.createElement('section');
+    sec.className = 'holo-sec pad';
+    sec.innerHTML = '<div class="wrap gif-in"><div class="holo-box"></div><div><h2 class="display"></h2><p>The sticker, in holographic foil. Grab it and twist it, or double-tap to crumple it into a ball. Leave it alone and it flattens back out.</p></div></div>';
+    sec.querySelector('h2').textContent = name.trim() + ', in holo.';
+    gif.after(sec);
+    spots.push({
+      host: sec.querySelector('.holo-box'), hint: phone ? 'Swipe it sideways. Double-tap to crumple.' : 'Twist it. Double-tap to crumple.',
+      opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
+    });
+  }
   if (!spots.length) return;
 
   let lib = null;
