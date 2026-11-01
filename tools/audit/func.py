@@ -27,7 +27,11 @@ with sync_playwright() as p:
     check('home: Find your crew button', pg.locator('a[href*="crew/match"]').count() > 0)
     # crew click-through: freeze a floater, hover, click
     box = pg.evaluate("() => { const b = JBCrew.bodies[0]; b.hover = true; const r = b.el.getBoundingClientRect(); return {x: r.left + r.width/2, y: r.top + r.height/2, slug: b.who.slug}; }")
-    pg.mouse.move(box['x'], box['y']); pg.wait_for_timeout(700); pg.mouse.click(box['x'], box['y']); pg.wait_for_timeout(1500)
+    pg.mouse.move(box['x'], box['y']); pg.wait_for_timeout(700); pg.mouse.click(box['x'], box['y'])
+    try:  # the first move also starts the holo box, which can hold up a software-GL browser for a moment
+        pg.wait_for_url(f"**/crew/{box['slug']}/**", timeout=10000)
+    except Exception:
+        pass
     check('home: clicking a floating crew member opens their page', f"/crew/{box['slug']}/" in pg.url, pg.url)
 
     # ---- shop
