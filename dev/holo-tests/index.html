@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Holo tests</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;800;900&display=swap" rel="stylesheet">
+<style>
+/* dev-only: the holo cloth on JB box art and crew stickers, one idea per scene. localhost only. */
+:root{--navy:#233671;--yellow:#FCD804;--red:#EC1F28;--ink:#0A0A0A;--paper:#F1F1F1}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--navy);color:var(--paper);font:500 15px/1.4 Montserrat,Helvetica,Arial,sans-serif;overflow:hidden}
+nav{position:fixed;z-index:5;left:16px;right:16px;top:16px;display:flex;flex-wrap:wrap;gap:8px}
+nav a{padding:8px 16px;background:#fff;color:var(--ink);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);font-weight:800;text-decoration:none}
+nav a[aria-current]{background:var(--yellow)}
+#stage{position:fixed;inset:0}
+.cap{position:fixed;z-index:5;left:16px;bottom:16px;max-width:560px;background:var(--ink);padding:16px 24px;border-left:8px solid var(--red)}
+.cap h1{margin:0 0 4px;font-weight:900;font-size:32px;line-height:1;letter-spacing:-.02em;color:var(--yellow)}
+.cap p{margin:0}
+.devonly{display:grid;place-items:center;height:100vh;font-weight:800}
+@media (max-width:760px){.cap{right:16px}.cap h1{font-size:24px}}
+</style>
+</head>
+<body>
+<nav id="nav" hidden></nav>
+<div id="stage"></div>
+<div class="cap" id="cap" hidden><h1></h1><p></p></div>
+<p class="devonly" id="devonly" hidden>Holo tests run on localhost only.</p>
+<script type="module">
+if (!['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
+  document.getElementById('devonly').hidden = false;
+} else {
+  await import('../../js/holo/holo.js');
+  const A = '../../assets/';
+  const load = (src) => new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; });
+
+  // a holo trading card drawn in a canvas: navy card, yellow frame, the sticker, a name bar
+  async function card(sticker, name, line) {
+    const c = document.createElement('canvas'); c.width = 900; c.height = 1260;
+    const g = c.getContext('2d');
+    g.fillStyle = '#0A0A0A'; g.fillRect(0, 0, 900, 1260);
+    g.fillStyle = '#FCD804'; g.fillRect(24, 24, 852, 1212);
+    g.fillStyle = '#233671'; g.fillRect(56, 56, 788, 1148);
+    // halftone dots in the art window
+    g.fillStyle = 'rgba(255,255,255,.08)';
+    for (let y = 80; y < 900; y += 22) for (let x = 80; x < 820; x += 22) { g.beginPath(); g.arc(x + (y / 22 % 2) * 11, y, 4, 0, 7); g.fill(); }
+    const s = await load(sticker);
+    const k = Math.min(700 / s.width, 800 / s.height);
+    g.drawImage(s, 450 - s.width * k / 2, 90 + (800 - s.height * k) / 2, s.width * k, s.height * k);
+    g.fillStyle = '#EC1F28'; g.fillRect(56, 940, 788, 130);
+    g.fillStyle = '#fff'; g.font = '900 84px Montserrat, sans-serif'; g.textBaseline = 'middle';
+    g.fillText(name, 92, 1008);
+    g.fillStyle = '#FCD804'; g.font = '800 38px Montserrat, sans-serif';
+    g.fillText(line, 92, 1132);
+    return load(c.toDataURL('image/png'));
+  }
+
+  const SCENES = {
+    box: {
+      title: 'The box, as a flag', note: 'The original JB box collage printed on heavy cloth. Grab a corner and throw it.',
+      opts: { preset: 'jb-poster', clothImage: A + 'img/box.webp' },
+    },
+    sheet: {
+      title: 'Holo sticker sheet', note: 'Navy foil with the crew slapped on it. Tilt it and the foil runs red to yellow.',
+      opts: {
+        preset: 'jb-foil',
+        decals: [
+          { src: A + 'crew/lion.webp', u: .27, v: .3, scale: .34, rotation: -8 },
+          { src: A + 'crew/alien.webp', u: .72, v: .3, scale: .3, rotation: 6 },
+          { src: A + 'crew/chimp.webp', u: .28, v: .73, scale: .3, rotation: 5 },
+          { src: A + 'crew/devil.webp', u: .72, v: .72, scale: .32, rotation: -6 },
+          { src: A + 'img/jb-mark.webp', u: .5, v: .52, scale: .3, rotation: -4 },
+        ],
+      },
+    },
+    wall: {
+      title: 'The booth wall, in foil', note: 'The trade-show wall as a wide holo banner, with the OG mark on top.',
+      opts: { preset: 'jb-foil', clothImage: A + 'img/booth-wall.webp', decals: [{ src: A + 'img/jb-mark.webp', u: .5, v: .5, scale: .24 }] },
+    },
+    card: {
+      title: 'Torch, holo rookie card', note: 'A crew trading card in foil. One per character could live on each crew page.',
+      opts: { preset: 'jb-foil', clothImage: () => card(A + 'crew/lion.webp', 'TORCH', 'GAFFER. OWNER. REGRETS IT DAILY.') },
+    },
+    poster: {
+      title: 'Eye poster, on canvas', note: 'Box-art eye poster as a woven print. The weave catches the light when it moves.',
+      opts: { preset: 'jb-poster', clothImage: A + 'cut/eyeposter.webp' },
+    },
+  };
+
+  const key = new URLSearchParams(location.search).get('s') || 'sheet';
+  const S = SCENES[key] || SCENES.sheet;
+  const nav = document.getElementById('nav');
+  nav.hidden = false;
+  nav.innerHTML = Object.entries(SCENES).map(([k, s]) => `<a href="?s=${k}"${k === key ? ' aria-current="page"' : ''}>${s.title}</a>`).join('');
+  const cap = document.getElementById('cap');
+  cap.hidden = false;
+  cap.querySelector('h1').textContent = S.title;
+  cap.querySelector('p').textContent = S.note;
+
+  const opts = { ...S.opts };
+  if (typeof opts.clothImage === 'function') opts.clothImage = await opts.clothImage();
+  JBHolo.mountHoloCloth(document.getElementById('stage'), { ...opts, pokeOnEnter: true, transparentBg: true, onReady: () => { window.__ready = true; } });
+}
+</script>
+</body>
+</html>

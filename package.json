@@ -1,0 +1,15 @@
+{
+  "name": "jerome-baker-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:holo": "esbuild src/holo/mount.ts --bundle --format=esm --minify --target=es2020 --define:import.meta.env.DEV=false --outfile=js/holo/holo.js --legal-comments=linked && node -e \"require('fs').copyFileSync('src/holo/LICENSE','js/holo/HOLOCLOTH-LICENSE.txt')\""
+  },
+  "dependencies": {
+    "motion": "14.9.0",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
