@@ -302,6 +302,7 @@
       host = document.body;
     }
     if (!target || !host || !target.complete || !target.naturalWidth) return false;
+    if (detail && (host.classList.contains('holo-live') || host.querySelector('.holo-live'))) return false; // the holo has the stage
     running = true;
     const layer = layerIn(host);
     const W = host === document.body ? innerWidth : host.clientWidth;
