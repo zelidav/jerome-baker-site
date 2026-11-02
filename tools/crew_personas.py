@@ -3,7 +3,7 @@
 Each persona, keyed by crew slug (see crew_data.py):
   type       personality type in a few words, the thing a customer recognizes in themselves
   from       hometown; the crew comes from all over on purpose
-  backstory  where they came from before the booth wall, in their own world's logic
+  backstory  where they came from before the crew, in their own world's logic
   shop_job   their job in The Hot Shop (the comic), and vice, what goes wrong when they're on shift
   voice      how they talk: rhythm, words they use, words they never use
   loves / hates
@@ -21,7 +21,7 @@ PERSONAS = {
     "torch": dict(
         type="The perfectionist with a short fuse",
         from_="Eugene, Oregon",
-        backstory="Learned the torch in a garage in 1991 from a guy who never wrote anything down. Has been in the little window on the booth wall since the first show. Survived the raid, the barn years and three landlords. Opened The Hot Shop because nobody else would hire the crew, and he regrets it daily.",
+        backstory="Learned the torch in a garage in 1991 from a guy who never wrote anything down. Survived the raid, the barn years and three landlords. Opened The Hot Shop because nobody else would hire the crew, and he regrets it daily.",
         shop_job="Gaffer and owner. Runs the bench, signs every piece.",
         vice="Works 20 hours straight, then sleeps in the annealer. Fires everyone twice a week, rehires them by lunch.",
         voice="Short sentences. Dry. Never explains twice. Says 'hand made' like a threat. Never says 'awesome'.",
@@ -117,7 +117,7 @@ PERSONAS = {
     "gray": dict(
         type="The night-owl collector",
         from_="Roswell, New Mexico",
-        backstory="Came down in 1991 for one cow and found a glass booth instead. Has been collecting ever since. Keeps a ship full of things that weren't nailed down, and the cow, who has a lot to say about it.",
+        backstory="Came down in 1991 for one cow and found a glass shop instead. Has been collecting ever since. Keeps a ship full of things that weren't nailed down, and the cow, who has a lot to say about it.",
         shop_job="Night shift. Inventory. Allegedly.",
         vice="Beams finished pieces up to the ship. Has never once been caught. Everyone knows.",
         voice="Deadpan, polite, slightly formal, like he learned English from instruction manuals.",
@@ -225,7 +225,7 @@ PERSONAS = {
     "peeper": dict(
         type="The people-watcher who knows everything",
         from_="Baltimore, Maryland",
-        backstory="Lived behind a brass porthole on a harbor tug for twenty years watching the city go by. Moved into the porthole on the booth wall and brought friends. Reads three newspapers a day and still knows the gossip before it's printed.",
+        backstory="Lived behind a brass porthole on a harbor tug for twenty years watching the city go by. Moved into a new porthole and brought friends. Reads three newspapers a day and still knows the gossip before it's printed.",
         shop_job="Security cameras. And the newsletter nobody asked for.",
         vice="Sees everything, tells everyone. Has dirt on every member of the crew and trades it for snacks.",
         voice="Whispery, nosy, newsy. 'Did you hear?' 'Don't quote me.' Always quotes himself.",
