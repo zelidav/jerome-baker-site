@@ -65,6 +65,9 @@ Codes start with `TEST-` and say "not valid at checkout yet". Nothing touches th
 
 ## How to review it
 
+**On the live site:** promos and bundles are hidden from normal visitors while codes are TEST codes. Open any page with `?promo=on` once (e.g. https://jeromebaker.cannacrypted.com/crew/torch/?promo=on) and that browser sees them from then on. `?promo=off` turns them back off. The price-anchored merch row is live for everyone.
+
+
 The preview is in the **Site Studio**: https://jb-site-studio-804083036164.us-east1.run.app. Sign in, open **Changes → "Crew promos"**, then **OPEN FULL PREVIEW ↗**. At the end of the preview address, add:
 - `?promo=golden` for the golden ticket
 - `?promo=glass` for Beamer's "up to $4,000 off The Alien"

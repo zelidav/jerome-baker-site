@@ -7,6 +7,13 @@
   if (!m || m[1] === 'match' || document.querySelector('.fit')) return;
   const slug = m[1];
   const TEST = true;
+  // same switch as js/promo.js: on the live site, test bundles only show for reviewers who opened ?promo=on
+  if (TEST && /(^|\.)jeromebaker\.cannacrypted\.com$/.test(location.hostname)) {
+    let on = false;
+    try { on = localStorage.getItem('jbpromo-preview') === '1'; } catch (e) { /* */ }
+    const v = new URLSearchParams(location.search).get('promo');
+    if (!(on || (v && v !== 'off'))) return;
+  }
   const base = document.documentElement.dataset.base || '';
   const crew = (Array.isArray(window.JB_CREW) ? window.JB_CREW : Object.values(window.JB_CREW || {})).find((c) => c.slug === slug);
   const after = document.querySelector('section.wearing');

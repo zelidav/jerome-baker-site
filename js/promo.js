@@ -17,6 +17,18 @@
   const here = /\/glass\//.test(path) ? 'glass' : /\/shop\//.test(path) ? 'shop' : /\/crew\/match\//.test(path) ? 'match'
     : /\/crew\/([^/]+)\//.test(path) ? 'crew' : /\/(travel|comics)\//.test(path) ? 'off' : 'home';
   if (here === 'off') return;
+  // While codes are TEST codes, real visitors on the live site never see promos. Reviewers opt in once with
+  // ?promo=on (or any ?promo=<kind>), which this browser remembers; ?promo=off opts back out.
+  const optIn = (() => {
+    const v = new URLSearchParams(location.search).get('promo');
+    try {
+      if (v === 'off') localStorage.removeItem('jbpromo-preview');
+      else if (v) localStorage.setItem('jbpromo-preview', '1');
+      return localStorage.getItem('jbpromo-preview') === '1';
+    } catch (e) { return !!v && v !== 'off'; }
+  })();
+  if (TEST && /(^|\.)jeromebaker\.cannacrypted\.com$/.test(location.hostname) && !optIn) return;
+  window.JBPromoPreview = optIn;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---------- tracking (this browser only, no personal data) ----------
@@ -190,7 +202,7 @@
   // Up to 3 offers a session, 60s apart, each kind once; two dismissals in a row ends it for the session.
   const sess = () => { try { return JSON.parse(ss('jbpromo-sess')) || { kinds: [], last: 0, nos: 0 }; } catch (e) { return { kinds: [], last: 0, nos: 0 }; } };
   const sessSave = (o) => ss('jbpromo-sess', JSON.stringify(o));
-  const forced = q && OFFERS[q] ? q : null;
+  const forced = q && OFFERS[q] ? q : null; // ?promo=on just opts in, it doesn't force one
   const crewSlug = () => (path.match(/\/crew\/([^/]+)\//) || [])[1];
   const productId = () => { const m = location.hash.match(/^#p=(.+)$/); return m ? decodeURIComponent(m[1]) : null; };
 
