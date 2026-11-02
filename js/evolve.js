@@ -41,7 +41,7 @@
 
   const INTRO = [
     'This is the Jerome Baker Travel Guide.',
-    "It's here for when you're tripping.",
+    "It's here for when you're tr!pping.",
     'Put it on the biggest screen you have.',
     'Lie back. You can leave it on all night.',
     'It never plays the same way twice.',

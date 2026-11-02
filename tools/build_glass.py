@@ -106,3 +106,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+# site rule: flaggable words get number/symbol swaps (b0ng, p!pe, sm0ke...). See tools/scrub.py.
+import scrub as _scrub  # noqa: E402
+_scrub.main()

@@ -1,7 +1,7 @@
 /* Crew promos: now and then a crew member walks in holding a sign or a golden ticket.
    Rules (David, 2026-11-02; see ~/.claude/skills/buyable/references/jb.md):
-   - golden ticket: 15-25% off glass, earned by repeat visits or long time on site; giant bongs excluded
-   - glass with merch: 10% off glass with a merch order; the only offer that touches giant bongs
+   - golden ticket: 15-25% off glass, earned by repeat visits or long time on site; giant b0ngs excluded
+   - glass with merch: 10% off glass with a merch order; the only offer that touches giant b0ngs
      ("up to $4,000 off" = 10% of The Alien)
    - crew pick: 15% off something a crew member is wearing
    Up to 3 offers a session, 60s apart, timed to when attention slips or they look like they're leaving
@@ -77,7 +77,7 @@
   const crewList = () => (Array.isArray(window.JB_CREW) ? window.JB_CREW : Object.values(window.JB_CREW || {}));
   const wearOf = (slug) => (crewList().find((c) => c.slug === slug) || {}).wear || [];
 
-  // The Alien: the uranium giant bong the "up to $4,000" headline is pinned to
+  // The Alien: the uranium giant b0ng the "up to $4,000" headline is pinned to
   const ALIEN = { id: 'JBD-30A28BA0570D', price: 40000 };
   const alienLive = () => {
     const p = window.JB_GLASS && window.JB_GLASS.pieces && window.JB_GLASS.pieces.find((x) => x.id === ALIEN.id);
@@ -95,7 +95,7 @@
       const who = pick(['torch', 'mama-cobra', 'mouthy', 'crude', 'big-bill']);
       return {
         kind: 'golden', who, pct, hours: 48, tag: 'GOLD' + pct,
-        kicker: 'Golden ticket', big: pct + '% off', line: 'any glass on the shelf. Giant bongs excluded.',
+        kicker: 'Golden ticket', big: pct + '% off', line: 'any glass on the shelf. Giant b0ngs excluded.',
         say: 'You keep coming back. ' + CREW[who][0] + ' noticed.',
         cta: ['Pick your glass', base + 'glass/'],
       };
@@ -218,7 +218,7 @@
     if (!done.includes('golden') && goldenEarned()) list.push(['golden']);
     if (here === 'glass') {
       const p = id && (window.JB_GLASS?.pieces || []).find((x) => x.id === id);
-      if (p && p.shelf === 'giant') list.unshift(['glass']); // a giant bong is open: the merch combo is the only deal on it
+      if (p && p.shelf === 'giant') list.unshift(['glass']); // a giant b0ng is open: the merch combo is the only deal on it
       list.push(['glass'], ['crew']);
     } else if (here === 'shop') {
       const wearer = id && Object.keys(CREW).find((s) => wearOf(s).some((w) => w.slug === id));

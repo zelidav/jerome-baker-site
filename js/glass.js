@@ -1,5 +1,5 @@
-/* The Glass showcase: shelves from js/glass-data.js, smoke off any piece you hover, and the bench,
-   where you hold a piece down to fill it with smoke and let it go. */
+/* The Glass showcase: shelves from js/glass-data.js, sm0ke off any piece you hover, and the bench,
+   where you hold a piece down to fill it with sm0ke and let it go. */
 (() => {
   const D = window.JB_GLASS;
   if (!D) return;
@@ -11,7 +11,7 @@
   const byId = Object.fromEntries(D.pieces.map((p) => [p.id, p]));
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-  /* ---------------------------------------------------------------- smoke */
+  /* ---------------------------------------------------------------- sm0ke */
   // soft, lumpy puffs, drawn once and stamped many times
   const puffs = [0, 1, 2, 3].map((k) => {
     const c = document.createElement('canvas');
@@ -29,7 +29,7 @@
     return c;
   });
 
-  // the same puffs in a cool grey, so smoke still reads on the white store tiles
+  // the same puffs in a cool grey, so sm0ke still reads on the white store tiles
   const grays = puffs.map((src) => {
     const c = document.createElement('canvas');
     c.width = c.height = 128;
@@ -42,7 +42,7 @@
   });
 
   class Smoke {
-    // world coords: page smoke lives in document coords and scrolls; bench smoke is local to its canvas
+    // world coords: page sm0ke lives in document coords and scrolls; bench sm0ke is local to its canvas
     constructor(canvas, { scrolls, cap }) {
       Object.assign(this, { canvas, scrolls, cap, ctx: canvas.getContext('2d'), ps: [], emitters: new Map(), raf: 0, last: 0 });
       this.fit();
@@ -113,7 +113,7 @@
   }
 
   const page = new Smoke($('#smoke'), { scrolls: true, cap: 320 });
-  // where the smoke leaves a piece: its mouthpiece, read off the cutout at build time
+  // where the sm0ke leaves a piece: its mouthpiece, read off the cutout at build time
   const mouthOf = (el, p) => () => {
     const r = el.getBoundingClientRect();
     if (r.bottom < -50 || r.top > innerHeight + 50) return null;
@@ -135,7 +135,7 @@
   const tagOf = (p) => (p.status === 'sold' ? 'Sold' : p.status === 'collected' ? 'In a collection' : '');
   const aisles = $('#aisles');
   const tile = (p, feature) => {
-    const sub = [p.series === 'Limited Edition' || p.series === 'Original Series' || p.series === 'Giant Bong Series' ? p.shape : p.series, p.inches && `${p.inches} in`].filter(Boolean).join(', ');
+    const sub = [p.series === 'Limited Edition' || p.series === 'Original Series' || p.series === 'Giant B0ng Series' ? p.shape : p.series, p.inches && `${p.inches} in`].filter(Boolean).join(', ');
     return `<button type="button" class="tile${feature ? ' feature' : ''}${sold(p) ? ' out' : ''}${p.w > p.h * .8 ? ' wide' : ''}" data-id="${p.id}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}">`
       + `<span class="frame"><span class="pill">${esc(p.edition || '1 of 1')}</span>${sold(p) ? `<span class="pill gone">${tagOf(p)}</span>` : ''}`
       + `<img class="cut" src="${img(p, !feature)}" alt="" loading="lazy" decoding="async"></span>`
@@ -187,7 +187,7 @@
   });
   apply();
 
-  // hover: smoke off the mouthpiece; rest on it a moment and the studio photo fades in
+  // hover: sm0ke off the mouthpiece; rest on it a moment and the studio photo fades in
   const light = (el, on) => {
     el.classList.toggle('lit', on);
     clearTimeout(el._flip);
@@ -558,7 +558,7 @@
     setTimeout(() => say.classList.remove('on'), 2000);
   }
 
-  /* hold to take a hit: the glass fills with smoke from the base up, bubbles in the water, then you let it go */
+  /* hold to take a hit: the glass fills with sm0ke from the base up, bubbles in the water, then you let it go */
   let holding = false, lvl = 0, t0 = 0, raf = 0, drain = 0;
   const FILL_MS = 2600;
   function setLvl(v) {
@@ -579,7 +579,7 @@
     if (!holding) return;
     setLvl(Math.min(1, (now - t0) / FILL_MS));
     if (Math.random() < .55) bubble();
-    // as the chamber fills, smoke starts leaking out the top
+    // as the chamber fills, sm0ke starts leaking out the top
     if (lvl > .5 && Math.random() < (lvl - .4) * .7 && !calm) { const m = benchMouth(); bSmoke.puff(m[0], m[1], { ...wisp, size: 18 + lvl * 10 }); }
     raf = requestAnimationFrame(tick);
   }

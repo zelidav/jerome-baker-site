@@ -1,6 +1,6 @@
 /* The phone menu: a glass tube docked to the bottom of the screen (css/dock.css).
-   The tube fills with smoke as you scroll down the page and bubbles when you scroll fast.
-   The JB mark in the middle is the bowl: tap it and the whole menu spills out as stickers. */
+   The tube fills with sm0ke as you scroll down the page and bubbles when you scroll fast.
+   The JB mark in the middle is the b0wl: tap it and the whole menu spills out as stickers. */
 (() => {
   if (document.querySelector('.dock')) return;
   const base = document.documentElement.dataset.base || '';
@@ -23,7 +23,7 @@
   const TABS = [
     ['glass', 'Glass', 'glass/'],
     ['shop', 'Ritual Merch', 'shop/'],
-    null,  // the bowl
+    null,  // the b0wl
     ['crew', 'The JB Crew', 'crew/'],
     ['comics', 'The Hot Shop', 'comics/'],
   ];
@@ -58,7 +58,7 @@
   document.body.append(pile, dock);
   document.body.classList.add('has-dock');
 
-  // ---- the bowl ----
+  // ---- the b0wl ----
   const bowl = dock.querySelector('.bowl');
   const open = (on) => {
     bowl.setAttribute('aria-expanded', String(on));
@@ -71,7 +71,7 @@
   pile.addEventListener('click', (e) => { if (e.target === pile || e.target.closest('a')) open(false); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && pile.classList.contains('on')) { open(false); bowl.focus(); } });
 
-  // ---- the tube: smoke level = how far down the page you are ----
+  // ---- the tube: sm0ke level = how far down the page you are ----
   const fill = dock.querySelector('.fill'), bubbles = dock.querySelector('.bubbles');
   let lastY = scrollY, lastT = performance.now(), queued = false, bubbleAt = 0;
   const bubble = () => {
@@ -181,6 +181,15 @@
   document.head.appendChild(css);
   const s = document.createElement('script');
   s.src = base + 'js/header.js';
+  s.defer = true;
+  document.head.appendChild(s);
+})();
+
+// the pop-art finish (js/popfx.js): halftone dot shadows, outlines on text that doesn't stand out. Every page.
+(() => {
+  if (document.querySelector('script[src$="js/popfx.js"]')) return;
+  const s = document.createElement('script');
+  s.src = (document.documentElement.dataset.base || '') + 'js/popfx.js';
   s.defer = true;
   document.head.appendChild(s);
 })();

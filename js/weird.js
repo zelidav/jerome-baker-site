@@ -69,9 +69,15 @@
       btn.addEventListener('click', () => { document.body.classList.add('drop'); setTimeout(() => document.body.classList.remove('drop'), 1000); });
     },
     honey() {
-      css('.drip{top:0;width:var(--w);background:linear-gradient(90deg,#c97a00,#FDB514 40%,#ffd75e 55%,#c97a00);border-radius:0 0 999px 999px;height:var(--h);transition:height .4s ease;opacity:.92}');
+      css('.drip{top:0;width:var(--w);background:linear-gradient(90deg,#c97a00,#FDB514 40%,#ffd75e 55%,#c97a00);border-radius:0 0 999px 999px;height:var(--h);max-height:24vh;transition:height .6s ease;opacity:.55}');
       const drips = Array.from({ length: 14 }, (_, i) => { const d = el('span', `left:${i * 7.4 + rnd(-2, 2)}vw;--w:${rnd(26, 60)}px;--h:${rnd(20, 60)}px`, 'drip'); d.dataset.k = rnd(0.2, 1.1); fx.appendChild(d); return d; });
-      addEventListener('scroll', () => drips.forEach((d) => d.style.setProperty('--h', 30 + scrollY * d.dataset.k * 0.35 + 'px')), { passive: true });
+      // drips run while you scroll, never past a quarter of the screen, and pull back up when you stop
+      let rest = 0;
+      addEventListener('scroll', () => {
+        drips.forEach((d) => d.style.setProperty('--h', 30 + (scrollY % 900) * d.dataset.k * 0.3 + 'px'));
+        clearTimeout(rest);
+        rest = setTimeout(() => drips.forEach((d) => d.style.setProperty('--h', rnd(14, 36) + 'px')), 1600);
+      }, { passive: true });
     },
     sneakers() {
       const shoes = ['192', '252', '272', '231'];
@@ -114,13 +120,15 @@
       setInterval(() => { if (document.hidden) return; const s = el('span', `left:${rnd(0, 96)}vw;top:-50px;background:${cols[Math.floor(rnd(0, cols.length))]}`, 'scoop'); fx.appendChild(s); setTimeout(() => s.remove(), 4000); }, 700);
     },
     confiscated() {
-      css('.stamp{font-family:var(--display);font-weight:900;font-size:clamp(36px,6vw,80px);color:#DA2342;border:8px solid #DA2342;padding:4px 18px;opacity:.82;animation:stamp .25s cubic-bezier(.2,2,.4,1)}@keyframes stamp{from{scale:3;opacity:0}}');
+      css('.stamp{font-family:var(--display);font-weight:900;font-size:clamp(36px,6vw,80px);color:#DA2342;border:8px solid #DA2342;padding:4px 18px;opacity:.55;animation:stamp .25s cubic-bezier(.2,2,.4,1),stampout .6s ease-in 2.2s forwards}@keyframes stamp{from{scale:3;opacity:0}}@keyframes stampout{to{opacity:0;scale:.9}}');
       const words = ['CONFISCATED', 'EVIDENCE', 'SEIZED', 'EXHIBIT A', 'STILL HERE', 'NOT FOR YOU', 'PAPERWORK'];
       let n = 0, lastY = 0;
       addEventListener('scroll', () => {
-        if (Math.abs(scrollY - lastY) < 340 || n > 14) return; lastY = scrollY; n++;
+        if (Math.abs(scrollY - lastY) < 340) return; lastY = scrollY; n++;
         const s = el('span', `left:${rnd(2, 60)}vw;top:${rnd(8, 80)}vh;rotate:${rnd(-24, 24)}deg`, 'stamp');
         s.textContent = words[n % words.length]; fx.appendChild(s);
+        setTimeout(() => s.remove(), 2900); // stamps land, then fade: never more than a few on screen
+        const all = fx.querySelectorAll('.stamp'); if (all.length > 3) all[0].remove();
       }, { passive: true });
     },
     dark() {

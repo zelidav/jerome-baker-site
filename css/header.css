@@ -2,8 +2,8 @@
 header.hdr{position:relative;border-bottom:0!important;overflow:visible}
 header.top.hdr{position:sticky}
 @media (max-width:900px){header.top.hdr{position:relative}}
-.hdr-tear{position:absolute;left:0;right:0;top:100%;height:48px;margin-top:-1px;background:no-repeat left top/3000px 48px;pointer-events:none;z-index:2;filter:drop-shadow(0 3px 0 rgba(10,10,10,.55))}
-@media (max-width:760px){.hdr-tear{height:32px;background-size:2000px 32px}}
+.hdr-tear{position:absolute;left:0;right:0;top:100%;height:40px;margin-top:-1px;background:no-repeat left top/3000px 40px;pointer-events:none;z-index:2;}
+@media (max-width:760px){.hdr-tear{height:28px;background-size:2100px 28px}}
 
 /* the logo: floats and wobbles, catches a glint, jelly-spins on hover/tap */
 .hdr-logo{position:relative;display:inline-block;transform-origin:50% 60%;animation:hdr-float 4.2s ease-in-out infinite}
@@ -24,7 +24,24 @@ header.hdr nav a.genie{display:inline-block;transform-origin:50% 100%;will-chang
 
 @media (prefers-reduced-motion:reduce){.hdr-logo,.hdr-logo::after{animation:none}}
 
-/* a bar of links right under the header (the shop's yellow category bar) starts below the tear, not under it */
-header.hdr + .subnav{padding-top:48px}
-@media (max-width:760px){header.hdr + .subnav{padding-top:32px}}
-@media (min-width:901px){body:has(header.hdr + .subnav) .filters{top:calc(var(--hdr,92px) + 110px);max-height:calc(100vh - var(--hdr,92px) - 126px)}}
+/* the shop's yellow category bar: the next layer of paper. It starts below the menu's tear and tears over the page itself */
+.subnav.hdr-under{padding-top:42px;border-bottom:0!important}
+@media (max-width:760px){.subnav.hdr-under{padding-top:30px}}
+@media (min-width:901px){body:has(.subnav.hdr-under) .filters{top:calc(var(--hdr,92px) + 144px);max-height:calc(100vh - var(--hdr,92px) - 160px)}}
+
+/* the squiggly red line under every menu link (it used to be only under the shop's "Ritual Merch"); hover and it squiggles */
+header.hdr nav a:not(.btn):not(.cartbtn){position:relative;text-decoration:none}
+header.hdr nav a:not(.btn):not(.cartbtn)::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:6px;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6' viewBox='0 0 12 6'%3E%3Cpath d='M0 3 Q3 0 6 3 T12 3' fill='none' stroke='%23DA2342' stroke-width='2'/%3E%3C/svg%3E") repeat-x 0 50%/12px 6px}
+header.hdr nav a:not(.btn):not(.cartbtn):hover::after,header.hdr nav a:not(.btn):not(.cartbtn):focus-visible::after{animation:hdr-squiggle .32s linear infinite,hdr-squiggle-amp .64s ease-in-out infinite}
+@keyframes hdr-squiggle{to{background-position-x:-12px}}
+@keyframes hdr-squiggle-amp{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}
+@media (prefers-reduced-motion:reduce){header.hdr nav a::after{animation:none!important}}
+
+/* the logo flips to the crossed-bongs Jerome Baker logo (js/header.js) on hover and now and then on its own */
+.hdr-logo{perspective:600px}
+.hdr-logo > img:not(.hdr-alt){transition:transform .35s cubic-bezier(.3,1.4,.5,1),opacity .2s}
+.hdr-alt{position:absolute;left:50%;top:50%;height:128%;width:auto;max-width:none;translate:-50% -50%;opacity:0;transform:rotateY(90deg) scale(.7);transition:transform .35s cubic-bezier(.3,1.4,.5,1),opacity .2s;pointer-events:none;filter:drop-shadow(2px 3px 0 rgba(10,10,10,.5))}
+.hdr-logo.alt > img:not(.hdr-alt){opacity:0;transform:rotateY(-90deg) scale(.7)}
+.hdr-logo.alt .hdr-alt{opacity:1;transform:none;transition-delay:.12s}
+.hdr-logo.alt::after{opacity:0}

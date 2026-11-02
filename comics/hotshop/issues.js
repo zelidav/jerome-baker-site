@@ -42,7 +42,7 @@ window.HOTSHOP = [
     "lines": [
      {
       "who": "Torch",
-      "t": "They took the pipes. They didn't take the hands."
+      "t": "They took the p!pes. They didn't take the hands."
      }
     ],
     "fx": [
@@ -89,8 +89,8 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-o1-4.webp",
-    "alt": "Night on a cannabis farm. Torch duct-tapes a HELP WANTED sign to the door of an old drying barn under a neon sign: THE HOT SHOP.",
-    "cap": "Opening week. He rents the old drying barn on a cannabis farm.",
+    "alt": "Night on a c@nnabis farm. Torch duct-tapes a HELP WANTED sign to the door of an old drying barn under a neon sign: THE HOT SHOP.",
+    "cap": "Opening week. He rents the old drying barn on a c@nnabis farm.",
     "sfx": "RRRIP!",
     "lines": [
      {
@@ -186,7 +186,7 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-o2-4.webp",
-    "alt": "Big Sur at night. Ocho reads the flyer by moonlight. Lunar Larry floats above in a cloud of smoke.",
+    "alt": "Big Sur at night. Ocho reads the flyer by moonlight. Lunar Larry floats above in a cloud of sm0ke.",
     "cap": "OCHO. Big Sur. Washed up at a festival and stayed. LUNAR LARRY. Splashed down years late. Still up.",
     "sfx": null,
     "lines": [
@@ -225,7 +225,7 @@ window.HOTSHOP = [
   "label": "Origins 3",
   "slug": "hot-shop-o3",
   "title": "Opening Night",
-  "blurb": "Every road in America leads to one old barn on a weed farm with a flickering sign. Torch is hiring one person. Everybody shows up.",
+  "blurb": "Every road in America leads to one old barn on a w33d farm with a flickering sign. Torch is hiring one person. Everybody shows up.",
   "panels": [
    {
     "img": "hot-shop-o3-1.webp",
@@ -381,7 +381,7 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-01-3.webp",
-    "alt": "Red-eyed and baked, Chomps lunges jaws-first at the centerpiece like it is a giant gummy snake. Torch dives for it.",
+    "alt": "Red-eyed and b@ked, Chomps lunges jaws-first at the centerpiece like it is a giant gummy snake. Torch dives for it.",
     "cap": "One hour later. The brownies kick in.",
     "sfx": "CHOMP!",
     "lines": [
@@ -527,7 +527,7 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-02-4.webp",
-    "alt": "Smoke from the burning drying shed rolls over the field. Sooty Crude holds up the clean centerpiece. Mama Cobra is red-eyed and blissed out. Torch holds a hose.",
+    "alt": "Sm0ke from the burning drying shed rolls over the field. Sooty Crude holds up the clean centerpiece. Mama Cobra is red-eyed and blissed out. Torch holds a hose.",
     "cap": "The piece survives. The drying shed does not.",
     "sfx": "FWOOMP!",
     "lines": [

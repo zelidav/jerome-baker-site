@@ -1,0 +1,143 @@
+/* Pop-art finish, every page (loaded by js/dock.js):
+   1. Halftone shadows. The hard black offset box-shadows become comic-book dot-matrix shadows: an SVG filter
+      takes the element's own shape, shifts it by the same offset and fills it with black dots. The elements and
+      their layout don't change, only how the shadow is drawn.
+   2. Outlined text where it doesn't stand out. Text whose color is too close to what's behind it (contrast under
+      3:1), or that sits straight on a busy picture (the collage), gets an outline in black or white, whichever
+      contrasts with the text. */
+(() => {
+  if (window.JBPopFx) return;
+  window.JBPopFx = true;
+  const NS = 'http://www.w3.org/2000/svg';
+  const DOT = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="6" height="6"><circle cx="3" cy="3" r="1.55" fill="#0A0A0A"/></svg>');
+  const DOT_FINE = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><circle cx="2" cy="2" r="1" fill="#0A0A0A"/></svg>');
+  let defs = null;
+  const made = new Set();
+  const filterFor = (dx, dy) => {
+    const id = `jb-ht-${dx}-${dy}`;
+    if (made.has(id)) return id;
+    if (!defs) {
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('width', '0'); svg.setAttribute('height', '0'); svg.setAttribute('aria-hidden', 'true');
+      svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+      defs = document.createElementNS(NS, 'defs');
+      svg.append(defs);
+      document.body.append(svg);
+    }
+    const small = Math.max(dx, dy) <= 4, tile = small ? 4 : 6;
+    const f = document.createElementNS(NS, 'filter');
+    f.id = id;
+    f.setAttribute('x', '-5%'); f.setAttribute('y', '-5%'); f.setAttribute('width', '125%'); f.setAttribute('height', '125%');
+    f.setAttribute('color-interpolation-filters', 'sRGB');
+    f.innerHTML = `<feImage href="${small ? DOT_FINE : DOT}" x="0" y="0" width="${tile}" height="${tile}" result="dot"/>` +
+      `<feTile in="dot" result="dots"/>` +
+      `<feOffset in="SourceAlpha" dx="${dx}" dy="${dy}" result="off"/>` +
+      `<feComposite in="dots" in2="off" operator="in" result="shadow"/>` +
+      `<feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>`;
+    defs.append(f);
+    made.add(id);
+    return id;
+  };
+  window.JBHalftone = filterFor; // the header tear uses it too
+
+  const INK = /rgb\(10, 10, 10\) (-?\d+(?:\.\d+)?)px (-?\d+(?:\.\d+)?)px 0px(?: 0px)?$/;
+  const halftone = (el) => {
+    if (el.dataset.ht) return;
+    const cs = getComputedStyle(el);
+    if (cs.boxShadow === 'none' || (cs.boxShadow.match(/rgb/g) || []).length > 1 || cs.boxShadow.includes('inset')) return;
+    const m = cs.boxShadow.match(INK);
+    if (!m) return;
+    const dx = Math.round(+m[1]), dy = Math.round(+m[2]);
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 3) return; // tiny ones stay crisp
+    el.dataset.ht = '1';
+    el.style.boxShadow = 'none';
+    const f = `url(#${filterFor(dx, dy)})`;
+    el.style.filter = cs.filter && cs.filter !== 'none' ? cs.filter + ' ' + f : f;
+  };
+
+  // ---------- contrast ----------
+  const rgb = (c) => (c.match(/[\d.]+/g) || []).map(Number);
+  const lum = ([r, g, b]) => {
+    const f = (v) => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; };
+    return .2126 * f(r) + .7152 * f(g) + .0722 * f(b);
+  };
+  const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+  const behind = (el) => {
+    for (let e = el; e && e !== document.documentElement; e = e.parentElement) {
+      const cs = getComputedStyle(e);
+      if (cs.backgroundImage !== 'none' && /url\(/.test(cs.backgroundImage)) return 'busy';
+      if (e.classList.contains('boxbg') || e.querySelector(':scope > .wash')) return 'busy'; // the box-art collage (drawn in ::before)
+      const c = rgb(cs.backgroundColor);
+      if (c.length >= 3 && (c.length === 3 || c[3] > .6)) return c;
+    }
+    return rgb(getComputedStyle(document.body).backgroundColor);
+  };
+  const SKIP = 'script,style,svg,canvas,video,img,input,textarea,select,option,header nav,.holo-stage,.jb-ol';
+  const outline = (el) => {
+    if (el.dataset.ol || el.closest(SKIP)) return;
+    if (![...el.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim())) return;
+    const cs = getComputedStyle(el);
+    if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0 || (cs.webkitTextStrokeWidth && cs.webkitTextStrokeWidth !== '0px')) return;
+    const fg = rgb(cs.color);
+    if (fg.length < 3) return;
+    const bg = behind(el);
+    if (bg !== 'busy' && ratio(fg, bg) >= 3) return;
+    el.dataset.ol = '1';
+    el.classList.add('jb-ol');
+    el.style.setProperty('--olc', lum(fg) > .35 ? '#0A0A0A' : '#FFFFFF');
+    if (parseFloat(cs.fontSize) >= 28) el.classList.add('jb-ol-big');
+  };
+
+  const css = document.createElement('style');
+  css.textContent = `
+.jb-ol{--o:1.5px;text-shadow:calc(var(--o)*-1) calc(var(--o)*-1) 0 var(--olc),var(--o) calc(var(--o)*-1) 0 var(--olc),calc(var(--o)*-1) var(--o) 0 var(--olc),var(--o) var(--o) 0 var(--olc),0 calc(var(--o)*-1) 0 var(--olc),0 var(--o) 0 var(--olc),calc(var(--o)*-1) 0 0 var(--olc),var(--o) 0 0 var(--olc)}
+.jb-ol-big{--o:3px}
+.lx{display:inline-block;rotate:-11deg;translate:0 -.05em;font-weight:900;scale:1.08;margin:0 .01em}
+.lx:nth-of-type(2n){rotate:9deg}`;
+  document.head.append(css);
+
+  // ---------- swapped letters (tools/scrub.py writes b0ng, p!pe, sm0ke...): the swapped character gets a little
+  // graffiti tilt so it reads as lettering, not a typo
+  const SWAP = /(?:b0ng|p!pe|sm0k|tr!pp|w33d|c@nnabis|m@rijuana|st0n|j0int|bl\*nt|n@rcotic|psych3delic|mu\$hroom|@cid|t0k|b@ked|h@sh|b0wl|r0lling|h!gh|k\*sh|spl!ff|d@b|v@p|3dible|d!spensar|dr\*g|d0pe|g@nja|\$tash)/i;
+  const SWAPS = new RegExp(SWAP.source, 'gi');
+  const letters = (root) => {
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (SWAP.test(n.nodeValue) && !n.parentElement.closest('script,style,textarea,input,.lx,svg') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
+    });
+    const hits = [];
+    while (w.nextNode()) hits.push(w.currentNode);
+    for (const n of hits) {
+      const frag = document.createDocumentFragment();
+      let last = 0;
+      n.nodeValue.replace(SWAPS, (m, at) => {
+        frag.append(n.nodeValue.slice(last, at));
+        for (const ch of m) {
+          if ('0!@3$*'.includes(ch)) { const sp = document.createElement('span'); sp.className = 'lx'; sp.textContent = ch; frag.append(sp); } else frag.append(ch);
+        }
+        last = at + m.length;
+        return m;
+      });
+      frag.append(n.nodeValue.slice(last));
+      n.replaceWith(frag);
+    }
+  };
+
+  const scan = (root) => {
+    if (root.nodeType === 1) letters(root);
+    const all = root.querySelectorAll ? [root, ...root.querySelectorAll('*')] : [];
+    for (const el of all) {
+      if (!(el instanceof HTMLElement)) continue;
+      halftone(el);
+      outline(el);
+    }
+  };
+  const run = () => scan(document.body);
+  if (document.readyState === 'complete') setTimeout(run, 50);
+  else addEventListener('load', () => setTimeout(run, 50));
+  // pages build parts of themselves later (shop grid, crew wall, dialogs): pick those up as they come
+  let queue = new Set(), t = 0;
+  new MutationObserver((ms) => {
+    for (const m of ms) m.addedNodes.forEach((n) => { if (n.nodeType === 1) queue.add(n); });
+    if (!t && queue.size) t = setTimeout(() => { t = 0; const q = queue; queue = new Set(); q.forEach((n) => n.isConnected && scan(n)); }, 250);
+  }).observe(document.body, { childList: true, subtree: true });
+})();
