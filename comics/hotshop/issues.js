@@ -121,8 +121,8 @@ window.HOTSHOP = [
   "panels": [
    {
     "img": "hot-shop-o2-1.webp",
-    "alt": "Venice Beach. Chomps bites a NO SHARKS sign mid-kickflip while Shellby blurs past. The flyer is stuck to his board.",
-    "cap": "CHOMPS. Venice Beach. Banned from four skateparks and an aquarium. SHELLBY. Daytona. Has lost one race, ever.",
+    "alt": "Venice Beach. Chomps bites a NO SHARKS sign mid-kickflip while Speedbump blurs past. The flyer is stuck to his board.",
+    "cap": "CHOMPS. Venice Beach. Banned from four skateparks and an aquarium. SPEEDBUMP. Daytona. Has lost one race, ever.",
     "sfx": null,
     "lines": [
      {
@@ -130,7 +130,7 @@ window.HOTSHOP = [
       "t": "A job with FIRE? Who do I bite?"
      },
      {
-      "who": "Shellby",
+      "who": "Speedbump",
       "t": "Nyoom. Already there."
      }
     ],
@@ -186,16 +186,16 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-o2-4.webp",
-    "alt": "Big Sur at night. Enlightened Ed reads the flyer by moonlight. Major Tom-Tom floats above in a cloud of smoke.",
-    "cap": "ED. Big Sur. Washed up at a festival and stayed. TOM-TOM. Splashed down years late. Still up.",
+    "alt": "Big Sur at night. Ocho reads the flyer by moonlight. Lunar Larry floats above in a cloud of smoke.",
+    "cap": "OCHO. Big Sur. Washed up at a festival and stayed. LUNAR LARRY. Splashed down years late. Still up.",
     "sfx": null,
     "lines": [
      {
-      "who": "Ed",
+      "who": "Ocho",
       "t": "The fire... is hiring."
      },
      {
-      "who": "Tom-Tom",
+      "who": "Larry",
       "t": "Copy that, cadet. Which way is down?"
      }
     ],
@@ -229,16 +229,16 @@ window.HOTSHOP = [
   "panels": [
    {
     "img": "hot-shop-o3-1.webp",
-    "alt": "A desert highway at night. Shellby sprints past a semi, Dillo rolls down the center line, Two-Can rides one giant sneaker.",
+    "alt": "A desert highway at night. Speedbump sprints past a semi, Gutterball rolls down the center line, Big Bill rides one giant sneaker.",
     "cap": "Every road. Same night.",
     "sfx": "NYOOM!",
     "lines": [
      {
-      "who": "Shellby",
+      "who": "Speedbump",
       "t": "Passed one semi. Two. THREE."
      },
      {
-      "who": "Two-Can",
+      "who": "Big Bill",
       "t": "Wepa! I lost the other shoe!"
      }
     ],
@@ -256,12 +256,12 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-o3-2.webp",
-    "alt": "The line outside the barn. Cy inspects the HELP WANTED sign through a magnifying glass. Mama Cobra cuts the line jangling the barn keys.",
+    "alt": "The line outside the barn. Dr. Squint inspects the HELP WANTED sign through a magnifying glass. Mama Cobra cuts the line jangling the barn keys.",
     "cap": "Opening night. The line.",
     "sfx": null,
     "lines": [
      {
-      "who": "Cy",
+      "who": "Dr. Squint",
       "t": "No questions. No standards. Cute."
      },
      {
@@ -275,12 +275,12 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-o3-3.webp",
-    "alt": "Inside, Peeper whispers through the porthole in the front door. Torch stands with his arms crossed, eyes shut.",
+    "alt": "Inside, Lookie Lou whispers through the porthole in the front door. Torch stands with his arms crossed, eyes shut.",
     "cap": null,
     "sfx": null,
     "lines": [
      {
-      "who": "Peeper",
+      "who": "Lookie Lou",
       "t": "Did you hear? A shark, a devil, a monkey in orbit."
      },
      {
@@ -294,7 +294,7 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-o3-4.webp",
-    "alt": "Torch opens the door and the whole crowd stampedes in over him: Chomps lunging at the sign, Tom-Tom floating, Mama Cobra, Dillo rolling.",
+    "alt": "Torch opens the door and the whole crowd stampedes in over him: Chomps lunging at the sign, Lunar Larry floating, Mama Cobra, Gutterball rolling.",
     "cap": "Midnight. Read on: Harvest Week.",
     "sfx": "WHUMP!",
     "lines": [
@@ -584,7 +584,7 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-03-2.webp",
-    "alt": "Midnight card game in the tractor shed. Lil' Lucky slides the centerpiece into the pot. Dillo and Chomps stare.",
+    "alt": "Midnight card game in the tractor shed. Lil' Lucky slides the centerpiece into the pot. Gutterball and Chomps stare.",
     "cap": "Midnight. Cards in the tractor shed. Lucky is out of chips.",
     "sfx": null,
     "lines": [
@@ -599,12 +599,12 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-03-3.webp",
-    "alt": "Dillo curls into a ball around the centerpiece and rolls off down the hill. Lil' Lucky dives after it.",
-    "cap": "Dillo has a full house.",
+    "alt": "Gutterball curls into a ball around the centerpiece and rolls off down the hill. Lil' Lucky dives after it.",
+    "cap": "Gutterball has a full house.",
     "sfx": "THOOM!",
     "lines": [
      {
-      "who": "Dillo",
+      "who": "Gutterball",
       "t": "Winner rolls home, y'all!"
      }
     ],
@@ -614,7 +614,7 @@ window.HOTSHOP = [
    },
    {
     "img": "hot-shop-03-4.webp",
-    "alt": "Dawn. Mama Cobra has swallowed Lil' Lucky up to his neck and holds the centerpiece safe in her tail. Dillo lies dizzy.",
+    "alt": "Dawn. Mama Cobra has swallowed Lil' Lucky up to his neck and holds the centerpiece safe in her tail. Gutterball lies dizzy.",
     "cap": "Dawn. The piece survives. Lucky, mostly.",
     "sfx": null,
     "lines": [

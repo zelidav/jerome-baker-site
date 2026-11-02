@@ -282,11 +282,11 @@
   "big": [
    [
     "1783KB",
-    "/assets/gifs/major-tom-tom.gif"
+    "/assets/gifs/lunar-larry.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Major Tom-Tom. The JB Crew",
+  "title": "Lunar Larry. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -303,7 +303,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/major-tom-tom/",
+  "path": "/crew/lunar-larry/",
   "lcp": 304,
   "errs": [],
   "bad": []
@@ -356,11 +356,11 @@
   "big": [
    [
     "1769KB",
-    "/assets/gifs/enlightened-ed.gif"
+    "/assets/gifs/ocho.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Enlightened Ed. The JB Crew",
+  "title": "Ocho. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -377,7 +377,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/enlightened-ed/",
+  "path": "/crew/ocho/",
   "lcp": 460,
   "errs": [],
   "bad": []
@@ -393,11 +393,11 @@
   "big": [
    [
     "1606KB",
-    "/assets/gifs/baker-bot.gif"
+    "/assets/gifs/dj-rivets.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Baker Bot. The JB Crew",
+  "title": "DJ Rivets. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -414,7 +414,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/baker-bot/",
+  "path": "/crew/dj-rivets/",
   "lcp": 196,
   "errs": [],
   "bad": []
@@ -430,11 +430,11 @@
   "big": [
    [
     "1563KB",
-    "/assets/gifs/honey-pot.gif"
+    "/assets/gifs/sticky-ricky.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Honey Pot. The JB Crew",
+  "title": "Sticky Ricky. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -451,7 +451,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/honey-pot/",
+  "path": "/crew/sticky-ricky/",
   "lcp": 292,
   "errs": [],
   "bad": []
@@ -467,11 +467,11 @@
   "big": [
    [
     "1476KB",
-    "/assets/gifs/two-can.gif"
+    "/assets/gifs/big-bill.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Two-Can. The JB Crew",
+  "title": "Big Bill. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -488,7 +488,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/two-can/",
+  "path": "/crew/big-bill/",
   "lcp": 208,
   "errs": [],
   "bad": []
@@ -541,11 +541,11 @@
   "big": [
    [
     "1351KB",
-    "/assets/gifs/gray.gif"
+    "/assets/gifs/beamer.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Gray. The JB Crew",
+  "title": "Beamer. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -562,7 +562,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/gray/",
+  "path": "/crew/beamer/",
   "lcp": 236,
   "errs": [],
   "bad": []
@@ -652,11 +652,11 @@
   "big": [
    [
     "1881KB",
-    "/assets/gifs/public-enemy.gif"
+    "/assets/gifs/big-stitch.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Public Enemy No. 1. The JB Crew",
+  "title": "Big Stitch. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -673,7 +673,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/public-enemy/",
+  "path": "/crew/big-stitch/",
   "lcp": 256,
   "errs": [],
   "bad": []
@@ -688,7 +688,7 @@
   "imgKB": 114,
   "big": [],
   "overflow": 0,
-  "title": "Jack. The JB Crew",
+  "title": "Gourdo. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -705,7 +705,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/jack/",
+  "path": "/crew/gourdo/",
   "lcp": 260,
   "errs": [],
   "bad": []
@@ -721,11 +721,11 @@
   "big": [
    [
     "1344KB",
-    "/assets/gifs/dillo.gif"
+    "/assets/gifs/gutterball.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Dillo. The JB Crew",
+  "title": "Gutterball. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -742,7 +742,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/dillo/",
+  "path": "/crew/gutterball/",
   "lcp": 520,
   "errs": [],
   "bad": []
@@ -758,11 +758,11 @@
   "big": [
    [
     "1515KB",
-    "/assets/gifs/shellby.gif"
+    "/assets/gifs/speedbump.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Shellby. The JB Crew",
+  "title": "Speedbump. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -779,7 +779,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/shellby/",
+  "path": "/crew/speedbump/",
   "lcp": 428,
   "errs": [],
   "bad": []
@@ -795,11 +795,11 @@
   "big": [
    [
     "1363KB",
-    "/assets/gifs/cy.gif"
+    "/assets/gifs/dr-squint.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Cy. The JB Crew",
+  "title": "Dr. Squint. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -816,7 +816,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/cy/",
+  "path": "/crew/dr-squint/",
   "lcp": 668,
   "errs": [],
   "bad": []
@@ -832,11 +832,11 @@
   "big": [
    [
     "1398KB",
-    "/assets/gifs/the-spinners.gif"
+    "/assets/gifs/the-zone-outs.gif"
    ]
   ],
   "overflow": 0,
-  "title": "The Spinners. The JB Crew",
+  "title": "The Zone-Outs. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -853,7 +853,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/the-spinners/",
+  "path": "/crew/the-zone-outs/",
   "lcp": 584,
   "errs": [],
   "bad": []
@@ -869,11 +869,11 @@
   "big": [
    [
     "1687KB",
-    "/assets/gifs/peeper.gif"
+    "/assets/gifs/lookie-lou.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Peeper. The JB Crew",
+  "title": "Lookie Lou. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -890,7 +890,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/peeper/",
+  "path": "/crew/lookie-lou/",
   "lcp": 456,
   "errs": [],
   "bad": []
@@ -943,11 +943,11 @@
   "big": [
    [
     "1634KB",
-    "/assets/gifs/the-grin.gif"
+    "/assets/gifs/mouthy.gif"
    ]
   ],
   "overflow": 0,
-  "title": "The Grin. The JB Crew",
+  "title": "Mouthy. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -964,7 +964,7 @@
   ],
   "lazyMissing": 0,
   "view": "desktop",
-  "path": "/crew/the-grin/",
+  "path": "/crew/mouthy/",
   "lcp": 612,
   "errs": [],
   "bad": []
@@ -1246,7 +1246,7 @@
   "imgKB": 195,
   "big": [],
   "overflow": 0,
-  "title": "Major Tom-Tom. The JB Crew",
+  "title": "Lunar Larry. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1263,7 +1263,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/major-tom-tom/",
+  "path": "/crew/lunar-larry/",
   "lcp": 564,
   "errs": [],
   "bad": []
@@ -1311,11 +1311,11 @@
   "big": [
    [
     "1769KB",
-    "/assets/gifs/enlightened-ed.gif"
+    "/assets/gifs/ocho.gif"
    ]
   ],
   "overflow": 0,
-  "title": "Enlightened Ed. The JB Crew",
+  "title": "Ocho. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1332,7 +1332,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/enlightened-ed/",
+  "path": "/crew/ocho/",
   "lcp": 896,
   "errs": [],
   "bad": []
@@ -1347,7 +1347,7 @@
   "imgKB": 172,
   "big": [],
   "overflow": 0,
-  "title": "Baker Bot. The JB Crew",
+  "title": "DJ Rivets. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1364,7 +1364,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/baker-bot/",
+  "path": "/crew/dj-rivets/",
   "lcp": 212,
   "errs": [],
   "bad": []
@@ -1379,7 +1379,7 @@
   "imgKB": 118,
   "big": [],
   "overflow": 0,
-  "title": "Honey Pot. The JB Crew",
+  "title": "Sticky Ricky. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1396,7 +1396,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/honey-pot/",
+  "path": "/crew/sticky-ricky/",
   "lcp": 224,
   "errs": [],
   "bad": []
@@ -1411,7 +1411,7 @@
   "imgKB": 182,
   "big": [],
   "overflow": 0,
-  "title": "Two-Can. The JB Crew",
+  "title": "Big Bill. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1428,7 +1428,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/two-can/",
+  "path": "/crew/big-bill/",
   "lcp": 176,
   "errs": [],
   "bad": []
@@ -1475,7 +1475,7 @@
   "imgKB": 121,
   "big": [],
   "overflow": 0,
-  "title": "Gray. The JB Crew",
+  "title": "Beamer. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1492,7 +1492,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/gray/",
+  "path": "/crew/beamer/",
   "lcp": 324,
   "errs": [],
   "bad": []
@@ -1571,7 +1571,7 @@
   "imgKB": 148,
   "big": [],
   "overflow": 0,
-  "title": "Public Enemy No. 1. The JB Crew",
+  "title": "Big Stitch. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1588,7 +1588,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/public-enemy/",
+  "path": "/crew/big-stitch/",
   "lcp": 192,
   "errs": [],
   "bad": []
@@ -1603,7 +1603,7 @@
   "imgKB": 114,
   "big": [],
   "overflow": 0,
-  "title": "Jack. The JB Crew",
+  "title": "Gourdo. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1620,7 +1620,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/jack/",
+  "path": "/crew/gourdo/",
   "lcp": 184,
   "errs": [],
   "bad": []
@@ -1635,7 +1635,7 @@
   "imgKB": 180,
   "big": [],
   "overflow": 0,
-  "title": "Dillo. The JB Crew",
+  "title": "Gutterball. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1652,7 +1652,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/dillo/",
+  "path": "/crew/gutterball/",
   "lcp": 180,
   "errs": [],
   "bad": []
@@ -1667,7 +1667,7 @@
   "imgKB": 169,
   "big": [],
   "overflow": 0,
-  "title": "Shellby. The JB Crew",
+  "title": "Speedbump. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1684,7 +1684,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/shellby/",
+  "path": "/crew/speedbump/",
   "lcp": 240,
   "errs": [],
   "bad": []
@@ -1699,7 +1699,7 @@
   "imgKB": 108,
   "big": [],
   "overflow": 0,
-  "title": "Cy. The JB Crew",
+  "title": "Dr. Squint. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1716,7 +1716,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/cy/",
+  "path": "/crew/dr-squint/",
   "lcp": 200,
   "errs": [],
   "bad": []
@@ -1731,7 +1731,7 @@
   "imgKB": 177,
   "big": [],
   "overflow": 0,
-  "title": "The Spinners. The JB Crew",
+  "title": "The Zone-Outs. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1748,7 +1748,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/the-spinners/",
+  "path": "/crew/the-zone-outs/",
   "lcp": 212,
   "errs": [],
   "bad": []
@@ -1763,7 +1763,7 @@
   "imgKB": 106,
   "big": [],
   "overflow": 0,
-  "title": "Peeper. The JB Crew",
+  "title": "Lookie Lou. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1780,7 +1780,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/peeper/",
+  "path": "/crew/lookie-lou/",
   "lcp": 196,
   "errs": [],
   "bad": []
@@ -1827,7 +1827,7 @@
   "imgKB": 81,
   "big": [],
   "overflow": 0,
-  "title": "The Grin. The JB Crew",
+  "title": "Mouthy. The JB Crew",
   "desc": true,
   "og": true,
   "icon": true,
@@ -1844,7 +1844,7 @@
   ],
   "lazyMissing": 0,
   "view": "phone",
-  "path": "/crew/the-grin/",
+  "path": "/crew/mouthy/",
   "lcp": 204,
   "errs": [],
   "bad": []

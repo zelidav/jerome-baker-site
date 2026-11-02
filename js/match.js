@@ -280,7 +280,8 @@
   };
 
   const route = () => {
-    const slug = decodeURIComponent(location.hash.slice(1));
+    let slug = decodeURIComponent(location.hash.slice(1));
+    slug = (window.JB_RENAMED || {})[slug] || slug; // crew links from before the renames
     let mine = null;
     try { mine = JSON.parse(sessionStorage.getItem('jbMatch') || 'null'); } catch (e) {}
     if (bySlug[slug] && mine && mine.slug === slug && Array.isArray(mine.answers) && mine.answers.length === QUESTIONS.length) {

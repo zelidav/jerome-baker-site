@@ -37,22 +37,22 @@ FEATURED = [7570, 7472, 7431, 7399, 7206, 1298, 252, 'Men’s High Top – NY Dr
 
 # kind of product -> crew slugs who fit it (first match wins)
 KINDS = [
-    ('high top', ['two-can', 'shellby', 'chomps', 'major-tom-tom', 'mr-x']),
-    ('flip', ['enlightened-ed', 'gray']),
+    ('high top', ['big-bill', 'speedbump', 'chomps', 'lunar-larry', 'mr-x']),
+    ('flip', ['ocho', 'beamer']),
     ('board short', ['crude']),
-    ('bikini', ['crude', 'enlightened-ed']),
-    ('towel', ['enlightened-ed', 'crude']),
-    ('legging', ['dillo', 'shellby']),
-    ('crop top', ['dillo']),
-    ('backpack', ['baker-bot', 'peeper']),
-    ('reversible bucket', ['mama-cobra', 'major-tom-tom']),
-    ('bucket hat', ['honey-pot', 'peeper']),
-    ('hat', ['the-spinners', 'two-can']),
-    ('hoodie', ['torch', 'public-enemy']),
-    ('polo', ['the-grin', 'lil-lucky', 'honey-pot']),
-    ('mug', ['honey-pot', 'jack']),
-    ('bottle', ['gray', 'baker-bot']),
-    ('tee', ['baker-bot', 'gray', 'cy', 'jack', 'mr-x']),
+    ('bikini', ['crude', 'ocho']),
+    ('towel', ['ocho', 'crude']),
+    ('legging', ['gutterball', 'speedbump']),
+    ('crop top', ['gutterball']),
+    ('backpack', ['dj-rivets', 'lookie-lou']),
+    ('reversible bucket', ['mama-cobra', 'lunar-larry']),
+    ('bucket hat', ['sticky-ricky', 'lookie-lou']),
+    ('hat', ['the-zone-outs', 'big-bill']),
+    ('hoodie', ['torch', 'big-stitch']),
+    ('polo', ['mouthy', 'lil-lucky', 'sticky-ricky']),
+    ('mug', ['sticky-ricky', 'gourdo']),
+    ('bottle', ['beamer', 'dj-rivets']),
+    ('tee', ['dj-rivets', 'beamer', 'dr-squint', 'gourdo', 'mr-x']),
 ]
 
 
