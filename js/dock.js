@@ -108,4 +108,15 @@
   s.src = base + 'js/promo.js';
   s.defer = true;
   document.head.appendChild(s);
+  // "Get the fit" bundles (js/fit.js) on crew character pages
+  if (/\/crew\/(?!match\/)[^/]+\//.test(location.pathname)) {
+    const fc = document.createElement('link');
+    fc.rel = 'stylesheet';
+    fc.href = base + 'css/fit.css';
+    document.head.appendChild(fc);
+    const f = document.createElement('script');
+    f.src = base + 'js/fit.js';
+    f.defer = true;
+    document.head.appendChild(f);
+  }
 })();
