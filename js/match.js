@@ -27,7 +27,8 @@
       { t: 'Running a cockroach racing ring out of the basement', n: { night: 2, crew: 1, roam: -2, hands: -1, new: -1 } },
       { t: 'Smuggling frogs across a border. In your pants', n: { roam: 2, new: 1, crew: -2, night: -1 } },
       { t: 'Stealing a priceless painting to hang over the toilet', n: { new: -2, hands: 1, night: 1, crew: -1, roam: -1 } },
-      { t: 'Starting a cult. You charge a cover', n: { crew: 2, hands: -2, new: 1, chaos: -1 } }
+      { t: 'Starting a cult. You charge a cover', n: { crew: 2, hands: -2, new: 1, chaos: -1 } },
+      { t: 'Selling b0ngs. The feds already tried that one in 2003', n: { hands: 2, crew: 1, night: 1, chaos: -1 } }
     ] },
     { q: "Freak scale. Be honest, nobody's watching. (We're watching.)", kind: 'scale', a: [
       { t: 'Missionary. Lights off. Socks on. Done by the commercial break', n: { chaos: -2, new: -1, night: -2, hands: 2 } },
