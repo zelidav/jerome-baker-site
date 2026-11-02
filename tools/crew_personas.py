@@ -3,7 +3,7 @@
 Each persona, keyed by crew slug (see crew_data.py):
   type       personality type in a few words, the thing a customer recognizes in themselves
   from       hometown; the crew comes from all over on purpose
-  backstory  where they came from before the booth wall, in their own world's logic
+  backstory  where they came from before the crew, in their own world's logic
   shop_job   their job in The Hot Shop (the comic), and vice, what goes wrong when they're on shift
   voice      how they talk: rhythm, words they use, words they never use
   loves / hates
@@ -21,26 +21,26 @@ PERSONAS = {
     "torch": dict(
         type="The perfectionist with a short fuse",
         from_="Eugene, Oregon",
-        backstory="Learned the torch in a garage in 1991 from a guy who never wrote anything down. Has been in the little window on the booth wall since the first show. Survived the raid, the barn years and three landlords. Opened The Hot Shop because nobody else would hire the crew, and he regrets it daily.",
+        backstory="Learned the torch in a garage in 1991 from a guy who never wrote anything down. Survived the raid, the barn years and three landlords. Opened The Hot Shop because nobody else would hire the crew, and he regrets it daily.",
         shop_job="Gaffer and owner. Runs the bench, signs every piece.",
         vice="Works 20 hours straight, then sleeps in the annealer. Fires everyone twice a week, rehires them by lunch.",
         voice="Short sentences. Dry. Never explains twice. Says 'hand made' like a threat. Never says 'awesome'.",
         loves="A clean gather, the smell of fumed silver, people who show up on time",
         hates="Molds, shortcuts, anyone touching the bench",
         vibes_with="Craftspeople, perfectionists, OG heads who remember 1999, anyone who's been doing one thing for thirty years",
-        friends=["public-enemy", "cy"], beef=["chomps", "crude"],
+        friends=["big-stitch", "dr-squint"], beef=["chomps", "crude"],
         axes=dict(chaos=-1, crew=-1, night=1, new=-2, hands=2, roam=-1)),
-    "major-tom-tom": dict(
+    "lunar-larry": dict(
         type="The daydreamer who never came down",
         from_="Cocoa Beach, Florida",
-        backstory="Test pilot in the 1991 launch that nobody talks about. Splashed down years later with the hat and none of the paperwork. Lives on a couch that floats a few inches off the floor and swears it's a medical thing.",
+        backstory="Test pilot in the 1991 launch that nobody talks about. Splashed down years later with the hat, a new name and none of the paperwork. Lives on a couch that floats a few inches off the floor and swears it's a medical thing.",
         shop_job="Apprentice. Volunteers for everything, finishes nothing.",
         vice="Permanently elevated. Shows up four hours late with snacks for everyone and no memory of the drive.",
         voice="Slow, warm, wanders off mid-sentence. Space metaphors for everything. Calls everyone 'cadet'.",
         loves="Long nights on the roof, cartoons with the sound off, a perfect bowl of cereal at 3 a.m.",
         hates="Velcro, alarm clocks, the word 'deadline'",
         vibes_with="Stoners, stargazers, space nerds, people who show up late but bring snacks",
-        friends=["gray", "enlightened-ed", "two-can"], beef=["torch"],
+        friends=["beamer", "ocho", "big-bill"], beef=["torch"],
         axes=dict(chaos=0, crew=1, night=2, new=1, hands=-1, roam=1)),
     "chomps": dict(
         type="The adrenaline junkie",
@@ -52,9 +52,9 @@ PERSONAS = {
         loves="Stairs he can jump, hot sauce, a crowd watching",
         hates="Being told 'careful', helmets, the word 'no'",
         vibes_with="Skaters, surfers, adrenaline people, anyone who's been told to calm down their whole life",
-        friends=["shellby", "two-can"], beef=["torch", "honey-pot"],
+        friends=["speedbump", "big-bill"], beef=["torch", "sticky-ricky"],
         axes=dict(chaos=2, crew=1, night=0, new=1, hands=1, roam=1)),
-    "enlightened-ed": dict(
+    "ocho": dict(
         type="The seeker who's always a little bit tripping",
         from_="Big Sur, California",
         backstory="Washed up on a beach during a festival in the 90s and decided the crowd was his family. Started the poster as a joke and then meant it. Has eight arms, four flip-flops and one very strong opinion about the moon.",
@@ -64,9 +64,9 @@ PERSONAS = {
         loves="Sunrise, drum circles, the moment glass goes from orange to clear",
         hates="Socks, cynics, fluorescent lights",
         vibes_with="Festival people, seekers, yoga-then-a-joint people, anyone who's cried at a sunrise",
-        friends=["mama-cobra", "mr-x", "major-tom-tom"], beef=["the-spinners"],
+        friends=["mama-cobra", "mr-x", "lunar-larry"], beef=["the-zone-outs"],
         axes=dict(chaos=1, crew=2, night=1, new=0, hands=-1, roam=2)),
-    "baker-bot": dict(
+    "dj-rivets": dict(
         type="The tech nerd who just wants to dance",
         from_="Detroit, Michigan",
         backstory="Built on an assembly line in Detroit, escaped the Baker Bots poster during a soundcheck and never went back. Learned everything from warehouse parties and pirate radio. Has never played the same set twice, same rule as the glass.",
@@ -76,9 +76,9 @@ PERSONAS = {
         loves="Warehouse parties, 120 BPM, a fresh spare antenna",
         hates="Magnets, silence, being called a toaster",
         vibes_with="DJs, ravers, programmers, people who'd rather dance than talk",
-        friends=["crude", "the-spinners"], beef=["jack"],
+        friends=["crude", "the-zone-outs"], beef=["gourdo"],
         axes=dict(chaos=0, crew=1, night=2, new=2, hands=1, roam=-1)),
-    "honey-pot": dict(
+    "sticky-ricky": dict(
         type="The homebody who feeds everybody",
         from_="Kansas City, Missouri",
         backstory="Grew up behind a barbecue joint and came off the Honey Pot poster with a spatula already in his paw. Treats the grill like church. Has opinions about sauce he will share whether you ask or not.",
@@ -88,9 +88,9 @@ PERSONAS = {
         loves="A long Sunday cook, his recliner, people with an appetite",
         hates="Bees with opinions, rushing, people who say 'I'm not hungry'",
         vibes_with="Foodies, homebodies, grill dads, anyone whose love language is feeding you",
-        friends=["dillo", "lil-lucky"], beef=["chomps"],
+        friends=["gutterball", "lil-lucky"], beef=["chomps"],
         axes=dict(chaos=-2, crew=1, night=-1, new=-1, hands=2, roam=-2)),
-    "two-can": dict(
+    "big-bill": dict(
         type="The traveler who loses everything",
         from_="San Juan, Puerto Rico",
         backstory="Left the island chasing a rumor about the biggest high top ever made. Found it, lost the other one. Has been on every continent and left a sock on all of them.",
@@ -100,7 +100,7 @@ PERSONAS = {
         loves="Airports, street food, rare sneakers, a beach at sunset",
         hates="Laces, layovers, being asked where the keys are",
         vibes_with="Sneakerheads, backpackers, people with a passport full of stamps and nothing in the fridge",
-        friends=["chomps", "major-tom-tom", "shellby"], beef=["torch"],
+        friends=["chomps", "lunar-larry", "speedbump"], beef=["torch"],
         axes=dict(chaos=1, crew=1, night=0, new=1, hands=0, roam=2)),
     "crude": dict(
         type="The laid-back surfer who's always half lit",
@@ -112,31 +112,31 @@ PERSONAS = {
         loves="A long wave, a cold can of 30-weight, a hammock",
         hates="Paper towels, mornings, people who say 'clean up'",
         vibes_with="Surfers, mechanics, Gulf Coast folks, anyone whose plan is to not have a plan",
-        friends=["baker-bot", "gray"], beef=["torch", "dillo"],
+        friends=["dj-rivets", "beamer"], beef=["torch", "gutterball"],
         axes=dict(chaos=1, crew=0, night=1, new=-1, hands=1, roam=0)),
-    "gray": dict(
+    "beamer": dict(
         type="The night-owl collector",
         from_="Roswell, New Mexico",
-        backstory="Came down in 1991 for one cow and found a glass booth instead. Has been collecting ever since. Keeps a ship full of things that weren't nailed down, and the cow, who has a lot to say about it.",
+        backstory="Came down in 1991 for one cow and found a glass shop instead. Has been collecting ever since. Keeps a ship full of things that weren't nailed down, and the cow, who has a lot to say about it.",
         shop_job="Night shift. Inventory. Allegedly.",
         vice="Beams finished pieces up to the ship. Has never once been caught. Everyone knows.",
         voice="Deadpan, polite, slightly formal, like he learned English from instruction manuals.",
         loves="Rare pieces, juice boxes, 3 a.m., a perfectly organized shelf",
         hates="Daylight, gravity, people who say 'it's just a pipe'",
         vibes_with="Collectors, sci-fi fans, night owls, anyone with a shelf they won't let you touch",
-        friends=["major-tom-tom", "peeper", "crude"], beef=["public-enemy"],
+        friends=["lunar-larry", "lookie-lou", "crude"], beef=["big-stitch"],
         axes=dict(chaos=0, crew=-2, night=2, new=0, hands=0, roam=1)),
     "mama-cobra": dict(
         type="The charmer who always gets her way",
         from_="New Orleans, Louisiana",
         backstory="Spent years in baskets getting charmed by guys with flutes. Bought her own flute and flipped it. Ran the best second line in the French Quarter before she followed the crew north. Wears the luchador bucket hat to stay incognito. It is not working.",
         shop_job="Showroom and sales. Nobody leaves empty-handed.",
-        vice="Charms customers out of their wallets. Locks herself in the bathroom with Enlightened Ed. Has three exes on staff.",
+        vice="Charms customers out of their wallets. Locks herself in the bathroom with Ocho. Has three exes on staff.",
         voice="Slow, sultry, teasing. Hisses on the s. Calls everyone 'sugar'.",
         loves="Brass bands, a good gossip, being the last one dancing",
         hates="Being told what to do, garden hoses that won't dance",
         vibes_with="Artists, flirts, performers, New Orleans people, anyone who walks into a room and owns it",
-        friends=["enlightened-ed", "lil-lucky"], beef=["the-spinners", "peeper"],
+        friends=["ocho", "lil-lucky"], beef=["the-zone-outs", "lookie-lou"],
         axes=dict(chaos=1, crew=2, night=2, new=-1, hands=-2, roam=0)),
     "lil-lucky": dict(
         type="The hustler",
@@ -148,21 +148,21 @@ PERSONAS = {
         loves="A handshake deal, heat, a long shot that pays",
         hates="Paperwork, freezers that work, the word 'refund'",
         vibes_with="Entrepreneurs, salespeople, gamblers, anyone running three businesses out of one phone",
-        friends=["mama-cobra", "honey-pot"], beef=["cy"],
+        friends=["mama-cobra", "sticky-ricky"], beef=["dr-squint"],
         axes=dict(chaos=1, crew=1, night=0, new=1, hands=-2, roam=1)),
-    "public-enemy": dict(
+    "big-stitch": dict(
         type="The reformed rebel with a soft heart",
         from_="The Bronx, New York",
-        backstory="Spent years on a wanted poster for something he will only describe as 'a misunderstanding with a truck'. Found needlepoint in a halfway house and got calm. Still has a few open warrants in states he's never been to.",
+        backstory="Spent years on a wanted poster for something he will only describe as 'a misunderstanding with a truck'. Found needlepoint in a halfway house and got calm. The crew calls him Big Stitch, carefully. Still has a few open warrants in states he's never been to.",
         shop_job="Shipping and security.",
         vice="Gets arrested at least once a week, usually for something somebody else did. Very calm about it.",
         voice="Quiet, gentle, careful with words. Says 'respectfully' a lot. Big guy, small voice.",
         loves="Needlepoint, his mom's cooking, a quiet morning",
         hates="Knocks on the door at 6 a.m., flashlights, being rushed",
         vibes_with="New Yorkers, crafters, people with a past who turned it around, gentle giants",
-        friends=["torch", "honey-pot"], beef=["gray", "peeper"],
+        friends=["torch", "sticky-ricky"], beef=["beamer", "lookie-lou"],
         axes=dict(chaos=-1, crew=-1, night=-1, new=-2, hands=2, roam=-1)),
-    "jack": dict(
+    "gourdo": dict(
         type="The dark-humored night creature",
         from_="Salem, Massachusetts",
         backstory="Got carved every October for decades and decided it was his turn. Only carves watermelons. Lights his own way, which is handy because he keeps tripping the breakers.",
@@ -172,9 +172,9 @@ PERSONAS = {
         loves="October, candlelight, horror movies, the smell of a struck match",
         hates="Pie season, daylight savings, people who are scared of the dark",
         vibes_with="Goths, Halloween lifers, horror fans, anyone who decorates for October in August",
-        friends=["peeper", "the-grin"], beef=["baker-bot"],
+        friends=["lookie-lou", "mouthy"], beef=["dj-rivets"],
         axes=dict(chaos=0, crew=0, night=2, new=-2, hands=1, roam=-1)),
-    "dillo": dict(
+    "gutterball": dict(
         type="The good-time Texan",
         from_="Austin, Texas",
         backstory="Lived under a pyramid with an eye on it, which got old. Rolled out one night and kept rolling until he hit a bowling alley in Austin. Has bowled a perfect game with himself as the ball. Wears the crop top so his belly can breathe.",
@@ -182,11 +182,11 @@ PERSONAS = {
         vice="Rolls through the showroom like it's a lane. Strikes the glass wall at least once a month.",
         voice="Big, friendly, corny. Dad jokes, bowling metaphors, says 'y'all' with his whole chest.",
         loves="Bowling night, two-stepping, breakfast tacos, a full house",
-        hates="Gutters, fancy restaurants, being rushed",
+        hates="Gutters (do not bring up the name), fancy restaurants, being rushed",
         vibes_with="Texans, bowlers, dad-joke people, anyone who's the life of every backyard party",
-        friends=["honey-pot", "shellby"], beef=["crude"],
+        friends=["sticky-ricky", "speedbump"], beef=["crude"],
         axes=dict(chaos=1, crew=2, night=-1, new=-1, hands=1, roam=0)),
-    "shellby": dict(
+    "speedbump": dict(
         type="The underdog who refuses to lose",
         from_="Daytona Beach, Florida",
         backstory="Started out as a critter on the joint of a piece, sitting still for a decade. Watched the races on TV every Sunday. Bought four high tops and never sat still again. Has lost a race exactly once and still talks about it.",
@@ -196,9 +196,9 @@ PERSONAS = {
         loves="Race day, personal bests, being underestimated",
         hates="Turning, traffic, the hare",
         vibes_with="Runners, racers, gym rats, underdogs, anyone who's been told they're too slow",
-        friends=["chomps", "dillo", "two-can"], beef=["major-tom-tom"],
+        friends=["chomps", "gutterball", "big-bill"], beef=["lunar-larry"],
         axes=dict(chaos=1, crew=0, night=-2, new=1, hands=2, roam=1)),
-    "cy": dict(
+    "dr-squint": dict(
         type="The brutally honest critic",
         from_="Brooklyn, New York",
         backstory="Born with one eye and 20/20 in it. Ran an eye clinic on Atlantic Avenue that doubled as an art crit. Has the loudest pants in New York and the most honest mouth in the five boroughs.",
@@ -208,9 +208,9 @@ PERSONAS = {
         loves="Good design, gallery openings, catching a flaw nobody else saw",
         hates="Winking, sloppy seams, people who say 'close enough'",
         vibes_with="Designers, critics, editors, New Yorkers, anyone who notices the font on a menu",
-        friends=["torch", "peeper"], beef=["lil-lucky", "dillo"],
+        friends=["torch", "lookie-lou"], beef=["lil-lucky", "gutterball"],
         axes=dict(chaos=-1, crew=-1, night=0, new=1, hands=0, roam=-1)),
-    "the-spinners": dict(
+    "the-zone-outs": dict(
         type="The harmony group that runs the room",
         from_="Philadelphia, Pennsylvania",
         backstory="Three heads, one harmony, discovered singing under a streetlight in South Philly. Had one regional hit nobody remembers. Got into hypnosis to sell more records and never stopped. Wear the snapbacks 'for the sun'. Not for the sun.",
@@ -220,19 +220,19 @@ PERSONAS = {
         loves="A tight harmony, a captive audience, matching outfits",
         hates="Wind, solos, people who don't blink",
         vibes_with="Music lovers, choir kids, Philly people, anyone who does everything with their best friends",
-        friends=["baker-bot", "jack"], beef=["enlightened-ed", "mama-cobra"],
+        friends=["dj-rivets", "gourdo"], beef=["ocho", "mama-cobra"],
         axes=dict(chaos=-1, crew=2, night=1, new=-2, hands=-2, roam=-1)),
-    "peeper": dict(
+    "lookie-lou": dict(
         type="The people-watcher who knows everything",
         from_="Baltimore, Maryland",
-        backstory="Lived behind a brass porthole on a harbor tug for twenty years watching the city go by. Moved into the porthole on the booth wall and brought friends. Reads three newspapers a day and still knows the gossip before it's printed.",
+        backstory="Lived behind a brass porthole on a harbor tug for twenty years watching the city go by. Moved into a new porthole and brought friends. Reads three newspapers a day and still knows the gossip before it's printed.",
         shop_job="Security cameras. And the newsletter nobody asked for.",
         vice="Sees everything, tells everyone. Has dirt on every member of the crew and trades it for snacks.",
         voice="Whispery, nosy, newsy. 'Did you hear?' 'Don't quote me.' Always quotes himself.",
         loves="The morning paper, a juicy rumor, a window seat",
         hates="Eye drops, curtains, being out of the loop",
         vibes_with="News junkies, gossips, people-watchers, anyone who reads the comments",
-        friends=["gray", "jack", "cy"], beef=["mama-cobra", "public-enemy"],
+        friends=["beamer", "gourdo", "dr-squint"], beef=["mama-cobra", "big-stitch"],
         axes=dict(chaos=0, crew=0, night=0, new=0, hands=-2, roam=-2)),
     "mr-x": dict(
         type="The calm center",
@@ -244,9 +244,9 @@ PERSONAS = {
         loves="Mountain mornings, breathwork, a perfectly marked spot",
         hates="Loud noises, wobbly mushrooms, people who skip savasana",
         vibes_with="Yoga people, hikers, wellness heads, anyone whose morning routine is longer than their workday",
-        friends=["enlightened-ed", "honey-pot"], beef=["chomps"],
+        friends=["ocho", "sticky-ricky"], beef=["chomps"],
         axes=dict(chaos=-2, crew=0, night=-2, new=1, hands=0, roam=1)),
-    "the-grin": dict(
+    "mouthy": dict(
         type="The showman who never stops smiling",
         from_="Las Vegas, Nevada",
         backstory="Was the smile on a casino billboard for fifteen years. When the billboard came down, kept smiling. Wears the green polo to look professional. If you stop moving, it gets ideas.",
@@ -256,7 +256,7 @@ PERSONAS = {
         loves="An audience, bright lights, a perfect set of teeth",
         hates="Popcorn kernels, silence, people who don't laugh",
         vibes_with="Comedians, performers, Vegas people, anyone who's the loudest laugh in the room",
-        friends=["jack", "lil-lucky"], beef=["cy"],
+        friends=["gourdo", "lil-lucky"], beef=["dr-squint"],
         axes=dict(chaos=2, crew=1, night=1, new=0, hands=-1, roam=0)),
 }
 

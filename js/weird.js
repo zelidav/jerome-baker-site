@@ -185,7 +185,7 @@
       css('@keyframes pop{from{scale:0}}main{animation:breathe2 8s ease-in-out infinite}@keyframes breathe2{50%{scale:1.015}}');
     },
     chomp() {
-      // leave the page alone and The Grin takes bites out of the screen: a jaw snaps shut on an edge and leaves a
+      // leave the page alone and Mouthy takes bites out of the screen: a jaw snaps shut on an edge and leaves a
       // chunk missing. Touch, scroll or move and the bites heal.
       css('.jaw{position:fixed;width:var(--w);height:var(--w);translate:-50% -50%;z-index:86}.jaw i{position:absolute;left:0;right:0;height:46%;background:radial-gradient(circle at 50% 0,#fff 0 58%,transparent 60%) 0 0/calc(var(--w)/7) 100%,#fff;border:4px solid #0A0A0A;transition:transform .14s cubic-bezier(.7,0,1,.6)}.jaw i:first-child{top:0;border-radius:40% 40% 0 0;transform:translateY(-70%);background:radial-gradient(circle at 50% 100%,#fff 0 58%,#0A0A0A 60%) 0 100%/calc(var(--w)/7) 34% repeat-x,#F7E9D7;border-bottom:0}.jaw i:last-child{bottom:0;border-radius:0 0 40% 40%;transform:translateY(70%);background:radial-gradient(circle at 50% 0,#fff 0 58%,#0A0A0A 60%) 0 0/calc(var(--w)/7) 34% repeat-x,#F7E9D7;border-top:0}.jaw.snap i{transform:none}.jaw.gone{opacity:0;transition:opacity .3s}.bite{position:fixed;width:var(--w);height:var(--w);translate:-50% -50%;z-index:84;rotate:var(--r);animation:bite-in .12s ease-out}.bite.heal{scale:0;transition:scale .35s ease-in}@keyframes bite-in{from{scale:.6}}.chomp-shake{animation:chomp-sh .2s}@keyframes chomp-sh{30%{translate:0 6px}60%{translate:0 -3px}}');
       // a bite: a dark hole with scalloped tooth marks round it and a red gum rim

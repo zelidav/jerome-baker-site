@@ -3,8 +3,8 @@ import json, sys, time
 from playwright.sync_api import sync_playwright
 
 import sys as _s; BASE = _s.argv[2] if len(_s.argv) > 2 else 'https://jeromebaker.cannacrypted.com/'
-CREW = ['torch', 'major-tom-tom', 'chomps', 'enlightened-ed', 'baker-bot', 'honey-pot', 'two-can', 'crude', 'gray', 'mama-cobra',
-        'lil-lucky', 'public-enemy', 'jack', 'dillo', 'shellby', 'cy', 'the-spinners', 'peeper', 'mr-x', 'the-grin']
+CREW = ['torch', 'lunar-larry', 'chomps', 'ocho', 'dj-rivets', 'sticky-ricky', 'big-bill', 'crude', 'beamer', 'mama-cobra',
+        'lil-lucky', 'big-stitch', 'gourdo', 'gutterball', 'speedbump', 'dr-squint', 'the-zone-outs', 'lookie-lou', 'mr-x', 'mouthy']
 PAGES = ['', 'glass/', 'shop/', 'crew/', 'crew/match/', 'comics/', 'travel/'] + [f'crew/{c}/' for c in CREW]
 VIEWS = {'desktop': dict(width=1440, height=900), 'phone': dict(width=390, height=844, is_mobile=True, device_scale_factor=3, has_touch=True)}
 

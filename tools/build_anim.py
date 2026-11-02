@@ -10,8 +10,8 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 SRC = Path(os.path.expanduser('~/code/jbsite-work/anim/cut'))
 OUT = ROOT / 'assets' / 'anim'
-CHARS = {'lion': 'torch', 'chimp': 'major-tom-tom', 'bot': 'baker-bot', 'alien': 'gray',
-         'devil': 'lil-lucky', 'gorilla': 'public-enemy', 'pumpkin': 'jack', 'cy': 'cy'}
+CHARS = {'lion': 'torch', 'chimp': 'lunar-larry', 'bot': 'dj-rivets', 'alien': 'beamer',
+         'devil': 'lil-lucky', 'gorilla': 'big-stitch', 'pumpkin': 'gourdo', 'cy': 'dr-squint'}
 POSES = ['stand', 'walk1', 'walk2', 'walk3', 'lean', 'hit', 'exhale', 'cough', 'pose', 'stroke1', 'stroke2',
          'hop', 'dizzy', 'carry', 'reach', 'punch']
 # the poses came out at different sizes; drawn at standing height x this, a character stays the same size

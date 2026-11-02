@@ -75,7 +75,7 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
     }[st.sort];
     list = list.slice().sort(cmp);
     grid.innerHTML = list.length ? list.map(card).join('') :
-      `<div class="empty" style="grid-column:1/-1"><img src="${base}assets/crew/peeper_s.webp" alt="">Peeper looked everywhere. Nothing matches that. <button type="button" class="clear" data-clear>Clear the filters</button></div>`;
+      `<div class="empty" style="grid-column:1/-1"><img src="${base}assets/crew/peeper_s.webp" alt="">Lookie Lou looked everywhere. Nothing matches that. <button type="button" class="clear" data-clear>Clear the filters</button></div>`;
     $('count').textContent = `SHOWING ${list.length} OF ${D.items.length}` + (st.cat ? ` · ${st.cat.toUpperCase()}` : '');
     document.querySelectorAll('#cats button').forEach((b) => b.classList.toggle('on', b.dataset.cat === st.cat));
     document.querySelectorAll('.subnav a').forEach((a) => a.classList.toggle('on', a.dataset.cat === st.cat));

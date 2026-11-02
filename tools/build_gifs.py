@@ -18,6 +18,10 @@ MS = 80
 
 spec = importlib.util.spec_from_file_location('crew_data', os.path.join(ROOT, 'tools', 'crew_data.py'))
 cd = importlib.util.module_from_spec(spec); spec.loader.exec_module(cd)
+# the hi-res cutouts in ~/code/jbsite-work/hires and the random seeds still use the pre-rename slugs, so a rebuild
+# matches the shipped GIFs
+OLD = {new: old for old, new in cd.RENAMED.items()}
+key = lambda c: OLD.get(c['slug'], c['slug'])  # noqa: E731
 HUMANOID = {'lion', 'chimp', 'bot', 'alien', 'devil', 'gorilla', 'pumpkin', 'cy'}
 # the poses came out of the generator at different sizes; these keep a character the same size frame to frame
 SCALE = {'stand': 1, 'walk1': .93, 'walk2': .93, 'walk3': .95, 'lean': .92, 'hit': .9, 'exhale': 1.0, 'cough': .8,
@@ -125,7 +129,7 @@ def humanoid(c):
     H, FLOOR = 340, 452
     cache = {}
     get = lambda n: cache.setdefault(n, pose(img, n, H))
-    rnd = random.Random(c['slug'])
+    rnd = random.Random(key(c))
     frames = []
 
     def shot(name, x, dx=0, dy=0, puffs=(), text=None, stars=None, alpha=1.0, extra=None):
@@ -191,11 +195,11 @@ def humanoid(c):
 
 def sticker(c):
     base = background(c)
-    src = os.path.join(HIRES, f"{c['slug']}_cutout.png")
+    src = os.path.join(HIRES, f"{key(c)}_cutout.png")
     im = Image.open(src if os.path.exists(src) else os.path.join(ROOT, 'assets', 'crew', c['img'] + '_m.webp')).convert('RGBA')
     im = im.crop(im.getchannel('A').point(lambda v: 255 if v > 40 else 0).getbbox())
     im.thumbnail((300, 300), Image.LANCZOS)
-    rnd = random.Random(c['slug'])
+    rnd = random.Random(key(c))
     frames = []
     cx, cy = S / 2, S / 2 + 30
 
