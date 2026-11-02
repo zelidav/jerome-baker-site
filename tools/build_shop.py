@@ -143,6 +143,8 @@ def main():
     names = {it['name']: it['id'] for it in items}
     featured = [f if isinstance(f, int) else names.get(f) for f in FEATURED]
     featured = [f for f in featured if any(it['id'] == f for it in items)]
+    # most expensive first: the first prices people see set the anchor for the rest
+    featured.sort(key=lambda f: -next(it['price'] for it in items if it['id'] == f))
 
     with cf.ThreadPoolExecutor(2) as ex:
         for f in cf.as_completed([ex.submit(save_img, s, d) for s, d in jobs]):

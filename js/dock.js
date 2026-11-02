@@ -95,3 +95,28 @@
   addEventListener('resize', tick, { passive: true });
   tick();
 })();
+
+// crew promos (js/promo.js) ride along with the dock, which every page except the comics loads
+(() => {
+  if (/\/(travel|comics)\//.test(location.pathname) || document.querySelector('script[src$="js/promo.js"]')) return;
+  const base = document.documentElement.dataset.base || '';
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = base + 'css/promo.css';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = base + 'js/promo.js';
+  s.defer = true;
+  document.head.appendChild(s);
+  // "Get the fit" bundles (js/fit.js) on crew character pages
+  if (/\/crew\/(?!match\/)[^/]+\//.test(location.pathname)) {
+    const fc = document.createElement('link');
+    fc.rel = 'stylesheet';
+    fc.href = base + 'css/fit.css';
+    document.head.appendChild(fc);
+    const f = document.createElement('script');
+    f.src = base + 'js/fit.js';
+    f.defer = true;
+    document.head.appendChild(f);
+  }
+})();
