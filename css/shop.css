@@ -9,7 +9,19 @@ header.top nav a{color:var(--white);font-weight:700;font-size:14px;text-decorati
 header.top nav a:hover,header.top nav a[aria-current]{color:var(--yellow)}
 header.top nav a[aria-current]{text-decoration:underline wavy var(--red) 2px;text-underline-offset:6px}
 header.top nav a.cartbtn{display:inline-flex;align-items:center;gap:8px;background:var(--red);color:var(--white)!important;padding:0 16px!important;min-height:44px;box-shadow:4px 4px 0 var(--ink);font-family:var(--display);font-weight:800!important}
-.subnav{background:var(--yellow);border-bottom:3px solid var(--ink);display:flex;justify-content:center;flex-wrap:wrap;gap:0 6px;position:sticky;top:var(--hdr,92px);z-index:55}
+.subnav{background:var(--yellow);display:flex;justify-content:center;flex-wrap:wrap;gap:0 6px;position:sticky;top:var(--hdr,92px);z-index:55;padding-top:16px}
+/* second torn layer: the yellow category bar rips over the page below, same paper build as the blue nav rip in site.css.
+   Rip shape shifts with the picked category (shop.js marks the link .on). */
+.subnav{--srip-c:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 32' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cpath id='w' d='M0 0H240V15L234 19L229 15L226 13L221 20L217 22L211 16L206 19L202 24L196 18L190 18L186 23L183 25L177 17L171 14L166 19L162 17L156 12L150 11L146 17L141 15L135 21L129 23L124 18L120 17L114 24L108 26L103 19L99 16L93 21L87 19L81 13L76 12L71 18L66 17L60 14L54 14L48 20L43 23L37 17L31 15L26 19L21 18L15 14L10 13L5 16L0 15Z'/%3E%3C/defs%3E%3Cg fill='%230A0A0A'%3E%3Cuse href='%23w' y='5' opacity='.1'/%3E%3Cuse href='%23w' y='3.5' opacity='.14'/%3E%3Cuse href='%23w' y='2' opacity='.2'/%3E%3C/g%3E%3Cuse href='%23w' fill='%23fff'/%3E%3Cpath fill='%23FFF100' d='M0 0H240V12L234 14L226 11L217 16L211 13L202 18L190 15L183 19L171 12L162 14L150 9L141 13L129 17L120 15L108 20L99 14L87 16L76 10L66 14L54 12L43 17L31 13L21 15L10 11L0 12Z'/%3E%3C/svg%3E");
+--srip-d:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 32' preserveAspectRatio='none'%3E%3Cdefs%3E%3Cpath id='w' d='M0 0H240V12L233 16L225 13L221 19L216 25L211 19L204 12L197 16L190 15L185 22L181 28L176 19L172 14L165 12L158 14L150 10L145 15L139 20L132 15L126 13L121 21L117 26L110 20L103 16L96 13L88 9L82 17L76 23L70 17L64 15L58 18L52 17L46 23L41 27L35 19L30 13L22 17L14 16L7 14L0 12Z'/%3E%3C/defs%3E%3Cg fill='%230A0A0A'%3E%3Cuse href='%23w' y='5' opacity='.1'/%3E%3Cuse href='%23w' y='3.5' opacity='.14'/%3E%3Cuse href='%23w' y='2' opacity='.2'/%3E%3C/g%3E%3Cuse href='%23w' fill='%23fff'/%3E%3Cpath fill='%23FFF100' d='M0 0H240V8L225 10L216 20L204 9L190 12L181 23L172 11L150 7L139 15L126 10L117 21L103 13L88 6L76 18L64 12L52 14L41 22L30 10L14 13L0 8Z'/%3E%3C/svg%3E");
+--srip:var(--srip-d);--srip-w:300px;--srip-x:-130px;--srip-h:14px;--srip-f:1}
+.subnav::after{content:"";position:absolute;left:0;right:0;top:calc(100% - 1px);height:calc(var(--srip-h) * 4 / 3);pointer-events:none;transform:scaleX(var(--srip-f));
+background-image:var(--srip);background-size:var(--srip-w) 100%;background-repeat:repeat-x;background-position:var(--srip-x) 0}
+.subnav:has(a.on[data-cat="Accessories"]){--srip:var(--srip-c);--srip-w:340px;--srip-x:-60px;--srip-h:15px;--srip-f:-1}
+.subnav:has(a.on[data-cat="Footwear"]){--srip:var(--srip-d);--srip-w:420px;--srip-x:-250px;--srip-h:17px;--srip-f:-1}
+.subnav:has(a.on[data-cat="Tops"]){--srip:var(--srip-c);--srip-w:260px;--srip-x:-180px;--srip-h:13px;--srip-f:1}
+.subnav:has(a.on[data-cat="JB Signature"]){--srip:var(--srip-d);--srip-w:360px;--srip-x:-20px;--srip-h:16px;--srip-f:1}
+.subnav:has(a.on[data-cat="NY Drop 1"]){--srip:var(--srip-c);--srip-w:480px;--srip-x:-300px;--srip-h:18px;--srip-f:-1}
 .subnav a{font-family:var(--display);font-weight:900;font-size:14px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;color:var(--ink);padding:12px 14px;display:inline-block}
 .subnav a:hover,.subnav a.on{background:var(--ink);color:var(--yellow)}
 
@@ -71,7 +83,7 @@ header.top nav a.cartbtn{display:inline-flex;align-items:center;gap:8px;backgrou
 .collection{background:var(--gray)}
 .collection .sec-head h2{color:var(--blue)}
 .shopbody{display:flex;gap:40px;align-items:flex-start}
-.filters{flex:0 0 270px;position:sticky;top:calc(var(--hdr,92px) + 64px);max-height:calc(100vh - var(--hdr,92px) - 80px);overflow:auto;background:var(--white);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:18px;display:flex;flex-direction:column;gap:22px}
+.filters{flex:0 0 270px;position:sticky;top:calc(var(--hdr,92px) + 96px);max-height:calc(100vh - var(--hdr,92px) - 112px);overflow:auto;background:var(--white);border:3px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:18px;display:flex;flex-direction:column;gap:22px}
 .filters h4{margin:0 0 10px;font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.18em}
 .filters select,.filters input[type=search]{width:100%;min-height:44px;border:2px solid var(--ink);padding:8px 10px;font:600 15px var(--body);background:var(--white)}
 .cats{list-style:none;margin:0;padding:0}
