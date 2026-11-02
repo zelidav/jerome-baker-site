@@ -2,8 +2,8 @@
 header.hdr{position:relative;border-bottom:0!important;overflow:visible}
 header.top.hdr{position:sticky}
 @media (max-width:900px){header.top.hdr{position:relative}}
-.hdr-tear{position:absolute;left:0;right:0;top:100%;height:30px;margin-top:-1px;background:no-repeat left top/3000px 30px;pointer-events:none;z-index:2;filter:drop-shadow(0 3px 0 rgba(10,10,10,.55))}
-@media (max-width:760px){.hdr-tear{height:20px;background-size:2000px 20px}}
+.hdr-tear{position:absolute;left:0;right:0;top:100%;height:48px;margin-top:-1px;background:no-repeat left top/3000px 48px;pointer-events:none;z-index:2;filter:drop-shadow(0 3px 0 rgba(10,10,10,.55))}
+@media (max-width:760px){.hdr-tear{height:32px;background-size:2000px 32px}}
 
 /* the logo: floats and wobbles, catches a glint, jelly-spins on hover/tap */
 .hdr-logo{position:relative;display:inline-block;transform-origin:50% 60%;animation:hdr-float 4.2s ease-in-out infinite}

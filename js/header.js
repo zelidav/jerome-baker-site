@@ -16,7 +16,7 @@
   for (const ch of location.pathname.replace(/index\.html$/, '')) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
   const rnd = () => { seed = Math.imul(seed ^ (seed >>> 15), 2246822507); seed = Math.imul(seed ^ (seed >>> 13), 3266489909); return ((seed ^= seed >>> 16) >>> 0) / 4294967296; };
   // drawn at real pixel size (never stretched, css/header.css sizes it), wide enough for big screens
-  const W = 3000, H = 30, N = 1024; // N segments, ~3px apart
+  const W = 3000, H = 48, N = 512; // N segments, ~6px apart (bigger, chunkier tears)
   // midpoint displacement: big wandering rips with smaller and smaller jags on top, like real torn paper
   const fractal = (amp, rough) => {
     const ys = new Array(N + 1);
@@ -28,11 +28,11 @@
   };
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
   // the white paper core: the deepest line
-  const rip = fractal(26, .56);
-  const paper = rip.map((v) => clamp(H * .55 + v, 9, H - 2));
-  // the blue layer tears a little shy of it: a thin white lip that now and then opens into a wide flap
-  const lipNoise = fractal(14, .62);
-  const blue = paper.map((y, i) => clamp(y - (1.2 + Math.max(0, lipNoise[i]) * .9 + Math.abs(lipNoise[i]) * .25), 4, y - 1));
+  const rip = fractal(44, .56);
+  const paper = rip.map((v) => clamp(H * .58 + v, 12, H - 3));
+  // the blue layer tears shy of it: a wide white lip that now and then opens into a bigger flap
+  const lipNoise = fractal(20, .6);
+  const blue = paper.map((y, i) => clamp(y - (4 + Math.max(0, lipNoise[i]) * 1.2 + Math.abs(lipNoise[i]) * .35), 4, y - 3));
   const line = (ys, dy = 0) => {
     let d = `M0 -4 H${W}`;
     for (let i = N; i >= 0; i--) d += ` L${(i * W / N).toFixed(1)} ${(ys[i] + dy).toFixed(1)}`;
@@ -44,8 +44,8 @@
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
     `<defs>` +
     // fibres: fine noise pushes the edges around so they fuzz instead of cutting clean
-    `<filter id="fz" x="-1%" y="-20%" width="102%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="1.1 .35" numOctaves="3" seed="${tseed}"/><feDisplacementMap in="SourceGraphic" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>` +
-    `<filter id="fb" x="-1%" y="-20%" width="102%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".8 .5" numOctaves="2" seed="${tseed + 7}"/><feDisplacementMap in="SourceGraphic" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter>` +
+    `<filter id="fz" x="-1%" y="-20%" width="102%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".7 .3" numOctaves="2" seed="${tseed}"/><feDisplacementMap in="SourceGraphic" scale="1.3" xChannelSelector="R" yChannelSelector="G"/></filter>` +
+    `<filter id="fb" x="-1%" y="-20%" width="102%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".6 .4" numOctaves="1" seed="${tseed + 7}"/><feDisplacementMap in="SourceGraphic" scale=".7" xChannelSelector="R" yChannelSelector="G"/></filter>` +
     `</defs>` +
     `<path d="${line(paper, 1.2)}" fill="#CFC6B4" filter="url(#fz)"/>` +   // paper thickness, a hair darker underneath
     `<path d="${line(paper)}" fill="#F7F2E8" filter="url(#fz)"/>` +        // the white core of the torn paper
