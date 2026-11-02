@@ -237,7 +237,7 @@ ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="gri
     if (scroll && h.length > 1) document.querySelector(h)?.scrollIntoView({ behavior: 'smooth' });
   };
   document.querySelectorAll('.subnav a, .sfoot a[href^="#cat="]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); route(a.getAttribute('href'), true); }));
-  addEventListener('popstate', () => route());
+  addEventListener('popstate', () => { if (!window.JBHoloFull) route(); }); // Back in the holo viewer only closes it
   addEventListener('hashchange', () => route());
 
   // keep the sticky subnav under the header
