@@ -95,3 +95,17 @@
   addEventListener('resize', tick, { passive: true });
   tick();
 })();
+
+// crew promos (js/promo.js) ride along with the dock, which every page except the comics loads
+(() => {
+  if (/\/(travel|comics)\//.test(location.pathname) || document.querySelector('script[src$="js/promo.js"]')) return;
+  const base = document.documentElement.dataset.base || '';
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = base + 'css/promo.css';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = base + 'js/promo.js';
+  s.defer = true;
+  document.head.appendChild(s);
+})();
