@@ -91,8 +91,8 @@
   JBCrew.bodies = bodies;
 
   // ---------- Phones: they pop in and out ----------
-  // On a small screen the crew takes turns: one at a time pops in somewhere, hangs around for a few seconds, pops
-  // out, and the screen stays clear for a while before the next one. Anyone being dragged or talking stays put.
+  // On a small screen the crew takes turns: one at a time pops in somewhere, hangs around for 6-9 seconds, pops
+  // out, and the screen stays clear for 3-5 seconds before the next one. Anyone being dragged or talking stays put.
   if (small && !reduce && bodies.length) {
     const out = (b) => b.el.classList.add('out');
     bodies.forEach((b, i) => { if (i) out(b); });
@@ -111,7 +111,7 @@
         nx.el.classList.add('pop');
         setTimeout(() => nx.el.classList.remove('pop'), 500);
         setTimeout(cycle, 6000 + Math.random() * 3000);
-      }, 8000 + Math.random() * 6000);
+      }, 3000 + Math.random() * 2000);
     };
     setTimeout(cycle, 7000);
   }
