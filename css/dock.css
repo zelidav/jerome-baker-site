@@ -73,6 +73,15 @@
   body.dock-open{overflow:hidden}
   body.dock-open .crew-toggle,body.dock-open .crew-layer{visibility:hidden}
 }
+/* the magnifying glass on the desktop top menu (js/dock.js): links swell under the mouse and drop out of the bar */
+@media (min-width:761px){
+  header nav.lens a{position:relative;transform-origin:50% 0;will-change:transform;
+    transition:transform .45s cubic-bezier(.3,1.6,.5,1),color .15s,text-shadow .15s}
+  header nav.lens.lensing a{transition:transform .12s ease-out,color .15s,text-shadow .15s}
+  header nav.lens a.lensed{z-index:3}
+  header nav.lens a.btn:hover,header nav.lens a.cartbtn:hover{rotate:-2deg}
+  header nav.lens a.lensed:not(.btn):not(.cartbtn){text-shadow:2px 2px 0 var(--ink)}
+}
 @media (max-width:760px) and (prefers-reduced-motion:reduce){
   .pile li,.pile-smoke,.dock .bowl,.tube .fill{transition:none}
   .dock .bowl[aria-expanded="true"]::after{animation:none}
