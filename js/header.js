@@ -28,74 +28,62 @@
     if (key && a.textContent.trim().toLowerCase() === LABEL[key].toLowerCase()) a.textContent = LABEL[key];
   });
 
-  // ---------- the torn edge, one per page ----------
-  // a small seeded random, so the same page always tears the same way and every page tears differently
-  let seed = 2166136261;
-  for (const ch of location.pathname.replace(/index\.html$/, '')) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
-  const rnd = () => { seed = Math.imul(seed ^ (seed >>> 15), 2246822507); seed = Math.imul(seed ^ (seed >>> 13), 3266489909); return ((seed ^= seed >>> 16) >>> 0) / 4294967296; };
-  // drawn at real pixel size (never stretched, css/header.css sizes it), wide enough for big screens
-  const W = 3000, H = 48, N = 512; // N segments, ~6px apart (bigger, chunkier tears)
-  // midpoint displacement: big wandering rips with smaller and smaller jags on top, like real torn paper
-  const fractal = (amp, rough) => {
-    const ys = new Array(N + 1);
-    ys[0] = (rnd() - .5) * amp; ys[N] = (rnd() - .5) * amp;
-    for (let step = N, a = amp; step > 1; step >>= 1, a *= rough) {
-      for (let i = step >> 1; i < N; i += step) ys[i] = (ys[i - (step >> 1)] + ys[i + (step >> 1)]) / 2 + (rnd() - .5) * a;
-    }
-    return ys;
+  // ---------- the torn edges, one per page ----------
+  // Sasha's brief: torn paper under the blue menu, and under the yellow bar when a page has one (the shop), each
+  // different, each page different. Like his reference: a rolling rip with small sharp jags, a white paper band of
+  // varying thickness showing past the print, and a soft shadow on whatever's below. The yellow bar sits under the
+  // blue one, so the two read as layers of paper.
+  const W = 3000, H = 40, N = 600; // drawn at real pixel size, 5px per step, wide enough for big screens
+  const tearSvg = (salt, color) => {
+    // a small seeded random: the same page always tears the same way, every page and every layer differently
+    let seed = 2166136261;
+    for (const ch of location.pathname.replace(/index\.html$/, '') + '|' + salt) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
+    const rnd = () => { seed = Math.imul(seed ^ (seed >>> 15), 2246822507); seed = Math.imul(seed ^ (seed >>> 13), 3266489909); return ((seed ^= seed >>> 16) >>> 0) / 4294967296; };
+    // midpoint displacement: long rolling swells, smaller jags riding on them
+    const fractal = (amp, rough) => {
+      const ys = new Array(N + 1);
+      ys[0] = (rnd() - .5) * amp; ys[N] = (rnd() - .5) * amp;
+      for (let step = N, a = amp; step > 1; step = Math.floor(step / 2), a *= rough) {
+        const h = Math.floor(step / 2);
+        for (let i = h; i < N; i += step) if (ys[i] === undefined) ys[i] = (ys[i - h] + ys[Math.min(N, i + h)]) / 2 + (rnd() - .5) * a;
+      }
+      for (let i = 0; i <= N; i++) if (ys[i] === undefined) ys[i] = ys[i - 1];
+      return ys;
+    };
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    const waves = [[520, 900, 8], [180, 320, 4.5], [60, 120, 2.2]].map(([a, b, amp]) => [a + rnd() * (b - a), rnd() * 6.28, amp * (.7 + rnd() * .6)]);
+    const swell = Array.from({ length: N + 1 }, (_, i) => waves.reduce((y, [per, ph, amp]) => y + amp * Math.sin((i * W / N) / per * 6.28 + ph), 0));
+    // the bottom of the paper: the swell plus fine, sharp teeth
+    const paper = swell.map((v) => clamp(H * .55 + v + (rnd() - .5) * 4.5, 12, H - 6));
+    // the white band: thin in places, fat in others, changing slowly
+    const band = fractal(16, .5);
+    const ink = paper.map((y, i) => clamp(y - (5 + Math.abs(band[i]) * 1.1) + (rnd() - .5) * 3, 2, y - 3));
+    const line = (ys) => {
+      let d = `M0 -2 H${W}`;
+      for (let i = N; i >= 0; i--) d += ` L${(i * W / N).toFixed(1)} ${ys[i].toFixed(1)}`;
+      return d + ' Z';
+    };
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+      `<path d="${line(paper)}" fill="#FFFFFF"/>` +                     // the white paper
+      `<path d="${line(paper.map((y) => y - .8))}" fill="#E9E6DF"/>` +   // a hair of shade on the paper's torn lip
+      `<path d="${line(paper.map((y) => y - 1.6))}" fill="#FFFFFF"/>` +
+      `<path d="${line(ink)}" fill="${color}"/></svg>`;               // the printed color, torn short of it
   };
-  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-  // the white paper core: the deepest line
-  const rip = fractal(44, .56);
-  const paper = rip.map((v) => clamp(H * .58 + v, 12, H - 9)); // leaves room under the deepest rip for the fuzz
-  // the blue layer tears shy of it: a wide white lip that now and then opens into a bigger flap
-  const lipNoise = fractal(20, .6);
-  const blue = paper.map((y, i) => clamp(y - (4 + Math.max(0, lipNoise[i]) * 1.2 + Math.abs(lipNoise[i]) * .35), 4, y - 3));
-  const line = (ys, dy = 0) => {
-    let d = `M0 -4 H${W}`;
-    for (let i = N; i >= 0; i--) d += ` L${(i * W / N).toFixed(1)} ${(ys[i] + dy).toFixed(1)}`;
-    return d + ' Z';
+  const tear = (el, salt) => {
+    const edge = document.createElement('div');
+    edge.className = 'hdr-tear';
+    edge.setAttribute('aria-hidden', 'true');
+    const color = getComputedStyle(el).backgroundColor || '#2A3B8E';
+    edge.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(tearSvg(salt, color))}")`;
+    el.append(edge);
+    // halftone dot shadow under the paper (js/popfx.js makes the filter), like the rest of the page
+    const dots = () => { if (window.JBHalftone) edge.style.filter = `url(#${window.JBHalftone(0, 6)})`; };
+    window.JBHalftone ? dots() : addEventListener('load', () => setTimeout(dots, 80));
   };
-  const bg = getComputedStyle(head).backgroundColor || '#2A3B8E';
-  const tseed = Math.floor(rnd() * 999);
-  const top = Math.min(...blue) - 2;
-  // the fuzz: loose paper fibres hanging off the rip. Clumpy on purpose: bare stretches, then a tuft, then a few strays,
-  // with lengths, angles, curl and thickness all random (and seeded, so each page keeps its own fuzz)
-  const yAt = (x) => { const f = clamp(x / W * N, 0, N), i = Math.min(N - 1, Math.floor(f)); return paper[i] + (paper[i + 1] - paper[i]) * (f - i); };
-  let fibres = '';
-  for (let x = rnd() * 30; x < W; x += 4 + Math.pow(rnd(), 1.8) * 70) {
-    const tuft = rnd() < .3 ? 0 : 1 + Math.floor(rnd() * rnd() * 9); // often a few, sometimes a big tuft, sometimes none
-    const spread = 3 + rnd() * 16;
-    for (let k = 0; k < tuft; k++) {
-      const fx = x + (rnd() - .5) * spread, y0 = yAt(fx) - 1.5;
-      const len = 3 + Math.pow(rnd(), 1.6) * 11;                 // 3px to 14px, mostly mid-length, the odd long one
-      const ang = (rnd() - .5) * 2.2;                            // anywhere from leaning hard left to hard right
-      const ex = fx + Math.sin(ang) * len, ey = Math.min(H - 1, y0 + Math.cos(ang) * len);
-      const curl = (rnd() - .5) * len * .9;                      // some straight, some hooked
-      const cx = (fx + ex) / 2 + curl, cy = (y0 + ey) / 2 + Math.abs(curl) * .3;
-      const w = (.7 + Math.pow(rnd(), 2) * 1.6).toFixed(2);      // thin hairs with a few thick strands
-      const c = rnd() < .22 ? '#CFC6B4' : '#F7F2E8';
-      fibres += `<path d="M${fx.toFixed(1)} ${y0.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}" stroke="${c}" stroke-width="${w}"/>`;
-    }
-  }
-  // a different noise grain per page, so the edge roughness itself is uneven too
-  const fq = (a, b) => (a + rnd() * (b - a)).toFixed(3);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
-    `<defs>` +
-    // fibres: layered noise (coarse + fine octaves) pushes the edges around so they fuzz in uneven patches instead of cutting clean
-    `<filter id="fz" x="-1%" y="-30%" width="102%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="${fq(.12, .22)} ${fq(.25, .45)}" numOctaves="4" seed="${tseed}"/><feDisplacementMap in="SourceGraphic" scale="${fq(3.5, 5)}" xChannelSelector="R" yChannelSelector="G"/></filter>` +
-    `<filter id="fb" x="-1%" y="-30%" width="102%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="${fq(.15, .3)} ${fq(.3, .5)}" numOctaves="3" seed="${tseed + 7}"/><feDisplacementMap in="SourceGraphic" scale="${fq(2, 3)}" xChannelSelector="R" yChannelSelector="G"/></filter>` +
-    `</defs>` +
-    `<g fill="none" stroke-linecap="round" filter="url(#fb)">${fibres}</g>` + // the loose fibres, tucked under the paper
-    `<path d="${line(paper, 1.2)}" fill="#CFC6B4" filter="url(#fz)"/>` +   // paper thickness, a hair darker underneath
-    `<path d="${line(paper)}" fill="#F7F2E8" filter="url(#fz)"/>` +        // the white core of the torn paper
-    `<path d="${line(blue)}" fill="${bg}" filter="url(#fb)"/>` +           // the blue print layer, torn short
-    `<rect x="0" y="-4" width="${W}" height="${(top + 4).toFixed(1)}" fill="${bg}"/></svg>`;
-  const edge = document.createElement('div');
-  edge.className = 'hdr-tear';
-  edge.setAttribute('aria-hidden', 'true');
-  edge.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
-  head.append(edge);
+  tear(head, 'menu');
+  // a bar of links right under the menu (the shop's yellow categories) is the next layer down, torn its own way
+  const under = head.nextElementSibling;
+  if (under && under.matches('.subnav')) { under.classList.add('hdr-under'); tear(under, 'under'); }
 
   // ---------- the logo ----------
   const logo = head.querySelector('a.logo, :scope > a:first-child');
@@ -108,8 +96,28 @@
       logo.classList.add('jelly');
       setTimeout(() => logo.classList.remove('jelly'), 900);
     };
-    logo.addEventListener('pointerenter', spin);
     logo.addEventListener('touchstart', spin, { passive: true });
+    // the other logo: the crossed-bongs Jerome Baker script (assets/img/jb-crossed.svg, from the NY site).
+    // Hover and it flips over to it; now and then it flips by itself, then back.
+    const alt = new Image();
+    alt.src = (img.currentSrc || img.src).replace(/jb-mark\.webp.*$/, 'jb-crossed.svg');
+    alt.alt = '';
+    alt.className = 'hdr-alt';
+    alt.setAttribute('aria-hidden', 'true');
+    logo.append(alt);
+    let back = 0;
+    const flip = (ms) => {
+      if (reduce) return;
+      clearTimeout(back);
+      logo.classList.add('alt');
+      if (ms) back = setTimeout(() => logo.classList.remove('alt'), ms);
+    };
+    logo.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') flip(0); else spin(); });
+    logo.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') { clearTimeout(back); back = setTimeout(() => logo.classList.remove('alt'), 350); } });
+    const now = () => {
+      setTimeout(() => { if (!document.hidden && !logo.matches(':hover')) flip(2600); now(); }, 9000 + Math.random() * 14000);
+    };
+    now();
   }
 
   // ---------- the links ----------

@@ -45,8 +45,8 @@
 .holo-finger.press::before{animation:holo-tap .7s ease-out}
 @keyframes holo-tap{0%{opacity:1;scale:.4}100%{opacity:0;scale:2.2}}
 .holo-fs{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 38%,#fff,#e4e4e4 75%);overscroll-behavior:contain}
-.holo-fs .holo-stage{position:relative;inset:auto;flex:1;min-height:0;opacity:1}
-.holo-fs-top{position:absolute;z-index:3;top:calc(10px + env(safe-area-inset-top));left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
+.holo-fs .holo-stage{position:relative;inset:auto;flex:1;min-height:0;opacity:1;z-index:1}
+.holo-fs-top{position:absolute;z-index:5;top:calc(10px + env(safe-area-inset-top));left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
 .holo-fs-top button{pointer-events:auto;width:48px;height:48px;border:3px solid #0A0A0A;background:#fff;color:#0A0A0A;font:900 24px/1 Montserrat,Helvetica,Arial,sans-serif;cursor:pointer;box-shadow:3px 3px 0 #0A0A0A}
 .holo-fs-hint{position:absolute;z-index:3;left:50%;top:calc(70px + env(safe-area-inset-top));translate:-50% 0;margin:0;padding:8px 14px;background:#0A0A0A;color:#FFF100;font:800 13px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;pointer-events:none;transition:opacity .5s}
 .holo-fs-buy{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#0A0A0A;color:#fff}
@@ -80,7 +80,7 @@
       opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
     });
   }
-  // the Crossed Bongs polos hang on a clothesline in the breeze, until the crew member who wears that color
+  // the Crossed B0ngs polos hang on a clothesline in the breeze, until the crew member who wears that color
   // runs in, grabs it and vanishes with it. The cutouts are assets/holo/polo-<id>.webp (made from the shop photo).
   const THIEF = { 672: 'bear', 696: 'devil', 720: 'grin' };
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -316,8 +316,8 @@
       // the front photo only: it's the one with a cutout
       src: (src) => { const m = src.match(/shop\/(\d+)_0\.webp/); return m && CLOTH.has(+m[1]) ? { id: m[1], src: base + 'assets/holo/cloth-' + m[1] + '.webp' } : null; },
       hint: phone ? 'Grab it anywhere to twist and curl.' : 'Grab it. Double-tap to crumple. ⤢ to spin it.', scene: mess,
-      opts: { preset: 'jb-fabric', dieCut: true } },
-    { dlg: '#pd', name: '#pdTitle', test: /^Polo – Crossed Bongs/i, host: '.pd-big', img: '#pdImg',
+      opts: { preset: 'jb-fabric', dieCut: true, stiff: true, snapBack: 2500 } },
+    { dlg: '#pd', name: '#pdTitle', test: /^Polo – Crossed B[o0]ngs/i, host: '.pd-big', img: '#pdImg',
       // only the front photo has a cutout
       src: (src) => { const m = src.match(/shop\/(\d+)_0\.webp/); return m && THIEF[m[1]] ? { id: m[1], src: base + 'assets/holo/polo-' + m[1] + '.webp' } : null; },
       hint: phone ? 'Grab it anywhere to twist and curl.' : 'Grab the polo. ⤢ to spin it.', scene: snatch,
@@ -429,6 +429,30 @@
     img.src = spot.opts.clothImage;
   }
 
+  // clothes: stiffer than a flag, lying on a surface. Tilted back a little, a halftone dot shadow under it, and when
+  // nobody's holding it gravity eases it back down flat; a few seconds after it's let go it's fully unfurled.
+  function lieFlat(spot) {
+    const h = spot.holo, app = h.app, alive = () => spot.holo === h && spot.host.isConnected;
+    if (app.params && app.params.physics) Object.assign(app.params.physics, { viscosity: .22, stiffness: 1, iterations: 18, smoothing: .03 });
+    app.camera.position.set(0, -1.3, 5.3);
+    app.controls.target.set(0, 0, 0);
+    app.controls.update();
+    const dots = () => { if (window.JBHalftone && alive()) spot.stage.style.filter = `url(#${window.JBHalftone(7, 9)})`; };
+    window.JBHalftone ? dots() : setTimeout(dots, 1500);
+    let held = false, up = performance.now();
+    spot.stage.addEventListener('pointerdown', () => { held = true; }, true);
+    const release = () => { if (held) { held = false; up = performance.now(); } };
+    addEventListener('pointerup', release);
+    addEventListener('pointercancel', release);
+    const tick = () => {
+      if (!alive()) return;
+      const idle = performance.now() - Math.max(up, spot.touchedAt || 0);
+      if (!held && !spot.busy && !spot.demo && !spot.full && idle > 900 && app.sim) app.sim.settle(idle > 2500 ? .08 : .012);
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
   // a finger shows how: presses on the cloth, tugs it, lets go. Once or twice a visit, not every time.
   async function coach(spot) {
     let n = 0;
@@ -451,6 +475,7 @@
       await tween(450, (k) => pos(x0 + 30 * (1 - k), y0 + 40 * (1 - k)));
       if (!alive()) return;
       f.classList.add('press');
+      spot.demo = true;
       h.grabAt(u, v);
       const dx = -Math.min(70, r.width * .16), dy = -Math.min(50, r.height * .1);
       await tween(900, (k) => {
@@ -461,6 +486,8 @@
       });
     } finally {
       try { h.letGo(); } catch (e) { /* gone */ }
+      spot.demo = false;
+      spot.touchedAt = performance.now() - 1500; // let it settle soon after the demo
       f.classList.remove('on');
       setTimeout(() => f.remove(), 300);
       if (alive() && !spot.opts.hang && spot.opts.snapBack !== false) h.snapBack(900);
@@ -487,6 +514,7 @@
     host.append(play);
     extras.push(play);
     readMask(spot);
+    if (spot.opts.stiff) lieFlat(spot);
     if (phone) {
       const stage = spot.stage;
       let snap = 0, held = false, lastTap = 0;

@@ -39,10 +39,10 @@
       { t: "There's a clown costume in your closet, and it isn't for parties", n: { chaos: 2, new: 1, night: 1, crew: -1, roam: -1 } }
     ] },
     { q: 'The crew left you a gift basket. Grab one thing.', kind: 'basket', a: [
-      { t: 'A fat joint. Classic. Coward', i: 'J', n: { crew: 2, roam: -1, new: -2, chaos: -1 } },
-      { t: 'The dab rig. You brought your own torch', i: 'D', n: { new: 1, hands: 1, chaos: 1 } },
-      { t: 'The mushrooms. See you in six hours', i: 'M', n: { roam: 2, new: 2, crew: -1, hands: 1 } },
-      { t: 'The acid sheet. All twenty smiley faces', i: 'A', n: { new: 1, chaos: 2, night: 1 } },
+      { t: 'A fat j0int. Classic. Coward', i: 'J', n: { crew: 2, roam: -1, new: -2, chaos: -1 } },
+      { t: 'The d@b rig. You brought your own torch', i: 'D', n: { new: 1, hands: 1, chaos: 1 } },
+      { t: 'The mu$hrooms. See you in six hours', i: 'M', n: { roam: 2, new: 2, crew: -1, hands: 1 } },
+      { t: 'The @cid sheet. All twenty smiley faces', i: 'A', n: { new: 1, chaos: 2, night: 1 } },
       { t: "The rainbow brownie. Nobody knows what's in it", i: 'B', n: { crew: 2, chaos: 1, roam: -2 } },
       { t: 'The gummy bears. The whole bag. "It\'s not hitting"', i: 'G', n: { roam: -2, night: 1, chaos: -1, new: -1 } },
       { t: 'The pills. Unmarked. Bold', i: 'P', n: { chaos: 1, crew: -1, hands: -1, roam: 1 } },
@@ -146,7 +146,7 @@
         h('button', { type: 'button', class: 'btn btn-red mx-lock', onclick: () => pick(Number(range.value)) }, 'Lock it in'));
     } else {
       const basket = Q.kind === 'basket';
-      const art = basket ? h('img', { class: 'mx-basket-art', src: base + 'assets/quiz/basket.webp', alt: 'A gift basket from the crew, wrapped in cellophane, stuffed with joints, a dab rig, mushrooms, acid, a rainbow brownie, gummy bears, pills, a baggie of white powder, whippets, cough syrup and a mystery baggie. The tag says not for sale.', width: 684, height: 900, decoding: 'async' }) : null;
+      const art = basket ? h('img', { class: 'mx-basket-art', src: base + 'assets/quiz/basket.webp', alt: 'A gift basket from the crew, wrapped in cellophane, stuffed with j0ints, a d@b rig, mu$hrooms, @cid, a rainbow brownie, gummy bears, pills, a baggie of white powder, whippets, cough syrup and a mystery baggie. The tag says not for sale.', width: 684, height: 900, decoding: 'async' }) : null;
       body = h('div', { class: 'mx-opts' + (basket ? ' mx-basket' : ''), role: 'group', 'aria-label': Q.q }, Q.a.map((a, ai) => h('button', {
         type: 'button', class: 'mx-opt' + (answers[qi] === ai ? ' picked' : ''),
         style: `--bg:${COLORS[ai % 4]};--tilt:${TILTS[(ai + qi) % 4]}`,
@@ -256,7 +256,7 @@
     if (scrollY > top) scrollTo({ top, behavior: reduce ? 'auto' : 'smooth' });
   };
 
-  // the questions are about getting high and getting weird, so adults only, asked once per visit
+  // the questions are about getting h!gh and getting weird, so adults only, asked once per visit
   let grown = false;
   try { grown = sessionStorage.getItem('jbMatch21') === '1'; } catch (e) {}
   const intro = () => {

@@ -48,7 +48,7 @@
   const bodies = cast.map((who, i) => {
     const el = document.createElement('div');
     el.className = 'floater';
-    const w = Math.round((small ? 84 : 120) + Math.random() * (small ? 30 : 50));
+    const w = Math.round((small ? 72 : 120) + Math.random() * (small ? 18 : 50));
     el.style.setProperty('--w', w + 'px');
     const img = new Image();
     img.src = base + 'assets/crew/' + who.img + '_s.webp';
@@ -89,6 +89,32 @@
   };
   JBCrew.say = (slug, text) => { const b = bodies.find((x) => x.who.slug === slug); if (b) { b.bub.textContent = text; b.bub.classList.add('on'); clearTimeout(b.talkT); b.talkT = setTimeout(() => b.bub.classList.remove('on'), 3200); } };
   JBCrew.bodies = bodies;
+
+  // ---------- Phones: they pop in and out ----------
+  // On a small screen the crew takes turns: one at a time pops in somewhere, hangs around for 6-9 seconds, pops
+  // out, and the screen stays clear for 3-5 seconds before the next one. Anyone being dragged or talking stays put.
+  if (small && !reduce && bodies.length) {
+    const out = (b) => b.el.classList.add('out');
+    bodies.forEach((b, i) => { if (i) out(b); });
+    let turn = 0;
+    const cycle = () => {
+      const cur = bodies[turn % bodies.length];
+      if (cur.held || cur.talking) { setTimeout(cycle, 1500); return; }
+      out(cur);
+      setTimeout(() => {
+        turn++;
+        const nx = bodies[turn % bodies.length];
+        // pop in near a side, not over the middle of the page
+        nx.x = Math.random() < .5 ? 4 + Math.random() * 30 : innerWidth - nx.w - 4 - Math.random() * 30;
+        nx.y = 90 + Math.random() * (innerHeight - nx.w - 200);
+        nx.el.classList.remove('out');
+        nx.el.classList.add('pop');
+        setTimeout(() => nx.el.classList.remove('pop'), 500);
+        setTimeout(cycle, 6000 + Math.random() * 3000);
+      }, 3000 + Math.random() * 2000);
+    };
+    setTimeout(cycle, 7000);
+  }
 
   // ---------- Grab and throw ----------
   bodies.forEach((b) => {
@@ -176,7 +202,7 @@
   document.addEventListener('visibilitychange', () => { running = !document.hidden; last = performance.now(); });
 
   // someone says something every so often, unprompted
-  setInterval(() => { if (!document.hidden && !reduce) { const b = pick(bodies); if (!b.held) say(b, { kind: 'chat' }, 2400); } }, 9000);
+  setInterval(() => { if (!document.hidden && !reduce) { const on = bodies.filter((x) => !x.el.classList.contains('out')); if (!on.length) return; const b = pick(on); if (!b.held) say(b, { kind: 'chat' }, 2400); } }, 9000);
 
   // now and then one of them turns real for a few seconds (js/real.js)
   if (!reduce && !document.body.hasAttribute('data-no-real')) {

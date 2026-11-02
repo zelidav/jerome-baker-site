@@ -44,7 +44,7 @@
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const intro = [
       'This is the Jerome Baker Travel Guide.',
-      "It's for when you're tripping.",
+      "It's for when you're tr!pping.",
       'Biggest screen you have. Full screen. Lie back.',
       'It never plays the same way twice.',
       'The longer it runs, the weirder it gets.'
