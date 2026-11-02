@@ -42,6 +42,46 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-off
 .strip{height:150px;margin:-30px -20px;position:relative;z-index:4;overflow:hidden;box-shadow:0 10px 0 rgba(10,10,10,.5)}
 .strip::before{animation-duration:120s}
 
+/* torn paper edge under the blue top nav. ::after is the blue rip, ::before its ink shadow.
+   Each page gets its own rip: hand-made pages via data-tear on the header, generated pages via their body attributes. */
+:root{
+--rip-a:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 24' preserveAspectRatio='none'%3E%3Cpath d='M0 0H240V10L228 17L219 9L205 20L196 12L183 16L170 6L158 18L147 11L131 22L122 13L110 17L97 7L86 15L71 10L60 21L49 12L37 16L24 8L12 19L0 10Z'/%3E%3C/svg%3E");
+--rip-b:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 24' preserveAspectRatio='none'%3E%3Cpath d='M0 0H240V6L231 14L222 4L214 18L200 10L189 22L178 8L166 13L155 3L143 16L130 9L118 20L109 11L95 15L84 5L70 19L58 12L46 17L33 6L20 14L9 9L0 6Z'/%3E%3C/svg%3E");
+--rip-c:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 24' preserveAspectRatio='none'%3E%3Cpath d='M0 0H240V12L234 14L226 11L217 16L211 13L202 18L190 15L183 19L171 12L162 14L150 9L141 13L129 17L120 15L108 20L99 14L87 16L76 10L66 14L54 12L43 17L31 13L21 15L10 11L0 12Z'/%3E%3C/svg%3E");
+--rip-d:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 24' preserveAspectRatio='none'%3E%3Cpath d='M0 0H240V8L225 10L216 20L204 9L190 12L181 23L172 11L150 7L139 15L126 10L117 21L103 13L88 6L76 18L64 12L52 14L41 22L30 10L14 13L0 8Z'/%3E%3C/svg%3E")}
+header.top,.topbar{--rip:var(--rip-a);--rip-w:420px;--rip-x:0px;--rip-h:18px;--rip-f:1}
+.topbar{position:relative;z-index:50}
+header.top::before,header.top::after,.topbar::before,.topbar::after{content:"";position:absolute;left:0;right:0;top:calc(100% - 1px);height:var(--rip-h);pointer-events:none;transform:scaleX(var(--rip-f));
+-webkit-mask-image:var(--rip);mask-image:var(--rip);-webkit-mask-size:var(--rip-w) 100%;mask-size:var(--rip-w) 100%;-webkit-mask-repeat:repeat-x;mask-repeat:repeat-x;-webkit-mask-position:var(--rip-x) 0;mask-position:var(--rip-x) 0}
+header.top::after,.topbar::after{background:var(--blue)}
+header.top::before,.topbar::before{background:var(--ink);translate:0 5px}
+[data-tear="home"]{--rip:var(--rip-a);--rip-w:420px;--rip-x:0px;--rip-h:18px;--rip-f:1}
+[data-tear="shop"]{--rip:var(--rip-b);--rip-w:360px;--rip-x:-90px;--rip-h:16px;--rip-f:-1}
+[data-tear="comics"]{--rip:var(--rip-d);--rip-w:480px;--rip-x:-200px;--rip-h:22px;--rip-f:1}
+[data-tear="glass"]{--rip:var(--rip-c);--rip-w:300px;--rip-x:-40px;--rip-h:14px;--rip-f:-1}
+body[data-crew-count="8"]:not([data-crew-self]) .topbar{--rip:var(--rip-b);--rip-w:520px;--rip-x:-310px;--rip-h:20px;--rip-f:1}
+body[data-glitch="hello"][data-crew-count="2"] .topbar{--rip:var(--rip-a);--rip-w:340px;--rip-x:-150px;--rip-h:15px;--rip-f:-1}
+[data-crew-self="beamer"] .topbar{--rip:var(--rip-d);--rip-w:380px;--rip-x:-60px;--rip-h:18px;--rip-f:-1}
+[data-crew-self="big-bill"] .topbar{--rip:var(--rip-c);--rip-w:460px;--rip-x:-230px;--rip-h:16px;--rip-f:1}
+[data-crew-self="big-stitch"] .topbar{--rip:var(--rip-a);--rip-w:500px;--rip-x:-120px;--rip-h:21px;--rip-f:-1}
+[data-crew-self="chomps"] .topbar{--rip:var(--rip-d);--rip-w:300px;--rip-x:-170px;--rip-h:20px;--rip-f:1}
+[data-crew-self="crude"] .topbar{--rip:var(--rip-c);--rip-w:400px;--rip-x:-10px;--rip-h:13px;--rip-f:1}
+[data-crew-self="dj-rivets"] .topbar{--rip:var(--rip-b);--rip-w:440px;--rip-x:-260px;--rip-h:17px;--rip-f:-1}
+[data-crew-self="dr-squint"] .topbar{--rip:var(--rip-a);--rip-w:380px;--rip-x:-300px;--rip-h:14px;--rip-f:1}
+[data-crew-self="gourdo"] .topbar{--rip:var(--rip-d);--rip-w:540px;--rip-x:-90px;--rip-h:19px;--rip-f:-1}
+[data-crew-self="gutterball"] .topbar{--rip:var(--rip-b);--rip-w:320px;--rip-x:-200px;--rip-h:15px;--rip-f:1}
+[data-crew-self="lil-lucky"] .topbar{--rip:var(--rip-c);--rip-w:520px;--rip-x:-330px;--rip-h:18px;--rip-f:-1}
+[data-crew-self="lookie-lou"] .topbar{--rip:var(--rip-a);--rip-w:460px;--rip-x:-40px;--rip-h:17px;--rip-f:1}
+[data-crew-self="lunar-larry"] .topbar{--rip:var(--rip-b);--rip-w:400px;--rip-x:-130px;--rip-h:22px;--rip-f:-1}
+[data-crew-self="mama-cobra"] .topbar{--rip:var(--rip-c);--rip-w:360px;--rip-x:-250px;--rip-h:16px;--rip-f:1}
+[data-crew-self="mouthy"] .topbar{--rip:var(--rip-d);--rip-w:420px;--rip-x:-310px;--rip-h:21px;--rip-f:1}
+[data-crew-self="mr-x"] .topbar{--rip:var(--rip-a);--rip-w:300px;--rip-x:-70px;--rip-h:13px;--rip-f:-1}
+[data-crew-self="ocho"] .topbar{--rip:var(--rip-b);--rip-w:480px;--rip-x:-380px;--rip-h:19px;--rip-f:1}
+[data-crew-self="speedbump"] .topbar{--rip:var(--rip-c);--rip-w:440px;--rip-x:-160px;--rip-h:14px;--rip-f:-1}
+[data-crew-self="sticky-ricky"] .topbar{--rip:var(--rip-d);--rip-w:340px;--rip-x:-20px;--rip-h:17px;--rip-f:1}
+[data-crew-self="the-zone-outs"] .topbar{--rip:var(--rip-a);--rip-w:540px;--rip-x:-270px;--rip-h:20px;--rip-f:1}
+[data-crew-self="torch"] .topbar{--rip:var(--rip-b);--rip-w:380px;--rip-x:-50px;--rip-h:18px;--rip-f:-1}
+
 /* stickers */
 .sticker{position:absolute;display:block;border:6px solid var(--white);box-shadow:7px 9px 0 rgba(10,10,10,.65);background:var(--white)}
 .sticker.round{border-radius:50%}
