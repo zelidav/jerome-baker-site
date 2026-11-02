@@ -130,7 +130,7 @@
       { transform: 'none', clipPath: 'polygon(0 0,100% 0,100% 100%,0 100%)', opacity: 1 },
     ], { duration: 720, delay: 120 + i * 85, easing: 'cubic-bezier(.2,.9,.3,1.2)', fill: 'backwards' });
     a.addEventListener('pointerenter', () => {
-      if (a._g) return;
+      if (a._g || a.closest('nav.lens')) return; // the magnifying glass (js/dock.js) owns hover on desktop
       a._g = a.animate([
         { transform: 'none', clipPath: 'polygon(0 0,100% 0,100% 100%,0 100%)' },
         { transform: 'scale(.9,1.18) skewX(8deg)', clipPath: 'polygon(14% 0,86% 0,100% 100%,0 100%)', offset: .35 },
