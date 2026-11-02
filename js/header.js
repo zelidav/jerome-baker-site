@@ -15,22 +15,42 @@
   let seed = 2166136261;
   for (const ch of location.pathname.replace(/index\.html$/, '')) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
   const rnd = () => { seed = Math.imul(seed ^ (seed >>> 15), 2246822507); seed = Math.imul(seed ^ (seed >>> 13), 3266489909); return ((seed ^= seed >>> 16) >>> 0) / 4294967296; };
-  const W = 1200, H = 30;
-  const tear = (depth, step) => {
-    // a ragged line along the bottom: big lazy dips with small sharp teeth on top
-    let d = `M0 0 H${W} V${(H * .35).toFixed(1)}`;
-    const phase = rnd() * 6.28, lazy = 2 + rnd() * 3;
-    for (let x = W; x > 0; x -= step * (.5 + rnd())) {
-      const swell = (Math.sin(x / W * Math.PI * lazy + phase) + 1) / 2;
-      const y = H * (.12 + .6 * swell * depth + rnd() * .35 * depth);
-      d += ` L${x.toFixed(1)} ${Math.min(H, y).toFixed(1)}`;
+  // drawn at real pixel size (never stretched, css/header.css sizes it), wide enough for big screens
+  const W = 3000, H = 30, N = 1024; // N segments, ~3px apart
+  // midpoint displacement: big wandering rips with smaller and smaller jags on top, like real torn paper
+  const fractal = (amp, rough) => {
+    const ys = new Array(N + 1);
+    ys[0] = (rnd() - .5) * amp; ys[N] = (rnd() - .5) * amp;
+    for (let step = N, a = amp; step > 1; step >>= 1, a *= rough) {
+      for (let i = step >> 1; i < N; i += step) ys[i] = (ys[i - (step >> 1)] + ys[i + (step >> 1)]) / 2 + (rnd() - .5) * a;
     }
-    return d + ` L0 ${(H * .3).toFixed(1)} Z`;
+    return ys;
+  };
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  // the white paper core: the deepest line
+  const rip = fractal(26, .56);
+  const paper = rip.map((v) => clamp(H * .55 + v, 9, H - 2));
+  // the blue layer tears a little shy of it: a thin white lip that now and then opens into a wide flap
+  const lipNoise = fractal(14, .62);
+  const blue = paper.map((y, i) => clamp(y - (1.2 + Math.max(0, lipNoise[i]) * .9 + Math.abs(lipNoise[i]) * .25), 4, y - 1));
+  const line = (ys, dy = 0) => {
+    let d = `M0 -4 H${W}`;
+    for (let i = N; i >= 0; i--) d += ` L${(i * W / N).toFixed(1)} ${(ys[i] + dy).toFixed(1)}`;
+    return d + ' Z';
   };
   const bg = getComputedStyle(head).backgroundColor || '#2A3B8E';
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">` +
-    `<path d="${tear(1, 14)}" fill="#F4EFE4"/>` +           // the paper fibres show past the blue
-    `<path d="${tear(.75, 10)}" fill="${bg}"/></svg>`;
+  const tseed = Math.floor(rnd() * 999);
+  const top = Math.min(...blue) - 2;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+    `<defs>` +
+    // fibres: fine noise pushes the edges around so they fuzz instead of cutting clean
+    `<filter id="fz" x="-1%" y="-20%" width="102%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="1.1 .35" numOctaves="3" seed="${tseed}"/><feDisplacementMap in="SourceGraphic" scale="3.2" xChannelSelector="R" yChannelSelector="G"/></filter>` +
+    `<filter id="fb" x="-1%" y="-20%" width="102%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".8 .5" numOctaves="2" seed="${tseed + 7}"/><feDisplacementMap in="SourceGraphic" scale="1.6" xChannelSelector="R" yChannelSelector="G"/></filter>` +
+    `</defs>` +
+    `<path d="${line(paper, 1.2)}" fill="#CFC6B4" filter="url(#fz)"/>` +   // paper thickness, a hair darker underneath
+    `<path d="${line(paper)}" fill="#F7F2E8" filter="url(#fz)"/>` +        // the white core of the torn paper
+    `<path d="${line(blue)}" fill="${bg}" filter="url(#fb)"/>` +           // the blue print layer, torn short
+    `<rect x="0" y="-4" width="${W}" height="${(top + 4).toFixed(1)}" fill="${bg}"/></svg>`;
   const edge = document.createElement('div');
   edge.className = 'hdr-tear';
   edge.setAttribute('aria-hidden', 'true');
