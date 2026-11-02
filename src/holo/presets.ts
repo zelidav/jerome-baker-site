@@ -4,7 +4,7 @@
 // keeps the foil in JB red → orange → yellow instead of the full rainbow.
 import type { HoloParams } from './scene.ts';
 
-export type PresetName = 'jb-foil' | 'jb-poster' | 'jb-sticker';
+export type PresetName = 'jb-foil' | 'jb-poster' | 'jb-sticker' | 'jb-fabric';
 
 const RENDER: HoloParams['render'] = {
   background: '#0b0c12',
@@ -29,7 +29,7 @@ const IMAGES: HoloParams['images'] = { edit: false, useImage: true, scale: 0.35,
 
 // radialFreq drives the engine's uRadialFreq uniform (upstream default 1.6, not in HoloParams): how far the hue
 // sweeps from the centre of the cloth out. Low = the bands stay in one slice of the wheel.
-export const PRESETS: Record<PresetName, { params: HoloParams; bump: 'scratch' | 'weave'; radialFreq: number }> = {
+export const PRESETS: Record<PresetName, { params: HoloParams; bump: 'scratch' | 'weave' | 'pique'; radialFreq: number }> = {
   // a real holo sticker: the art stays true, whites stay white, a silvery full-rainbow sheen runs across it as it bends
   'jb-sticker': {
     bump: 'scratch',
@@ -90,6 +90,38 @@ export const PRESETS: Record<PresetName, { params: HoloParams; bump: 'scratch' |
       },
       images: { ...IMAGES, opacity: 1 },
       render: RENDER,
+    },
+  },
+  // real shirt fabric (cotton pique): soft and matte, a fine knit, cotton sheen, only a whisper of holo.
+  // Light damping and softer constraints so it hangs and flaps in a breeze instead of floating in gel.
+  'jb-fabric': {
+    bump: 'pique',
+    radialFreq: 1.2,
+    params: {
+      performance: 'High',
+      physics: { viscosity: 0.035, stiffness: 0.9, iterations: 12, smoothing: 0.008, grabRadius: 0.3 },
+      material: {
+        preset: 'jb-fabric',
+        finish: 'Matte',
+        baseColor: '#ffffff',
+        holoIntensity: 0.07,
+        holoScale: 140,
+        bandFreq: 0.5,
+        saturation: 0.5,
+        hueShift: 0.94,
+        sparkle: 0,
+        specTint: 0,
+        iridescence: 0.08,
+        roughness: 0.92,
+        metalness: 0,
+        clearcoat: 0,
+        coatRoughness: 1,
+        sheen: 0.25,
+        bump: 0.7,
+        bumpTiling: 26,
+      },
+      images: { ...IMAGES, opacity: 1 },
+      render: { ...RENDER, exposure: 0.62, environment: 0.55, occlusionStrength: 1.4 },
     },
   },
   // the artwork at full opacity on cloth: light holo, strong bump from a weave normal map

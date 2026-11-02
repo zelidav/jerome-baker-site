@@ -1,5 +1,6 @@
 // One mount for the vendored holocloth engine: mountHoloCloth(el, opts) wraps new HoloApp(host).
 // The site is plain HTML, so this is the whole public surface; esbuild bundles it to js/holo/holo.js.
+import * as THREE from 'three';
 import { HoloApp } from './scene.ts';
 import { PRESETS, type PresetName } from './presets.ts';
 
@@ -25,6 +26,8 @@ export interface HoloClothOptions {
   performance?: 'High' | 'Medium' | 'Low';
   /** CSS touch-action on the canvas; 'pan-y' lets a phone scroll the page through it (drag sideways to grab). */
   touchAction?: string;
+  /** hang it on a line: clothespins at [u, v] spots (0..1 across the image), gravity, and a breeze */
+  hang?: { pins: Array<[number, number]>; wind?: number; gravity?: number };
   onReady?: (api: HoloClothHandle) => void;
 }
 
@@ -40,6 +43,16 @@ export interface HoloClothHandle {
   pause: () => void;
   resume: () => void;
   dispose: () => void;
+  /** breeze strength (hung cloth only) */
+  wind: (n: number) => void;
+  /** take the clothespins off */
+  release: () => void;
+  /** grab the cloth at [u, v]; pullTo then drags that spot to a point on screen; letGo drops it */
+  grabAt: (u: number, v: number) => void;
+  pullTo: (clientX: number, clientY: number) => void;
+  letGo: () => void;
+  /** where [u, v] on the cloth is on screen right now (client px) */
+  screenAt: (u: number, v: number) => { x: number; y: number };
 }
 
 const load = (src: string | HTMLImageElement): Promise<HTMLImageElement> => {
@@ -52,13 +65,24 @@ const load = (src: string | HTMLImageElement): Promise<HTMLImageElement> => {
 };
 
 // bump sources drawn in a canvas, so no big texture downloads: fine scratches for foil, a basket weave for cloth
-const bumpImage = (kind: 'scratch' | 'weave'): Promise<HTMLImageElement> => {
+const bumpImage = (kind: 'scratch' | 'weave' | 'pique'): Promise<HTMLImageElement> => {
   const c = document.createElement('canvas');
   c.width = c.height = 512;
   const g = c.getContext('2d')!;
   g.fillStyle = '#808080';
   g.fillRect(0, 0, 512, 512);
-  if (kind === 'weave') {
+  if (kind === 'pique') {
+    // a polo's knit: tiny raised cells in offset rows
+    const s = 8;
+    for (let y = 0; y < 512; y += s) {
+      for (let x = (y / s) % 2 ? s / 2 : 0; x < 512; x += s) {
+        const grad = g.createRadialGradient(x + s / 2, y + s / 2, 0, x + s / 2, y + s / 2, s * 0.6);
+        grad.addColorStop(0, '#d8d8d8'); grad.addColorStop(1, '#4a4a4a');
+        g.fillStyle = grad;
+        g.fillRect(x, y, s, s);
+      }
+    }
+  } else if (kind === 'weave') {
     const s = 16;
     for (let y = 0; y < 512; y += s) {
       for (let x = 0; x < 512; x += s) {
@@ -88,7 +112,8 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
   // engine internals the wrapper needs (TS-private upstream, untouched)
   const raw = app as unknown as {
     renderer: import('three').WebGLRenderer; scene: import('three').Scene; tick: () => void;
-    controls: { enabled: boolean }; holoUniforms: { uRadialFreq: { value: number }; uDieCut: { value: number } }; surface: { decals: Array<{ u: number; v: number; scale: number; rotation: number }>; redraw: () => void };
+    camera: import('three').PerspectiveCamera;
+    controls: { enabled: boolean; enableRotate: boolean; target: import('three').Vector3; update: () => void }; holoUniforms: { uRadialFreq: { value: number }; uDieCut: { value: number } }; surface: { decals: Array<{ u: number; v: number; scale: number; rotation: number }>; redraw: () => void };
   };
   const canvas = raw.renderer.domElement;
   let preset: PresetName = opts.preset || 'jb-foil';
@@ -105,7 +130,7 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
     if (opts.transparentBg) { raw.scene.background = null; raw.renderer.setClearColor(0x000000, 0); }
   };
 
-  type Sim = { poke: (n: number) => void; crumple: () => void; settle: (t: number) => void };
+  type Sim = import('./cloth.ts').ClothSim;
   const sim = () => (app as unknown as { sim: Sim }).sim;
   // snap back to the starting shape a few seconds after the last touch
   let idleT = 0;
@@ -153,6 +178,28 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
     pause: () => raw.renderer.setAnimationLoop(null),
     resume: () => { if (!disposed) raw.renderer.setAnimationLoop(raw.tick); },
     dispose: () => { if (disposed) return; disposed = true; clearTimeout(idleT); app.dispose(); },
+    wind: (n) => { sim().force.wind = n; },
+    release: () => sim().unpin(),
+    grabAt: (u, v) => {
+      const s = sim(), i = s.vertexAt(u, v) * 3;
+      s.startGrab(new THREE.Vector3(s.positions[i], s.positions[i + 1], s.positions[i + 2]), 0.32);
+    },
+    pullTo: (cx, cy) => {
+      // onto the plane through the cloth's middle, facing the camera
+      const r = canvas.getBoundingClientRect(), cam = raw.camera;
+      cam.updateMatrixWorld();
+      const ndc = new THREE.Vector3(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1, 0.5).unproject(cam);
+      const dir = ndc.sub(cam.position).normalize();
+      const t = -cam.position.z / dir.z;
+      sim().moveGrab(cam.position.clone().addScaledVector(dir, t));
+    },
+    letGo: () => sim().endGrab(),
+    screenAt: (u, v) => {
+      const s = sim(), i = s.vertexAt(u, v) * 3, r = canvas.getBoundingClientRect();
+      raw.camera.updateMatrixWorld();
+      const p = new THREE.Vector3(s.positions[i], s.positions[i + 1], s.positions[i + 2]).project(raw.camera);
+      return { x: r.left + (p.x + 1) / 2 * r.width, y: r.top + (1 - p.y) / 2 * r.height };
+    },
   };
 
   apply();
@@ -171,6 +218,18 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
       raw.surface.redraw();
     }
     apply();  // setClothImage rebuilds the cloth; re-assert params
+    if (opts.hang) {
+      // straight on, flat, pinned at the top, then let gravity and the breeze have it
+      const s = sim();
+      s.flatten();
+      s.pin(opts.hang.pins);
+      s.force.gravity = opts.hang.gravity ?? 9;
+      s.force.wind = opts.hang.wind ?? 6;
+      raw.camera.position.set(0, 0.15, 5.6);
+      raw.controls.target.set(0, -0.1, 0);
+      raw.controls.enableRotate = false;
+      raw.controls.update();
+    }
     app.reveal();
     if (opts.pokeOnEnter) handle.poke(1);
     opts.onReady?.(handle);

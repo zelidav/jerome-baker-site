@@ -27,7 +27,15 @@
 .holo-box{position:relative;flex:0 1 480px;width:min(480px,100%);aspect-ratio:1;max-width:100%}
 .holo-box .holo-hint{bottom:0}
 .holo-sec h2{color:#FFF100}
-.pd-big.holo-live > img{visibility:hidden}`;
+.pd-big.holo-live > img:not(.holo-thief){visibility:hidden}
+.pd-big:has(.holo-thief,.holo-line){overflow:hidden}
+.holo-line{position:absolute;z-index:8;left:-4%;right:-4%;height:3px;background:#5a4632;border-radius:2px;box-shadow:0 2px 3px rgba(0,0,0,.25);pointer-events:none}
+.holo-pin{position:absolute;z-index:10;width:9px;height:24px;translate:-50% -35%;background:#c79a5b;border:2px solid #0A0A0A;border-radius:2px;pointer-events:none}
+.holo-thief{position:absolute;z-index:11;height:34%;width:auto;pointer-events:none;translate:-50% -30%;filter:drop-shadow(3px 4px 0 rgba(0,0,0,.35))}
+.holo-poof{position:absolute;z-index:12;width:60%;aspect-ratio:1;translate:-50% -50%;pointer-events:none;
+  background:radial-gradient(circle at 35% 40%,#fff 0 18%,transparent 19%),radial-gradient(circle at 62% 35%,#eee 0 20%,transparent 21%),radial-gradient(circle at 50% 62%,#f4f4f4 0 24%,transparent 25%),radial-gradient(circle at 28% 64%,#ddd 0 15%,transparent 16%),radial-gradient(circle at 72% 62%,#e8e8e8 0 16%,transparent 17%)}
+.holo-poof b{position:absolute;left:50%;top:50%;translate:-50% -50%;rotate:-8deg;font:900 clamp(28px,6vw,52px)/1 Montserrat,Helvetica,Arial,sans-serif;color:#FFF100;-webkit-text-stroke:2px #0A0A0A;paint-order:stroke;text-shadow:3px 3px 0 #DA2342}
+.holo-took{position:absolute;z-index:12;left:50%;top:12px;translate:-50% 0;margin:0;padding:8px 14px;background:#DA2342;color:#fff;font:800 14px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;rotate:-2deg;box-shadow:3px 3px 0 #0A0A0A}`;
   document.head.appendChild(css);
 
   // the spots: where it goes, and what it shows
@@ -52,10 +60,108 @@
       opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
     });
   }
-  // in the merch detail view the Classic Tee is heavy woven cloth you can grab. Mounted when it opens, dropped when it closes.
+  // the Crossed Bongs polos hang on a clothesline in the breeze, until the crew member who wears that color
+  // runs in, grabs it and vanishes with it. The cutouts are assets/holo/polo-<id>.webp (made from the shop photo).
+  const THIEF = { 672: 'bear', 696: 'devil', 720: 'grin' };
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const tween = (ms, f) => new Promise((done) => {
+    const t0 = performance.now();
+    const go = (now) => { const k = Math.min(1, (now - t0) / ms); f(k); k < 1 ? requestAnimationFrame(go) : done(); };
+    requestAnimationFrame(go);
+  });
+  const snatch = async (spot) => {
+    const h = spot.holo, host = spot.host, alive = () => spot.holo === h && host.isConnected;
+    const at = (u, v) => { const r = host.getBoundingClientRect(), p = h.screenAt(u, v); return { x: p.x - r.left, y: p.y - r.top }; };
+    // the clothesline, and a pin on each shoulder
+    const L = at(.27, .1), R = at(.73, .1);
+    const line = document.createElement('i');
+    line.className = 'holo-line';
+    line.style.top = (L.y - 2) + 'px';
+    const pins = [L, R].map((p) => { const i = document.createElement('i'); i.className = 'holo-pin'; i.style.left = p.x + 'px'; i.style.top = p.y + 'px'; return i; });
+    spot.stage.before(line);
+    host.append(...pins);
+    spot.extras = [line, ...pins];
+    // let it blow around a while, and wait out anyone holding it
+    let touched = 0;
+    spot.stage.addEventListener('pointerdown', () => (touched = performance.now()));
+    await wait(phone ? 4000 : 5500);
+    while (alive() && performance.now() - touched < 2500) await wait(500);
+    if (!alive()) return;
+    const key = THIEF[spot.id];
+    const who = Object.values((window.JBShop && window.JBShop.crew) || {}).find((c) => c.img === key);
+    const thief = new Image();
+    // Lil' Lucky's crew art is a full scene, so he runs in as his animation cutout instead
+    const ANIM = { devil: 'assets/anim/devil/' };
+    thief.src = ANIM[key] ? base + ANIM[key] + 'stand.webp' : base + 'assets/crew/' + key + '_m.webp';
+    thief.alt = '';
+    thief.className = 'holo-thief';
+    await thief.decode().catch(() => {});
+    if (!alive()) return;
+    host.append(thief);
+    spot.extras.push(thief);
+    const W = host.clientWidth;
+    // runs in from the right to the right shoulder
+    const from = { x: W * 1.25, y: R.y + host.clientHeight * .12 };
+    await tween(850, (k) => {
+      const to = at(.7, .16), e = 1 - (1 - k) ** 3;
+      thief.style.left = from.x + (to.x - from.x) * e + 'px';
+      thief.style.top = from.y + (to.y - from.y) * e - Math.abs(Math.sin(k * Math.PI * 3)) * 18 + 'px';
+    });
+    if (!alive()) return;
+    // grabs it, the pins pop, and yanks it back the way they came
+    if (ANIM[key]) thief.src = base + ANIM[key] + 'carry.webp';
+    h.grabAt(.7, .16);
+    h.release();
+    h.wind(2);
+    pins.forEach((p) => p.animate([{ translate: '-50% -35%', opacity: 1 }, { translate: '-50% 120%', rotate: '160deg', opacity: 0 }], { duration: 600, easing: 'ease-in', fill: 'forwards' }));
+    const r0 = host.getBoundingClientRect(), x0 = parseFloat(thief.style.left), y0 = parseFloat(thief.style.top);
+    await tween(1100, (k) => {
+      const x = x0 + W * .14 * k * k, y = y0 - 20 * Math.sin(k * Math.PI); // a short yank: the POOF has to land in frame
+      thief.style.left = x + 'px';
+      thief.style.top = y + 'px';
+      thief.style.rotate = (k * 10) + 'deg';
+      h.pullTo(r0.left + x, r0.top + y);
+    });
+    if (!alive()) return;
+    // POOF: both gone
+    const poof = document.createElement('i');
+    poof.className = 'holo-poof';
+    poof.innerHTML = '<b>POOF!</b>';
+    // the POOF is 60% of the stage wide and centered on its spot: keep the center between 30% and 70%
+    poof.style.left = Math.min(W * .7, Math.max(W * .3, parseFloat(thief.style.left) + thief.offsetWidth / 2)) + 'px';
+    poof.style.top = (parseFloat(thief.style.top) + thief.offsetHeight * .2) + 'px';
+    host.append(poof);
+    spot.extras.push(poof);
+    h.letGo();
+    h.crumple();
+    poof.animate([{ scale: .2, opacity: 0 }, { scale: 1.1, opacity: 1, offset: .25 }, { scale: 1.3, opacity: 0 }], { duration: 1100, easing: 'ease-out', fill: 'forwards' });
+    thief.animate([{ scale: 1, opacity: 1 }, { scale: 0, opacity: 0 }], { duration: 220, fill: 'forwards' });
+    spot.stage.animate([{ scale: 1, opacity: 1 }, { scale: .1, opacity: 0 }], { duration: 260, fill: 'forwards' });
+    await wait(500);
+    if (!alive()) return;
+    // the photo comes back with a note, then a fresh one goes up on the line
+    stop(spot, true);
+    const took = document.createElement('p');
+    took.className = 'holo-took';
+    took.textContent = (who ? who.name : 'Somebody') + ' took it. Hang on.';
+    host.append(took);
+    spot.extras = [took];
+    await wait(3200);
+    if (spot.holo !== null || spot.closed || !host.isConnected) return;
+    took.remove();
+    start(spot);
+  };
+  // in the merch detail view: the Classic Tee is heavy woven cloth you can grab, the polos hang in the breeze.
+  // Mounted when it opens, dropped when it closes.
   const views = [
     { dlg: '#pd', name: '#pdTitle', test: /^Classic Tee/i, host: '.pd-big', img: '#pdImg',
       hint: phone ? 'Swipe the tee sideways.' : 'Grab the tee.', opts: { preset: 'jb-poster' } },
+    { dlg: '#pd', name: '#pdTitle', test: /^Polo/i, host: '.pd-big', img: '#pdImg',
+      // only the front photo has a cutout
+      src: (src) => { const m = src.match(/shop\/(\d+)_0\.webp/); return m && THIEF[m[1]] ? { id: m[1], src: base + 'assets/holo/polo-' + m[1] + '.webp' } : null; },
+      hint: phone ? 'Swipe the polo sideways.' : 'Grab the polo.', scene: snatch,
+      opts: { preset: 'jb-fabric', dieCut: true, pokeOnEnter: false, crumpleOnDoubleTap: false, snapBack: false,
+        hang: { pins: [[.27, .1], [.73, .1]], wind: 3.5, gravity: 9 } } },
   ].filter((v) => document.querySelector(v.dlg));
   if (!spots.length && !views.length) return;
 
@@ -91,6 +197,7 @@
           spot.host.classList.add('holo-live');
           stage.classList.add('on');
           setTimeout(() => (hint.style.opacity = '0'), 5000);
+          if (spot.scene) spot.scene(spot);
         },
       });
     } catch (e) { clearTimeout(bail); stage.remove(); hint.remove(); spot.holo = 'off'; } // no GPU for it: the art stays
@@ -109,25 +216,31 @@
   }), { rootMargin: '300px 0px' });
   spots.forEach((s) => near.observe(s.host));
 
-  const stop = (spot) => {
+  function stop(spot, keep) {
     if (spot.holo && spot.holo.dispose) spot.holo.dispose();
     spot.holo = null;
     if (spot.stage) spot.stage.remove();
     if (spot.hintEl) spot.hintEl.remove();
+    (spot.extras || []).forEach((el) => el.remove());
+    spot.extras = [];
+    if (!keep) spot.closed = true;
     spot.host.classList.remove('holo-live');
-  };
+  }
   views.forEach((v) => {
     const dlg = document.querySelector(v.dlg);
     let cur = null, t = 0;
     const sync = () => {
       const host = document.querySelector(v.host), img = document.querySelector(v.img), name = document.querySelector(v.name);
-      const want = dlg.open && host && img && name && v.test.test(name.textContent.trim()) ? img.src : null;
+      const pick = dlg.open && host && img && name && v.test.test(name.textContent.trim()) ? (v.src ? v.src(img.src) : { src: img.src }) : null;
+      const want = pick && pick.src;
       if (cur && (cur.key !== want || cur.host !== host || !host.isConnected)) { stop(cur); cur = null; }
       if (!want || cur) return;
-      cur = { key: want, host, hint: v.hint, opts: { ...v.opts, clothImage: want } };
+      cur = { key: want, id: pick.id, host, hint: v.hint, scene: v.scene, opts: { ...v.opts, clothImage: want } };
       engaged.then(() => { if (cur && cur.key === want) start(cur); });
     };
     new MutationObserver(() => { if (!t) t = setTimeout(() => { t = 0; sync(); }, 150); })
       .observe(dlg, { attributes: true, attributeFilter: ['open'], childList: true, subtree: true, characterData: true });
+    // a #p= link can open it before this runs
+    sync();
   });
 })();
