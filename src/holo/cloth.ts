@@ -48,6 +48,12 @@ export class ClothSim {
   private grab: GrabState | null = null;
   private accumulator = 0;
 
+  /** JB: outside forces for a cloth hung on a line (both 0 = upstream's zero-g gel) */
+  readonly force = { gravity: 0, wind: 0 };
+  private pinIdx: Int32Array | null = null;
+  private pinPos: Float32Array | null = null;
+  private time = 0;
+
   constructor(
     readonly width: number,
     readonly height: number,
@@ -149,6 +155,37 @@ export class ClothSim {
       const dy = (ay - by) * stepY;
       this.cRest[c] = Math.hypot(dx, dy);
     }
+  }
+
+  /** JB: lay the cloth out flat, facing the camera, and make that the rest pose. */
+  flatten() {
+    let k = 0;
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        this.positions[k++] = (x / this.segX - 0.5) * this.width;
+        this.positions[k++] = (0.5 - y / this.segY) * this.height;
+        this.positions[k++] = 0;
+      }
+    }
+    this.prev.set(this.positions);
+    this.rest.set(this.positions);
+  }
+
+  /** JB: clothespins. Each [u, v] (0..1 across the cloth) holds the nearest point where it is now. */
+  pin(uv: Array<[number, number]>) {
+    const idx = uv.map(([u, v]) => Math.round(v * this.segY) * this.cols + Math.round(u * this.segX));
+    this.pinIdx = new Int32Array(idx);
+    this.pinPos = new Float32Array(idx.length * 3);
+    idx.forEach((i, k) => this.pinPos!.set(this.positions.subarray(i * 3, i * 3 + 3), k * 3));
+  }
+
+  unpin() {
+    this.pinIdx = this.pinPos = null;
+  }
+
+  /** JB: the vertex nearest [u, v], for following a spot on the cloth */
+  vertexAt(u: number, v: number) {
+    return Math.round(Math.min(1, Math.max(0, v)) * this.segY) * this.cols + Math.round(Math.min(1, Math.max(0, u)) * this.segX);
   }
 
   reset() {
@@ -315,6 +352,21 @@ export class ClothSim {
       p[i] = cur + vel;
     }
 
+    // JB: gravity plus a gusty breeze, mostly sideways with some flutter toward and away from the camera
+    const { gravity, wind } = this.force;
+    if (gravity || wind) {
+      this.time += SUBSTEP;
+      const t = this.time, dt2 = SUBSTEP * SUBSTEP;
+      const gust = wind * (0.55 + 0.3 * Math.sin(t * 0.9) + 0.2 * Math.sin(t * 2.3 + 1.0));
+      for (let i = 0; i < n; i++) {
+        const x = p[i * 3], y = p[i * 3 + 1];
+        const flutter = Math.sin(t * 5.1 + x * 2.3 + y * 1.7) + 0.6 * Math.sin(t * 8.3 - y * 3.1 + x);
+        p[i * 3] += gust * (0.8 + 0.25 * Math.sin(t * 1.9 + y * 2.0)) * dt2;
+        p[i * 3 + 1] -= gravity * dt2;
+        p[i * 3 + 2] += gust * 0.9 * flutter * dt2;
+      }
+    }
+
     // laplacian smoothing — wrinkles relax back out, gel-like
     if (params.smoothing > 0) {
       const k = params.smoothing * 0.5;
@@ -354,6 +406,17 @@ export class ClothSim {
         p[ib] -= ox; p[ib + 1] -= oy; p[ib + 2] -= oz;
       }
       this.applyGrab();
+      this.applyPins();
+    }
+  }
+
+  private applyPins() {
+    const idx = this.pinIdx, pos = this.pinPos;
+    if (!idx || !pos) return;
+    const p = this.positions;
+    for (let k = 0; k < idx.length; k++) {
+      const i = idx[k] * 3;
+      p[i] = pos[k * 3]; p[i + 1] = pos[k * 3 + 1]; p[i + 2] = pos[k * 3 + 2];
     }
   }
 
