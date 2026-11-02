@@ -23,8 +23,11 @@
 .holo-hint{position:absolute;z-index:10;left:50%;bottom:8px;translate:-50% 0;margin:0;padding:6px 12px;background:#0A0A0A;color:#FCD804;font:800 13px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s}
 .holo-stage.on + .holo-hint{opacity:1}
 .collage.holo-live > :not(.holo-stage):not(.holo-hint){visibility:hidden}
-.cp-hero .art.holo-live{min-height:min(620px,92vw)}
-.cp-hero .art.holo-live > img{visibility:hidden}`;
+.holo-sec{background:#233671;color:#fff;padding-top:64px;padding-bottom:64px;border-top:4px solid #DA2342}
+.holo-box{position:relative;flex:0 1 480px;width:min(480px,100%);aspect-ratio:1;max-width:100%}
+.holo-box .holo-hint{bottom:0}
+.holo-sec h2{color:#FFF100}
+.pd-big.holo-live > img{visibility:hidden}`;
   document.head.appendChild(css);
 
   // the spots: where it goes, and what it shows
@@ -34,13 +37,27 @@
     host: collage, hint: phone ? 'Swipe the box sideways. Double-tap to crumple it.' : 'Grab the box. Double-tap to crumple it.',
     opts: { preset: 'jb-poster', clothImage: base + 'assets/img/box.webp' },
   });
-  const crewArt = document.querySelector('.cp-hero .art');
-  const crewImg = crewArt && crewArt.querySelector('img');
-  if (crewImg) spots.push({
-    host: crewArt, hint: phone ? 'Swipe it sideways. Double-tap to crumple.' : 'Twist it. Double-tap to crumple.',
-    opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
-  });
-  if (!spots.length) return;
+  // on a crew page the sticker gets its own section, right after the GIF one (the hero stays the art, so it can still turn real)
+  const crewImg = document.querySelector('.cp-hero .art img');
+  const gif = document.querySelector('section.gif');
+  if (crewImg && gif) {
+    const name = [...document.querySelectorAll('.cp-name span')].map((x) => x.textContent).join(' ') || 'The sticker';
+    const sec = document.createElement('section');
+    sec.className = 'holo-sec pad';
+    sec.innerHTML = '<div class="wrap gif-in"><div class="holo-box"></div><div><h2 class="display"></h2><p>The sticker, in holographic foil. Grab it and twist it, or double-tap to crumple it into a ball. Leave it alone and it flattens back out.</p></div></div>';
+    sec.querySelector('h2').textContent = name.trim() + ', in holo.';
+    gif.after(sec);
+    spots.push({
+      host: sec.querySelector('.holo-box'), hint: phone ? 'Swipe it sideways. Double-tap to crumple.' : 'Twist it. Double-tap to crumple.',
+      opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
+    });
+  }
+  // in the merch detail view the Classic Tee is heavy woven cloth you can grab. Mounted when it opens, dropped when it closes.
+  const views = [
+    { dlg: '#pd', name: '#pdTitle', test: /^Classic Tee/i, host: '.pd-big', img: '#pdImg',
+      hint: phone ? 'Swipe the tee sideways.' : 'Grab the tee.', opts: { preset: 'jb-poster' } },
+  ].filter((v) => document.querySelector(v.dlg));
+  if (!spots.length && !views.length) return;
 
   let lib = null;
   const loadLib = () => lib || (lib = import(new URL(base + 'js/holo/holo.js', location.href).href).then(() => window.JBHolo));
@@ -58,14 +75,17 @@
     const hint = document.createElement('p');
     hint.className = 'holo-hint';
     hint.textContent = spot.hint;
-    spot.host.append(stage, hint);
+    spot.host.append(stage);
+    if (spot.hint) spot.host.append(hint);
+    spot.stage = stage; spot.hintEl = hint;
     // if it isn't drawing within 8s, drop it and keep the art
     const bail = setTimeout(() => { try { spot.holo.dispose(); } catch (e) { /* never mounted */ } stage.remove(); hint.remove(); spot.holo = 'off'; }, 8000);
     try {
       spot.holo = mountHoloCloth(stage, {
-        ...spot.opts, transparentBg: true, pokeOnEnter: true, crumpleOnDoubleTap: true, snapBack: 3500,
+        transparentBg: true, pokeOnEnter: true, crumpleOnDoubleTap: true, snapBack: 3500,
         performance: phone ? 'Low' : 'High',
         touchAction: phone ? 'pan-y' : undefined,
+        ...spot.opts,
         onReady: () => {
           clearTimeout(bail);
           spot.host.classList.add('holo-live');
@@ -88,4 +108,26 @@
     else if (spot.holo && spot.holo.pause) e.isIntersecting ? spot.holo.resume() : spot.holo.pause();
   }), { rootMargin: '300px 0px' });
   spots.forEach((s) => near.observe(s.host));
+
+  const stop = (spot) => {
+    if (spot.holo && spot.holo.dispose) spot.holo.dispose();
+    spot.holo = null;
+    if (spot.stage) spot.stage.remove();
+    if (spot.hintEl) spot.hintEl.remove();
+    spot.host.classList.remove('holo-live');
+  };
+  views.forEach((v) => {
+    const dlg = document.querySelector(v.dlg);
+    let cur = null, t = 0;
+    const sync = () => {
+      const host = document.querySelector(v.host), img = document.querySelector(v.img), name = document.querySelector(v.name);
+      const want = dlg.open && host && img && name && v.test.test(name.textContent.trim()) ? img.src : null;
+      if (cur && (cur.key !== want || cur.host !== host || !host.isConnected)) { stop(cur); cur = null; }
+      if (!want || cur) return;
+      cur = { key: want, host, hint: v.hint, opts: { ...v.opts, clothImage: want } };
+      engaged.then(() => { if (cur && cur.key === want) start(cur); });
+    };
+    new MutationObserver(() => { if (!t) t = setTimeout(() => { t = 0; sync(); }, 150); })
+      .observe(dlg, { attributes: true, attributeFilter: ['open'], childList: true, subtree: true, characterData: true });
+  });
 })();
