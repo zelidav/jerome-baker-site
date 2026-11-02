@@ -27,7 +27,10 @@
       return localStorage.getItem('jbpromo-preview') === '1';
     } catch (e) { return !!v && v !== 'off'; }
   })();
-  if (TEST && /(^|\.)jeromebaker\.cannacrypted\.com$/.test(location.hostname) && !optIn) return;
+  // (the live-site switch is off: David wants the test promos visible to everyone, 2026-11-02)
+  let off = false;
+  try { off = localStorage.getItem('jbpromo-off') === '1'; if (new URLSearchParams(location.search).get('promo') === 'off') { localStorage.setItem('jbpromo-off', '1'); off = true; } else if (new URLSearchParams(location.search).get('promo')) localStorage.removeItem('jbpromo-off'); } catch (e) { /* */ }
+  if (off) return;
   window.JBPromoPreview = optIn;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
