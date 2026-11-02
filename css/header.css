@@ -25,6 +25,6 @@ header.hdr nav a.genie{display:inline-block;transform-origin:50% 100%;will-chang
 @media (prefers-reduced-motion:reduce){.hdr-logo,.hdr-logo::after{animation:none}}
 
 /* a bar of links right under the header (the shop's yellow category bar) starts below the tear, not under it */
-header.hdr + .subnav{padding-top:30px}
-@media (max-width:760px){header.hdr + .subnav{padding-top:18px}}
-@media (min-width:901px){body:has(header.hdr + .subnav) .filters{top:calc(var(--hdr,92px) + 94px);max-height:calc(100vh - var(--hdr,92px) - 110px)}}
+header.hdr + .subnav{padding-top:48px}
+@media (max-width:760px){header.hdr + .subnav{padding-top:32px}}
+@media (min-width:901px){body:has(header.hdr + .subnav) .filters{top:calc(var(--hdr,92px) + 110px);max-height:calc(100vh - var(--hdr,92px) - 126px)}}
