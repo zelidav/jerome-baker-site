@@ -29,7 +29,21 @@ A crew member walks in from the edge of the screen holding a hand-lettered sign 
 
 **Files:** `js/promo.js`, `css/promo.css`, and a loader at the end of `js/dock.js` (the dock is on every page, so promos reach every page with no rebuild).
 
-### 2. Test mode
+### 2. "Get the fit" bundles and price anchoring
+Every crew page now has a **Get the fit** box under "What <name> is wearing", with three real bundles at today's prices:
+- **Just the piece**: the main item they wear, full price.
+- **The fit** (flagged as the character's pick): their outfit plus the missing piece (a hat, or a tee), **15% off**. The best value per item, so it's the obvious choice.
+- **Full fit**: The fit plus shoes (or a backpack), **12% off**.
+
+The "separately" price is the real sum of today's prices, so no fake "was" prices. Savings show in dollars. On a phone the pick is listed first.
+
+**Anchoring:** the merch page's featured rail now runs from most expensive to least ($92 board shorts and $89 high-tops first, $22 crop top last), so the first prices people see set the reference point. The glass page already does this, with the giant bongs first and each shelf sorted high to low.
+
+**Why it works:** a three-tier choice where the middle tier is clearly the best value moves people from one item to a basket, and it's honest because every tier is real and buyable. The rules we follow: anchor with a real item, never a fake "was" price, never a decoy you can't actually buy.
+
+Files: `js/fit.js`, `css/fit.css` (loaded from `js/dock.js` on crew pages only), and the featured sort in `tools/build_shop.py`.
+
+### 3. Test mode
 Codes start with `TEST-` and say "not valid at checkout yet". Nothing touches the Woo store or the glass checkout. Every action is logged (`promo_shown`, `promo_claimed`, `promo_dismissed`, `promo_copied`, with page, character and trigger) so we can measure it once analytics is chosen.
 
 ## Why it's built this way
@@ -64,8 +78,9 @@ Code: https://github.com/zelidav/jerome-baker-site/compare/main...studio/crew-pr
 1. **Real codes:** minted by the glass app, single-use, expiring, one per email, and mirrored to native Woo coupons so they work in the Woo coupon box too.
 2. **Glass checkout:** today it refuses discount codes on one-of-one pieces, and all art glass and giant bongs are one of one. That rule has to change for glass offers.
 3. **Apply a code from a link:** neither checkout can take a code from a URL yet. On Woo (Dopestr) this is a small addition. Until then the code is copied for the shopper.
-4. **Glass with merch:** needs a Woo order notification that issues the glass code after a real merch order.
-5. **Analytics:** pick a tool and swap out the console log.
+4. **Bundles:** a Woo coupon per bundle that only applies when every piece is in the cart (product restrictions + minimum quantity), or a real bundle product.
+5. **Glass with merch:** needs a Woo order notification that issues the glass code after a real merch order.
+6. **Analytics:** pick a tool and swap out the console log.
 
 ## What's next on the buyable plan
 - **Holo cloth on phones:** grab handles on the page (the page scrolls everywhere else), plus a full-screen viewer with spin, pinch-zoom and the buy bar inside it.
