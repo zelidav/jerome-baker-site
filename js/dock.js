@@ -22,20 +22,20 @@
   };
   const TABS = [
     ['glass', 'Glass', 'glass/'],
-    ['shop', 'Merch', 'shop/'],
+    ['shop', 'Ritual Merch', 'shop/'],
     null,  // the bowl
-    ['crew', 'Crew', 'crew/'],
-    ['comics', 'Hot Shop', 'comics/'],
+    ['crew', 'The JB Crew', 'crew/'],
+    ['comics', 'The Hot Shop', 'comics/'],
   ];
   // everything, for the sticker pile
   const ALL = [
     ['Glass', 'glass/', 'blue', 'Hand blown. One of one.'],
-    ['Ritual merch', 'shop/', 'red', 'Wear the box art.'],
+    ['Ritual Merch', 'shop/', 'red', 'Wear the box art.'],
     ['The JB Crew', 'crew/', 'yellow', 'Twenty lunatics. No supervision.'],
-    ['Find your crew', 'crew/match/', 'teal', 'Four questions. No lying.'],
+    ['Find Your Crew', 'crew/match/', 'teal', 'Four questions. No lying.'],
     ['The Hot Shop', 'comics/', 'red', 'The comic. 21+.'],
-    ['The story', '#made', 'white', 'Since 1991.'],
-    ['Travel guide', 'travel/', 'yellow', 'Where to go next.'],
+    ['The Story', '#made', 'white', 'Since 1991.'],
+    ['Travel Guide', 'travel/', 'yellow', 'Where to go next.'],
     ['Home', '', 'blue', 'Back to the chaos.'],
   ];
   const href = (h) => base + h || './';
