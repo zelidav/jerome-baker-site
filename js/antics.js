@@ -42,6 +42,19 @@
     b.style.transform = `translate(${actor.x - w * .2}px,${actor.feet - h - 50}px)`;
     setTimeout(() => b.remove(), ms);
   };
+  // merch photos are on white, so the crew carries the transparent cutout (assets/shop/cut/, made by
+  // ~/code/jbsite-work/shopcut/cut.py). Glass tiles are already cutouts. No cutout = no antic on that item.
+  const cutFor = (img) => {
+    const src = img.currentSrc || img.src;
+    const m = src.match(/assets\/shop\/(\d+)_\d+(?:_t)?\.webp/);
+    if (!m) return Promise.resolve(src);
+    // always the product shot (photo 0): the other photos are often a model wearing it, and nobody should snatch a person
+    const url = base + 'assets/shop/cut/' + m[1] + '_0.webp';
+    const im = new Image();
+    im.src = url;
+    return im.decode().then(() => url, () => { console.warn('antics: no cutout for', m[1], '- skipped'); return null; });
+  };
+  const itemSrc = (t) => t._cut || t.currentSrc || t.src;
   // a copy of the product that the crew member can carry around
   const ghost = (layer, src, b) => {
     const g = document.createElement('img');
@@ -92,7 +105,7 @@
       await a.walk(fromLeft ? b.x - H * .2 : b.x + b.w + H * .2, 1100);
       a.face(fromLeft).pose('reach');
       await wait(300);
-      const g = ghost(layer, t.currentSrc || t.src, b);
+      const g = ghost(layer, itemSrc(t), b);
       t.style.visibility = 'hidden';
       a.pose('carry');
       say(layer, a, pick(['Mine now.', 'Nobody saw that.', "It's for my cousin.", 'Five finger discount.']));
@@ -130,7 +143,7 @@
       await a.walk(fromLeft ? b.x - H * .2 : b.x + b.w + H * .2, 1100);
       a.face(fromLeft).pose('reach');
       await wait(300);
-      const g = ghost(layer, t.currentSrc || t.src, b);
+      const g = ghost(layer, itemSrc(t), b);
       t.style.visibility = 'hidden';
       a.pose('pose');
       const [, h] = a.size();
@@ -155,7 +168,7 @@
       await thief.walk(fromLeft ? b.x - H * .2 : b.x + b.w + H * .2, 1000);
       thief.face(fromLeft).pose('reach');
       await wait(260);
-      const g = ghost(layer, t.currentSrc || t.src, b);
+      const g = ghost(layer, itemSrc(t), b);
       t.style.visibility = 'hidden';
       thief.pose('carry');
       await fly(g, overHead(thief, b, .5), 280);
@@ -221,7 +234,7 @@
       l.face(true).pose('reach'); r.face(false).pose('reach');
       say(layer, l, pick(['I saw it first.', 'Mine.', 'Let go.']), 1400);
       await wait(500);
-      const g = ghost(layer, t.currentSrc || t.src, b);
+      const g = ghost(layer, itemSrc(t), b);
       t.style.visibility = 'hidden';
       say(layer, r, pick(['Nope.', 'I called it.', 'Over my dead body.']), 1400);
       for (let i = 0; i < 6; i++) {
@@ -302,6 +315,9 @@
       host = document.body;
     }
     if (!target || !host || !target.complete || !target.naturalWidth) return false;
+    running = true; // held while the cutout loads so two bits can't start at once
+    target._cut = await cutFor(target);
+    if (!target._cut) { running = false; return false; }
     if (detail && (host.classList.contains('holo-live') || host.querySelector('.holo-live'))) return false; // the holo has the stage
     running = true;
     const layer = layerIn(host);
