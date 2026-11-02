@@ -1,0 +1,24 @@
+/* js/header.js: genie links, the living logo, a torn bottom edge that's different on every page */
+header.hdr{position:relative;border-bottom:0!important;overflow:visible}
+header.top.hdr{position:sticky}
+@media (max-width:900px){header.top.hdr{position:relative}}
+.hdr-tear{position:absolute;left:0;right:0;top:100%;height:30px;margin-top:-1px;background:no-repeat top/100% 100%;pointer-events:none;z-index:2;filter:drop-shadow(0 3px 0 rgba(10,10,10,.55))}
+@media (max-width:760px){.hdr-tear{height:18px}}
+
+/* the logo: floats and wobbles, catches a glint, jelly-spins on hover/tap */
+.hdr-logo{position:relative;display:inline-block;transform-origin:50% 60%;animation:hdr-float 4.2s ease-in-out infinite}
+.hdr-logo img{display:block}
+.hdr-logo::after{content:"";position:absolute;inset:0;pointer-events:none;
+  -webkit-mask:var(--mark) center/contain no-repeat;mask:var(--mark) center/contain no-repeat;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.85) 48%,transparent 60%) no-repeat;background-size:250% 100%;background-position:130% 0;
+  animation:hdr-glint 6s ease-in-out infinite 1.2s}
+.hdr-logo.jelly{animation:hdr-jelly .9s cubic-bezier(.3,1.6,.5,1)}
+.hdr-logo.jelly::after{animation:none}
+@keyframes hdr-float{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(-3px) rotate(-2.5deg)}65%{transform:translateY(1px) rotate(2deg)}}
+@keyframes hdr-glint{0%,70%{background-position:130% 0}85%,100%{background-position:-60% 0}}
+@keyframes hdr-jelly{0%{transform:none}20%{transform:scale(1.18,.82) rotate(-12deg)}45%{transform:scale(.88,1.14) rotate(200deg)}70%{transform:scale(1.06,.95) rotate(350deg)}100%{transform:rotate(360deg)}}
+
+/* links ride a genie transform */
+header.hdr nav a.genie{display:inline-block;transform-origin:50% 100%;will-change:transform}
+
+@media (prefers-reduced-motion:reduce){.hdr-logo,.hdr-logo::after{animation:none}}

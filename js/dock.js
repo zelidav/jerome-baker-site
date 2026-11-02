@@ -120,3 +120,17 @@
     document.head.appendChild(f);
   }
 })();
+
+// the header effects (js/header.js): genie links, the living logo, a torn edge that's different on every page
+(() => {
+  if (document.querySelector('script[src$="js/header.js"]') || !document.querySelector('header.top, header.topbar')) return;
+  const base = document.documentElement.dataset.base || '';
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = base + 'css/header.css';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = base + 'js/header.js';
+  s.defer = true;
+  document.head.appendChild(s);
+})();
