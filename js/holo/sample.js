@@ -90,7 +90,9 @@
     const key = THIEF[spot.id];
     const who = Object.values((window.JBShop && window.JBShop.crew) || {}).find((c) => c.img === key);
     const thief = new Image();
-    thief.src = base + 'assets/crew/' + key + '_m.webp';
+    // Lil' Lucky's crew art is a full scene, so he runs in as his animation cutout instead
+    const ANIM = { devil: 'assets/anim/devil/' };
+    thief.src = ANIM[key] ? base + ANIM[key] + 'stand.webp' : base + 'assets/crew/' + key + '_m.webp';
     thief.alt = '';
     thief.className = 'holo-thief';
     await thief.decode().catch(() => {});
@@ -107,13 +109,14 @@
     });
     if (!alive()) return;
     // grabs it, the pins pop, and yanks it back the way they came
+    if (ANIM[key]) thief.src = base + ANIM[key] + 'carry.webp';
     h.grabAt(.7, .16);
     h.release();
     h.wind(2);
     pins.forEach((p) => p.animate([{ translate: '-50% -35%', opacity: 1 }, { translate: '-50% 120%', rotate: '160deg', opacity: 0 }], { duration: 600, easing: 'ease-in', fill: 'forwards' }));
     const r0 = host.getBoundingClientRect(), x0 = parseFloat(thief.style.left), y0 = parseFloat(thief.style.top);
     await tween(1100, (k) => {
-      const x = x0 + W * .32 * k * k, y = y0 - 20 * Math.sin(k * Math.PI);
+      const x = x0 + W * .14 * k * k, y = y0 - 20 * Math.sin(k * Math.PI); // a short yank: the POOF has to land in frame
       thief.style.left = x + 'px';
       thief.style.top = y + 'px';
       thief.style.rotate = (k * 10) + 'deg';
@@ -124,7 +127,8 @@
     const poof = document.createElement('i');
     poof.className = 'holo-poof';
     poof.innerHTML = '<b>POOF!</b>';
-    poof.style.left = thief.style.left;
+    // the POOF is 60% of the stage wide and centered on its spot: keep the center between 30% and 70%
+    poof.style.left = Math.min(W * .7, Math.max(W * .3, parseFloat(thief.style.left) + thief.offsetWidth / 2)) + 'px';
     poof.style.top = (parseFloat(thief.style.top) + thief.offsetHeight * .2) + 'px';
     host.append(poof);
     spot.extras.push(poof);
