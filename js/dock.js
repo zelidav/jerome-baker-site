@@ -22,10 +22,10 @@
   };
   const TABS = [
     ['glass', 'Glass', 'glass/'],
-    ['shop', 'Merch', 'shop/'],
+    ['shop', 'Ritual Merch', 'shop/'],
     null,  // the bowl
-    ['crew', 'Crew', 'crew/'],
-    ['comics', 'Hot Shop', 'comics/'],
+    ['crew', 'The JB Crew', 'crew/'],
+    ['comics', 'The Hot Shop', 'comics/'],
   ];
   // everything, for the sticker pile
   const ALL = [

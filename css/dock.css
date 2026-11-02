@@ -31,7 +31,8 @@
   .dock .tab svg{width:26px;height:26px;fill:var(--ink);stroke:none;transition:transform .2s ease}
   .dock .tab svg .ln{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round}
   .dock .tab img{width:30px;height:30px;object-fit:contain;transition:transform .2s ease}
-  .dock .tab span{transition:opacity .2s ease,max-height .2s ease;max-height:14px;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+  /* full menu names (same words as the header and footer), allowed to break onto two short lines */
+  .dock .tab span{transition:opacity .2s ease,max-height .2s ease;max-height:24px;font-size:10px;line-height:1.1;text-align:center;text-wrap:balance;text-shadow:0 1px 0 rgba(255,255,255,.7)}
   /* where you are: a yellow sticker slapped on the glass */
   .dock .tab.on::before{content:"";position:absolute;inset:7px 2px;background:var(--yellow);border:2.5px solid var(--ink);rotate:-4deg;z-index:-1;box-shadow:2px 2px 0 var(--ink)}
   .dock .tab:active svg,.dock .tab:active img{transform:scale(.86) rotate(-8deg)}

@@ -22,6 +22,11 @@
     if (a.textContent.trim().toLowerCase() === LABEL[key].toLowerCase()) a.textContent = LABEL[key];
     if (key !== '#made' && !a.hasAttribute('aria-current') && new URL(a.href, location.href).pathname === page) a.setAttribute('aria-current', 'page');
   });
+  // the shared footer is built by the same script, so its links get the same words
+  document.querySelectorAll('footer.site-foot a').forEach((a) => {
+    const key = Object.keys(LABEL).find((k) => (a.getAttribute('href') || '').replace(/^(\.\.\/)+/, '') === k);
+    if (key && a.textContent.trim().toLowerCase() === LABEL[key].toLowerCase()) a.textContent = LABEL[key];
+  });
 
   // ---------- the torn edge, one per page ----------
   // a small seeded random, so the same page always tears the same way and every page tears differently
