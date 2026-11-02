@@ -31,7 +31,8 @@
   .dock .tab svg{width:26px;height:26px;fill:var(--ink);stroke:none;transition:transform .2s ease}
   .dock .tab svg .ln{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round}
   .dock .tab img{width:30px;height:30px;object-fit:contain;transition:transform .2s ease}
-  .dock .tab span{transition:opacity .2s ease,max-height .2s ease;max-height:14px;white-space:nowrap;text-shadow:0 1px 0 rgba(255,255,255,.7)}
+  /* full menu names (same words as the header and footer), allowed to break onto two short lines */
+  .dock .tab span{transition:opacity .2s ease,max-height .2s ease;max-height:24px;font-size:10px;line-height:1.1;text-align:center;text-wrap:balance;text-shadow:0 1px 0 rgba(255,255,255,.7)}
   /* where you are: a yellow sticker slapped on the glass */
   .dock .tab.on::before{content:"";position:absolute;inset:7px 2px;background:var(--yellow);border:2.5px solid var(--ink);rotate:-4deg;z-index:-1;box-shadow:2px 2px 0 var(--ink)}
   .dock .tab:active svg,.dock .tab:active img{transform:scale(.86) rotate(-8deg)}
@@ -72,6 +73,15 @@
   .pile-x{display:block;margin:22px auto 0;min-height:44px;padding:0 18px;background:none;border:2px solid var(--white);color:var(--white);font-family:var(--display);font-weight:800;font-size:15px;cursor:pointer}
   body.dock-open{overflow:hidden}
   body.dock-open .crew-toggle,body.dock-open .crew-layer{visibility:hidden}
+}
+/* the magnifying glass on the desktop top menu (js/dock.js): links swell under the mouse and drop out of the bar */
+@media (min-width:761px){
+  header nav.lens a{position:relative;transform-origin:50% 0;will-change:transform;
+    transition:transform .45s cubic-bezier(.3,1.6,.5,1),color .15s,text-shadow .15s}
+  header nav.lens.lensing a{transition:transform .12s ease-out,color .15s,text-shadow .15s}
+  header nav.lens a.lensed{z-index:3}
+  header nav.lens a.btn:hover,header nav.lens a.cartbtn:hover{rotate:-2deg}
+  header nav.lens a.lensed:not(.btn):not(.cartbtn){text-shadow:2px 2px 0 var(--ink)}
 }
 @media (max-width:760px) and (prefers-reduced-motion:reduce){
   .pile li,.pile-smoke,.dock .bowl,.tube .fill{transition:none}

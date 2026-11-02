@@ -10,27 +10,87 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   head.classList.add('hdr');
 
+  // ---------- one menu, every page ----------
+  // the crew pages are built by a script, so their menu labels are brought in line here:
+  // same words as the home, shop, glass and comics menus, and the page you're on lights up
+  const LABEL = { 'glass/': 'Glass', 'shop/': 'Ritual Merch', 'crew/': 'The JB Crew', 'crew/match/': 'Find Your Crew',
+    'comics/': 'The Hot Shop', '#made': 'The Story', 'travel/': 'Travel Guide' };
+  const page = location.pathname.replace(/index\.html$/, '');
+  head.querySelectorAll('nav[aria-label="Main"] a:not(.btn):not(.cartbtn)').forEach((a) => {
+    const key = Object.keys(LABEL).find((k) => (a.getAttribute('href') || '').replace(/^(\.\.\/)+/, '') === k);
+    if (!key) return;
+    if (a.textContent.trim().toLowerCase() === LABEL[key].toLowerCase()) a.textContent = LABEL[key];
+    if (key !== '#made' && !a.hasAttribute('aria-current') && new URL(a.href, location.href).pathname === page) a.setAttribute('aria-current', 'page');
+  });
+  // the shared footer is built by the same script, so its links get the same words
+  document.querySelectorAll('footer.site-foot a').forEach((a) => {
+    const key = Object.keys(LABEL).find((k) => (a.getAttribute('href') || '').replace(/^(\.\.\/)+/, '') === k);
+    if (key && a.textContent.trim().toLowerCase() === LABEL[key].toLowerCase()) a.textContent = LABEL[key];
+  });
+
   // ---------- the torn edge, one per page ----------
   // a small seeded random, so the same page always tears the same way and every page tears differently
   let seed = 2166136261;
   for (const ch of location.pathname.replace(/index\.html$/, '')) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
   const rnd = () => { seed = Math.imul(seed ^ (seed >>> 15), 2246822507); seed = Math.imul(seed ^ (seed >>> 13), 3266489909); return ((seed ^= seed >>> 16) >>> 0) / 4294967296; };
-  const W = 1200, H = 30;
-  const tear = (depth, step) => {
-    // a ragged line along the bottom: big lazy dips with small sharp teeth on top
-    let d = `M0 0 H${W} V${(H * .35).toFixed(1)}`;
-    const phase = rnd() * 6.28, lazy = 2 + rnd() * 3;
-    for (let x = W; x > 0; x -= step * (.5 + rnd())) {
-      const swell = (Math.sin(x / W * Math.PI * lazy + phase) + 1) / 2;
-      const y = H * (.12 + .6 * swell * depth + rnd() * .35 * depth);
-      d += ` L${x.toFixed(1)} ${Math.min(H, y).toFixed(1)}`;
+  // drawn at real pixel size (never stretched, css/header.css sizes it), wide enough for big screens
+  const W = 3000, H = 48, N = 512; // N segments, ~6px apart (bigger, chunkier tears)
+  // midpoint displacement: big wandering rips with smaller and smaller jags on top, like real torn paper
+  const fractal = (amp, rough) => {
+    const ys = new Array(N + 1);
+    ys[0] = (rnd() - .5) * amp; ys[N] = (rnd() - .5) * amp;
+    for (let step = N, a = amp; step > 1; step >>= 1, a *= rough) {
+      for (let i = step >> 1; i < N; i += step) ys[i] = (ys[i - (step >> 1)] + ys[i + (step >> 1)]) / 2 + (rnd() - .5) * a;
     }
-    return d + ` L0 ${(H * .3).toFixed(1)} Z`;
+    return ys;
+  };
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  // the white paper core: the deepest line
+  const rip = fractal(44, .56);
+  const paper = rip.map((v) => clamp(H * .58 + v, 12, H - 9)); // leaves room under the deepest rip for the fuzz
+  // the blue layer tears shy of it: a wide white lip that now and then opens into a bigger flap
+  const lipNoise = fractal(20, .6);
+  const blue = paper.map((y, i) => clamp(y - (4 + Math.max(0, lipNoise[i]) * 1.2 + Math.abs(lipNoise[i]) * .35), 4, y - 3));
+  const line = (ys, dy = 0) => {
+    let d = `M0 -4 H${W}`;
+    for (let i = N; i >= 0; i--) d += ` L${(i * W / N).toFixed(1)} ${(ys[i] + dy).toFixed(1)}`;
+    return d + ' Z';
   };
   const bg = getComputedStyle(head).backgroundColor || '#2A3B8E';
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">` +
-    `<path d="${tear(1, 14)}" fill="#F4EFE4"/>` +           // the paper fibres show past the blue
-    `<path d="${tear(.75, 10)}" fill="${bg}"/></svg>`;
+  const tseed = Math.floor(rnd() * 999);
+  const top = Math.min(...blue) - 2;
+  // the fuzz: loose paper fibres hanging off the rip. Clumpy on purpose: bare stretches, then a tuft, then a few strays,
+  // with lengths, angles, curl and thickness all random (and seeded, so each page keeps its own fuzz)
+  const yAt = (x) => { const f = clamp(x / W * N, 0, N), i = Math.min(N - 1, Math.floor(f)); return paper[i] + (paper[i + 1] - paper[i]) * (f - i); };
+  let fibres = '';
+  for (let x = rnd() * 30; x < W; x += 4 + Math.pow(rnd(), 1.8) * 70) {
+    const tuft = rnd() < .3 ? 0 : 1 + Math.floor(rnd() * rnd() * 9); // often a few, sometimes a big tuft, sometimes none
+    const spread = 3 + rnd() * 16;
+    for (let k = 0; k < tuft; k++) {
+      const fx = x + (rnd() - .5) * spread, y0 = yAt(fx) - 1.5;
+      const len = 3 + Math.pow(rnd(), 1.6) * 11;                 // 3px to 14px, mostly mid-length, the odd long one
+      const ang = (rnd() - .5) * 2.2;                            // anywhere from leaning hard left to hard right
+      const ex = fx + Math.sin(ang) * len, ey = Math.min(H - 1, y0 + Math.cos(ang) * len);
+      const curl = (rnd() - .5) * len * .9;                      // some straight, some hooked
+      const cx = (fx + ex) / 2 + curl, cy = (y0 + ey) / 2 + Math.abs(curl) * .3;
+      const w = (.7 + Math.pow(rnd(), 2) * 1.6).toFixed(2);      // thin hairs with a few thick strands
+      const c = rnd() < .22 ? '#CFC6B4' : '#F7F2E8';
+      fibres += `<path d="M${fx.toFixed(1)} ${y0.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${ex.toFixed(1)} ${ey.toFixed(1)}" stroke="${c}" stroke-width="${w}"/>`;
+    }
+  }
+  // a different noise grain per page, so the edge roughness itself is uneven too
+  const fq = (a, b) => (a + rnd() * (b - a)).toFixed(3);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">` +
+    `<defs>` +
+    // fibres: layered noise (coarse + fine octaves) pushes the edges around so they fuzz in uneven patches instead of cutting clean
+    `<filter id="fz" x="-1%" y="-30%" width="102%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="${fq(.12, .22)} ${fq(.25, .45)}" numOctaves="4" seed="${tseed}"/><feDisplacementMap in="SourceGraphic" scale="${fq(3.5, 5)}" xChannelSelector="R" yChannelSelector="G"/></filter>` +
+    `<filter id="fb" x="-1%" y="-30%" width="102%" height="160%"><feTurbulence type="fractalNoise" baseFrequency="${fq(.15, .3)} ${fq(.3, .5)}" numOctaves="3" seed="${tseed + 7}"/><feDisplacementMap in="SourceGraphic" scale="${fq(2, 3)}" xChannelSelector="R" yChannelSelector="G"/></filter>` +
+    `</defs>` +
+    `<g fill="none" stroke-linecap="round" filter="url(#fb)">${fibres}</g>` + // the loose fibres, tucked under the paper
+    `<path d="${line(paper, 1.2)}" fill="#CFC6B4" filter="url(#fz)"/>` +   // paper thickness, a hair darker underneath
+    `<path d="${line(paper)}" fill="#F7F2E8" filter="url(#fz)"/>` +        // the white core of the torn paper
+    `<path d="${line(blue)}" fill="${bg}" filter="url(#fb)"/>` +           // the blue print layer, torn short
+    `<rect x="0" y="-4" width="${W}" height="${(top + 4).toFixed(1)}" fill="${bg}"/></svg>`;
   const edge = document.createElement('div');
   edge.className = 'hdr-tear';
   edge.setAttribute('aria-hidden', 'true');
@@ -70,7 +130,7 @@
       { transform: 'none', clipPath: 'polygon(0 0,100% 0,100% 100%,0 100%)', opacity: 1 },
     ], { duration: 720, delay: 120 + i * 85, easing: 'cubic-bezier(.2,.9,.3,1.2)', fill: 'backwards' });
     a.addEventListener('pointerenter', () => {
-      if (a._g) return;
+      if (a._g || a.closest('nav.lens')) return; // the magnifying glass (js/dock.js) owns hover on desktop
       a._g = a.animate([
         { transform: 'none', clipPath: 'polygon(0 0,100% 0,100% 100%,0 100%)' },
         { transform: 'scale(.9,1.18) skewX(8deg)', clipPath: 'polygon(14% 0,86% 0,100% 100%,0 100%)', offset: .35 },

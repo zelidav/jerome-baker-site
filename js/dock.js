@@ -22,20 +22,20 @@
   };
   const TABS = [
     ['glass', 'Glass', 'glass/'],
-    ['shop', 'Merch', 'shop/'],
+    ['shop', 'Ritual Merch', 'shop/'],
     null,  // the bowl
-    ['crew', 'Crew', 'crew/'],
-    ['comics', 'Hot Shop', 'comics/'],
+    ['crew', 'The JB Crew', 'crew/'],
+    ['comics', 'The Hot Shop', 'comics/'],
   ];
   // everything, for the sticker pile
   const ALL = [
     ['Glass', 'glass/', 'blue', 'Hand blown. One of one.'],
-    ['Ritual merch', 'shop/', 'red', 'Wear the box art.'],
+    ['Ritual Merch', 'shop/', 'red', 'Wear the box art.'],
     ['The JB Crew', 'crew/', 'yellow', 'Twenty lunatics. No supervision.'],
-    ['Find your crew', 'crew/match/', 'teal', 'Four questions. No lying.'],
+    ['Find Your Crew', 'crew/match/', 'teal', 'Four questions. No lying.'],
     ['The Hot Shop', 'comics/', 'red', 'The comic. 21+.'],
-    ['The story', '#made', 'white', 'Since 1991.'],
-    ['Travel guide', 'travel/', 'yellow', 'Where to go next.'],
+    ['The Story', '#made', 'white', 'Since 1991.'],
+    ['Travel Guide', 'travel/', 'yellow', 'Where to go next.'],
     ['Home', '', 'blue', 'Back to the chaos.'],
   ];
   const href = (h) => base + h || './';
@@ -94,6 +94,56 @@
   addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(tick); } }, { passive: true });
   addEventListener('resize', tick, { passive: true });
   tick();
+})();
+
+// the magnifying glass on the desktop top menu: links swell as the mouse gets close, like looking through a lens,
+// and drop down out of the bar. Neighbours slide aside so nothing overlaps. Mouse only, wide screens only.
+(() => {
+  const nav = document.querySelector('header nav[aria-label="Main"]');
+  if (!nav || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const links = [...nav.querySelectorAll('a')];
+  if (!links.length) return;
+  nav.classList.add('lens');
+  const MAX = 0.55, REACH = 130, DROP = 10;   // extra scale at the cursor, how far the lens reaches (px), how far it drops (px)
+  let boxes = null, frame = 0, mx = 0;
+  const measure = () => {
+    // resting layout (offset* ignore transforms, so a half-finished swell can't throw the numbers off)
+    boxes = links.map((a) => {
+      const p = (a.offsetParent || document.body).getBoundingClientRect();
+      return { cx: p.left + a.offsetLeft + a.offsetWidth / 2, w: a.offsetWidth, top: a.offsetTop };
+    });
+  };
+  const paint = () => {
+    frame = 0;
+    if (!boxes) measure();
+    const s = boxes.map((b) => { const d = Math.abs(mx - b.cx) / REACH; return d >= 1 ? 1 : 1 + MAX * (Math.cos(d * Math.PI) + 1) / 2; });
+    const shift = boxes.map(() => 0);
+    // push things outward from the cursor by half of each magnified neighbour's growth (same row only)
+    boxes.forEach((b, i) => {
+      const grow = (s[i] - 1) * b.w;
+      boxes.forEach((o, j) => {
+        if (j === i || Math.abs(o.top - b.top) > 4) return;
+        if (o.cx < b.cx) shift[j] -= grow / 2; else shift[j] += grow / 2;
+      });
+    });
+    // never shove the last link off the right edge
+    let over = 0;
+    boxes.forEach((b, i) => { over = Math.max(over, b.cx + shift[i] + (b.w * s[i]) / 2 - (innerWidth - 8)); });
+    links.forEach((a, i) => {
+      const k = s[i] - 1;
+      a.classList.toggle('lensed', k > 0.02);
+      a.style.transform = `translate(${(shift[i] - over).toFixed(1)}px, ${(k / MAX * DROP).toFixed(1)}px) scale(${s[i].toFixed(3)})`;
+    });
+  };
+  nav.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'mouse') return; measure(); nav.classList.add('lensing'); });
+  nav.addEventListener('pointermove', (e) => { if (e.pointerType !== 'mouse') return; mx = e.clientX; if (!frame) frame = requestAnimationFrame(paint); });
+  nav.addEventListener('pointerleave', () => {
+    cancelAnimationFrame(frame); frame = 0; boxes = null;
+    nav.classList.remove('lensing');
+    links.forEach((a) => { a.style.transform = ''; a.classList.remove('lensed'); });
+  });
+  addEventListener('resize', () => { boxes = null; }, { passive: true });
+  addEventListener('scroll', () => { boxes = null; }, { passive: true });
 })();
 
 // crew promos (js/promo.js) ride along with the dock, which every page except the comics loads
