@@ -22,13 +22,15 @@
 .holo-stage canvas:active{cursor:grabbing}
 .holo-hint{position:absolute;z-index:10;left:50%;bottom:8px;translate:-50% 0;margin:0;padding:6px 12px;background:#0A0A0A;color:#FCD804;font:800 13px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s}
 .holo-stage.on + .holo-hint{opacity:1}
+@media (max-width:700px){.holo-hint{white-space:normal;width:max-content;max-width:calc(100% - 80px);text-align:center;left:8px;translate:none}}
 .collage.holo-live > :not(.holo-stage):not(.holo-hint){visibility:hidden}
 .holo-sec{background:#233671;color:#fff;padding-top:64px;padding-bottom:64px;border-top:4px solid #DA2342}
 .holo-box{position:relative;flex:0 1 480px;width:min(480px,100%);aspect-ratio:1;max-width:100%}
 .holo-box .holo-hint{bottom:0}
 .holo-sec h2{color:#FFF100}
 .pd-big.holo-live > img:not(.holo-thief){visibility:hidden}
-.pd-big:has(.holo-thief,.holo-line){overflow:hidden}
+.pd-big.holo-cloth{background:radial-gradient(ellipse at 50% 42%,#fafafa 0,#e9e9ea 45%,#c9cacd 100%)}
+.pd-big:has(.holo-thief,.holo-line,.holo-say){overflow:hidden}
 .holo-line{position:absolute;z-index:8;left:-4%;right:-4%;height:3px;background:#5a4632;border-radius:2px;box-shadow:0 2px 3px rgba(0,0,0,.25);pointer-events:none}
 .holo-pin{position:absolute;z-index:10;width:9px;height:24px;translate:-50% -35%;background:#c79a5b;border:2px solid #0A0A0A;border-radius:2px;pointer-events:none}
 .holo-thief{position:absolute;z-index:11;height:34%;width:auto;pointer-events:none;translate:-50% -30%;filter:drop-shadow(3px 4px 0 rgba(0,0,0,.35))}
@@ -36,10 +38,12 @@
   background:radial-gradient(circle at 35% 40%,#fff 0 18%,transparent 19%),radial-gradient(circle at 62% 35%,#eee 0 20%,transparent 21%),radial-gradient(circle at 50% 62%,#f4f4f4 0 24%,transparent 25%),radial-gradient(circle at 28% 64%,#ddd 0 15%,transparent 16%),radial-gradient(circle at 72% 62%,#e8e8e8 0 16%,transparent 17%)}
 .holo-poof b{position:absolute;left:50%;top:50%;translate:-50% -50%;rotate:-8deg;font:900 clamp(28px,6vw,52px)/1 Montserrat,Helvetica,Arial,sans-serif;color:#FFF100;-webkit-text-stroke:2px #0A0A0A;paint-order:stroke;text-shadow:3px 3px 0 #DA2342}
 .holo-play{position:absolute;z-index:13;right:8px;bottom:8px;width:44px;height:44px;padding:0;border:3px solid #0A0A0A;background:#FFF100;color:#0A0A0A;font:900 22px/1 Montserrat,Helvetica,Arial,sans-serif;cursor:pointer;box-shadow:3px 3px 0 #0A0A0A}
-.holo-play[hidden],.holo-handle[hidden]{display:none}
-.holo-handle{position:absolute;z-index:12;left:0;top:0;width:48px;height:48px;margin:-24px 0 0 -24px;padding:0;border:0;background:none;touch-action:none;-webkit-tap-highlight-color:transparent}
-.holo-handle::after{content:"";position:absolute;inset:14px;border-radius:50%;background:#FFF100;border:3px solid #0A0A0A;animation:holo-ping 1.8s ease-out infinite}
-@keyframes holo-ping{0%{box-shadow:0 0 0 0 rgba(255,241,0,.85)}70%,100%{box-shadow:0 0 0 14px rgba(255,241,0,0)}}
+.holo-play[hidden]{display:none}
+.holo-finger{position:absolute;z-index:14;left:0;top:0;width:44px;height:44px;margin:-6px 0 0 -14px;pointer-events:none;opacity:0;transition:opacity .25s;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.35))}
+.holo-finger.on{opacity:1}
+.holo-finger::before{content:"";position:absolute;left:4px;top:-4px;width:20px;height:20px;border-radius:50%;border:3px solid #FFF100;opacity:0}
+.holo-finger.press::before{animation:holo-tap .7s ease-out}
+@keyframes holo-tap{0%{opacity:1;scale:.4}100%{opacity:0;scale:2.2}}
 .holo-fs{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 38%,#fff,#e4e4e4 75%);overscroll-behavior:contain}
 .holo-fs .holo-stage{position:relative;inset:auto;flex:1;min-height:0;opacity:1}
 .holo-fs-top{position:absolute;z-index:3;top:calc(10px + env(safe-area-inset-top));left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
@@ -49,6 +53,8 @@
 .holo-fs-buy b{font:900 26px/1 Montserrat,Helvetica,Arial,sans-serif;color:#FFF100}
 .holo-fs-buy span{display:block;font-size:13px;opacity:.8}
 .holo-fs-buy button{min-height:48px;padding:10px 18px;border:3px solid #FFF100;background:#DA2342;color:#fff;font:800 16px Montserrat,Helvetica,Arial,sans-serif;cursor:pointer}
+.holo-say{position:absolute;z-index:12;margin:0;padding:6px 10px;translate:-50% -100%;background:#fff;color:#0A0A0A;border:3px solid #0A0A0A;font:900 14px/1.15 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;pointer-events:none;box-shadow:3px 3px 0 #0A0A0A;rotate:-3deg}
+.holo-say[hidden]{display:none}
 .holo-took{position:absolute;z-index:12;left:50%;top:12px;translate:-50% 0;margin:0;padding:8px 14px;background:#DA2342;color:#fff;font:800 14px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;rotate:-2deg;box-shadow:3px 3px 0 #0A0A0A}`;
   document.head.appendChild(css);
 
@@ -56,7 +62,7 @@
   const spots = [];
   const collage = document.querySelector('.hero .collage');
   if (collage) spots.push({
-    host: collage, hint: phone ? 'Drag a yellow dot.' : 'Grab the box. Double-tap to crumple it.',
+    host: collage, hint: phone ? 'Grab it anywhere to twist and curl.' : 'Grab the box. Double-tap to crumple it.',
     opts: { preset: 'jb-poster', clothImage: base + 'assets/img/box.webp' },
   });
   // on a crew page the sticker gets its own section, right after the GIF one (the hero stays the art, so it can still turn real)
@@ -70,13 +76,14 @@
     sec.querySelector('h2').textContent = name.trim() + ', in holo.';
     gif.after(sec);
     spots.push({
-      host: sec.querySelector('.holo-box'), hint: phone ? 'Drag a yellow dot.' : 'Twist it. Double-tap to crumple.',
+      host: sec.querySelector('.holo-box'), hint: phone ? 'Grab it anywhere to twist and curl.' : 'Twist it. Double-tap to crumple.',
       opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
     });
   }
   // the Crossed Bongs polos hang on a clothesline in the breeze, until the crew member who wears that color
   // runs in, grabs it and vanishes with it. The cutouts are assets/holo/polo-<id>.webp (made from the shop photo).
   const THIEF = { 672: 'bear', 696: 'devil', 720: 'grin' };
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const tween = (ms, f) => new Promise((done) => {
     const t0 = performance.now();
@@ -111,7 +118,7 @@
     thief.className = 'holo-thief';
     await thief.decode().catch(() => {});
     if (!alive()) return;
-    spot.busy = true; // no handles or play button while the thief is on
+    spot.busy = true; // hands off the cloth, no play button, while the thief is on
     host.append(thief);
     spot.extras.push(thief);
     const W = host.clientWidth;
@@ -166,15 +173,154 @@
     took.remove();
     start(spot);
   };
+  // the rest of the cloth (tees, hoodies, crop tops, towels, board shorts, the signature polo): the front photo's
+  // cutout is the cloth (assets/holo/cloth-<id>.webp, trimmed from assets/shop/cut), so there is no white square,
+  // and the crew member who wears it comes by to mess with it: wads it into a ball and bounces it, or grabs a
+  // corner and snaps it out. Anybody touching it, or the full-screen viewer, and they leave it alone.
+  const CLOTH = new Set([7622, 7570, 7498, 7406, 7399, 7392, 7354, 7333, 7326, 7263, 7247, 7220, 7206, 7192, 7178, 7117, 7053, 7045, 7041, 7037, 7033, 1122, 1070, 1018, 966, 914, 862, 852, 824, 586]);
+  const ANIMS = new Set(['alien', 'bot', 'chimp', 'cy', 'devil', 'gorilla', 'lion', 'pumpkin']);
+  const crewOf = (id) => {
+    const S = window.JBShop || {}, p = (S.items || []).find((x) => String(x.id) === String(id));
+    return (p && S.crew && S.crew[p.crew]) || null;
+  };
+  const mess = async (spot) => {
+    const h = spot.holo, host = spot.host, c = crewOf(spot.id);
+    if (!c) return;
+    spot.stage.addEventListener('pointerdown', () => (spot.touchedAt = performance.now()));
+    const anim = ANIMS.has(c.img);
+    const fr = (f) => base + (anim ? 'assets/anim/' + c.img + '/' + f : 'assets/crew/' + c.img + '_m') + '.webp';
+    await Promise.all((anim ? ['stand', 'walk1', 'walk2', 'walk3', 'reach', 'carry', 'hop', 'pose'] : ['']).map((f) => {
+      const i = new Image(); i.src = fr(f); return i.decode().catch(() => {});
+    }));
+    const alive = () => spot.holo === h && host.isConnected;
+    const towel = /^Towel/i.test((document.querySelector('#pdTitle') || {}).textContent || '');
+    const acts = towel ? [shake, scrunch] : [scrunch, shake];
+    for (let n = 0; n < acts.length; n++) {
+      await wait(n ? 16000 : phone ? 3500 : 4500);
+      while (alive() && (performance.now() - (spot.touchedAt || 0) < 3000 || spot.full)) await wait(500);
+      if (!alive()) return;
+      const t0 = performance.now();
+      const ok = () => alive() && !spot.full && (spot.touchedAt || 0) < t0;
+      const guy = new Image();
+      guy.alt = '';
+      guy.className = 'holo-thief';
+      guy.src = fr('stand');
+      guy.style.height = Math.round(host.clientHeight * .36) + 'px';
+      const say = document.createElement('p');
+      say.className = 'holo-say';
+      say.hidden = true;
+      host.append(guy, say);
+      (spot.extras = spot.extras || []).push(guy, say);
+      spot.busy = true;
+      spot.yields = true; // a touch takes the cloth back and the crew member ducks out
+      const R = () => host.getBoundingClientRect();
+      const at = (u, v) => { const r = R(), p = h.screenAt(u, v); return { x: p.x - r.left, y: p.y - r.top }; };
+      const pos = { x: 0, y: 0 };
+      const put = (x, y, bob = 0) => {
+        pos.x = x; pos.y = y;
+        guy.style.left = x + 'px';
+        guy.style.top = y - bob + 'px';
+        if (!say.hidden) {
+          say.style.left = Math.min(host.clientWidth - 80, Math.max(80, x)) + 'px';
+          say.style.top = Math.max(40, y - guy.offsetHeight * .3 - 6) + 'px';
+        }
+      };
+      const frame = (f) => { if (anim) guy.src = fr(f); };
+      const talk = (t) => { say.textContent = t; say.hidden = false; put(pos.x, pos.y); };
+      const walk = (to, ms) => {
+        const from = { ...pos };
+        guy.style.scale = to.x < from.x ? '-1 1' : '1 1';
+        return tween(ms, (k) => {
+          if (anim) guy.src = fr('walk' + (1 + (Math.floor(k * ms / 110) % 3)));
+          put(from.x + (to.x - from.x) * k, from.y + (to.y - from.y) * k, Math.abs(Math.sin(k * Math.PI * 4)) * 12);
+        });
+      };
+      // the cloth follows the hand (pullTo wants page coordinates)
+      const drag = (x, y) => { const r = R(); h.pullTo(r.left + x, r.top + y); };
+      const W = host.clientWidth, H = host.clientHeight;
+      try {
+        await acts[n]({ h, at, put, pos, walk, frame, talk, drag, ok, W, H });
+      } finally {
+        try { h.letGo(); } catch (e) { /* already let go */ }
+        if (alive()) {
+          // walks off, or just ducks out if someone grabbed the cloth
+          if (ok()) { say.hidden = true; await walk({ x: W * 1.3, y: pos.y }, 900); }
+          guy.remove(); say.remove();
+          spot.busy = false;
+          spot.yields = false;
+        }
+      }
+    }
+  };
+  // wad it into a ball, bounce it, toss it back: it unfolds
+  async function scrunch({ h, at, put, pos, walk, frame, talk, drag, ok, W, H }) {
+    const hem = at(.14, .84);
+    put(-W * .3, hem.y);
+    await walk(hem, 1000);
+    if (!ok()) return;
+    frame('reach');
+    h.grabAt(.14, .84);
+    await tween(450, (k) => drag(hem.x + W * .08 * k, hem.y - H * .06 * k));
+    if (!ok()) return;
+    talk('Needs a little wrinkle.');
+    h.crumple();
+    await wait(700);
+    if (!ok()) return;
+    frame('carry');
+    const ball = at(.5, .5);
+    await walk({ x: ball.x - W * .02, y: ball.y + H * .08 }, 700);
+    if (!ok()) return;
+    h.grabAt(.5, .5);
+    talk('Ball is life.');
+    const x0 = pos.x, y0 = pos.y;
+    for (let b = 0; b < 3; b++) {
+      frame(b % 2 ? 'carry' : 'hop');
+      await tween(420, (k) => { const up = Math.sin(k * Math.PI); drag(x0, y0 - H * (.06 + .14 * up)); put(x0, y0, up * 16); });
+      if (!ok()) return;
+    }
+    frame('pose');
+    talk('Good as new.');
+    await tween(380, (k) => drag(x0 + W * .05 * k, y0 - H * (.06 + .3 * k)));
+    h.letGo();
+    await h.snapBack(1400);
+    await wait(500);
+  }
+  // grab a corner and snap it out like a fresh towel
+  async function shake({ h, at, put, walk, frame, talk, drag, ok, W, H }) {
+    const cor = at(.9, .22);
+    put(W * 1.3, cor.y);
+    await walk(cor, 1000);
+    if (!ok()) return;
+    frame('reach');
+    h.grabAt(.9, .22);
+    await wait(250);
+    frame('carry');
+    talk('Shake it out!');
+    const x0 = cor.x, y0 = cor.y;
+    await tween(1500, (k) => {
+      const s = Math.sin(k * Math.PI * 7) * (1 - k * .6);
+      const x = x0 + W * .08 * Math.min(1, k * 3), y = y0 + H * .16 * s;
+      drag(x, y); put(x, y, Math.abs(s) * 6);
+    });
+    if (!ok()) return;
+    frame('pose');
+    talk('Fresh!');
+    h.letGo();
+    await h.snapBack(1000);
+    await wait(700);
+  }
   // in the merch detail view: the Classic Tee is heavy woven cloth you can grab, the polos hang in the breeze.
   // Mounted when it opens, dropped when it closes.
   const views = [
-    { dlg: '#pd', name: '#pdTitle', test: /^Classic Tee/i, host: '.pd-big', img: '#pdImg',
-      hint: phone ? 'Drag a yellow dot.' : 'Grab the tee. ⤢ to spin it.', opts: { preset: 'jb-poster' } },
-    { dlg: '#pd', name: '#pdTitle', test: /^Polo/i, host: '.pd-big', img: '#pdImg',
+    { dlg: '#pd', name: '#pdTitle', test: /^(Classic Tee|Hoodie|Cotton Crop Top|Towel|Polo – JB|Men’s Board Shorts)/i, host: '.pd-big', img: '#pdImg',
+      // the front photo only: it's the one with a cutout
+      src: (src) => { const m = src.match(/shop\/(\d+)_0\.webp/); return m && CLOTH.has(+m[1]) ? { id: m[1], src: base + 'assets/holo/cloth-' + m[1] + '.webp' } : null; },
+      hint: phone ? 'Grab it anywhere to twist and curl.' : 'Grab it. Double-tap to crumple. ⤢ to spin it.', scene: mess,
+      opts: { preset: 'jb-fabric', dieCut: true } },
+    { dlg: '#pd', name: '#pdTitle', test: /^Polo – Crossed Bongs/i, host: '.pd-big', img: '#pdImg',
       // only the front photo has a cutout
       src: (src) => { const m = src.match(/shop\/(\d+)_0\.webp/); return m && THIEF[m[1]] ? { id: m[1], src: base + 'assets/holo/polo-' + m[1] + '.webp' } : null; },
-      hint: phone ? 'Drag a yellow dot.' : 'Grab the polo. ⤢ to spin it.', scene: snatch,
+      hint: phone ? 'Grab it anywhere to twist and curl.' : 'Grab the polo. ⤢ to spin it.', scene: snatch,
       opts: { preset: 'jb-fabric', dieCut: true, pokeOnEnter: false, crumpleOnDoubleTap: false, snapBack: false,
         hang: { pins: [[.27, .1], [.73, .1]], wind: 3.5, gravity: 9 } } },
   ].filter((v) => document.querySelector(v.dlg));
@@ -210,6 +356,7 @@
         onReady: () => {
           clearTimeout(bail);
           spot.host.classList.add('holo-live');
+          if (spot.opts.dieCut && spot.host.classList.contains('pd-big')) spot.host.classList.add('holo-cloth'); // white tees need a shade behind them
           stage.classList.add('on');
           setTimeout(() => (hint.style.opacity = '0'), 5000);
           decorate(spot);
@@ -232,11 +379,98 @@
   }), { rootMargin: '300px 0px' });
   spots.forEach((s) => near.observe(s.host));
 
-  /* ---------------------------------------------------------------- touch: handles on the page, the rest full screen
-     On the page a phone keeps scrolling everywhere except the yellow dots: touch a dot and you're holding the
-     cloth. No spin or zoom on the page (the desktop wheel scrolls the page again). The ⤢ button opens it full
-     screen, where one finger on the cloth grabs it, one finger off it spins around it, and a pinch zooms. */
-  const HANDLES = { hang: [[.2, .9], [.8, .9], [.5, .55], [.06, .34], [.94, .34]], flat: [[.15, .85], [.85, .85], [.5, .5], [.15, .15], [.85, .15]] };
+  // which bit of cloth is under a screen point? Project a grid of the cloth's (u,v) points to the screen, find the
+  // little triangle the point is in, and (for die-cut art) check the picture isn't see-through there.
+  const N = 10;
+  function clothAt(spot, x, y) {
+    const h = spot.holo, P = [];
+    for (let j = 0; j <= N; j++) for (let i = 0; i <= N; i++) P.push(h.screenAt(i / N, j / N));
+    const tri = (a, b, c, ua, ub, uc) => {
+      const d = (b.y - c.y) * (a.x - c.x) + (c.x - b.x) * (a.y - c.y);
+      if (Math.abs(d) < 1e-6) return null;
+      const l1 = ((b.y - c.y) * (x - c.x) + (c.x - b.x) * (y - c.y)) / d;
+      const l2 = ((c.y - a.y) * (x - c.x) + (a.x - c.x) * (y - c.y)) / d;
+      const l3 = 1 - l1 - l2;
+      if (l1 < 0 || l2 < 0 || l3 < 0) return null;
+      return [l1 * ua[0] + l2 * ub[0] + l3 * uc[0], l1 * ua[1] + l2 * ub[1] + l3 * uc[1]];
+    };
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const k = j * (N + 1) + i, a = P[k], b = P[k + 1], c = P[k + N + 1], e = P[k + N + 2];
+      const u0 = i / N, u1 = (i + 1) / N, v0 = j / N, v1 = (j + 1) / N;
+      const uv = tri(a, b, c, [u0, v0], [u1, v0], [u0, v1]) || tri(e, c, b, [u1, v1], [u0, v1], [u1, v0]);
+      if (uv && solid(spot, uv)) return uv;
+    }
+    return null;
+  }
+  // die-cut art: a tiny copy of the picture's alpha, so a touch on the see-through part scrolls the page
+  function solid(spot, [u, v]) {
+    const m = spot.mask;
+    if (!spot.opts.dieCut) return true;
+    if (!m) return true; // not read yet: count it
+    const x = Math.min(m.w - 1, Math.max(0, Math.floor(u * m.w))), y = Math.min(m.h - 1, Math.max(0, Math.floor(v * m.h)));
+    // a little slack around the edge so it's easy to catch
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) {
+      const xx = x + dx, yy = y + dy;
+      if (xx >= 0 && yy >= 0 && xx < m.w && yy < m.h && m.a[(yy * m.w + xx) * 4 + 3] > 40) return true;
+    }
+    return false;
+  }
+  function readMask(spot) {
+    if (!spot.opts.dieCut || !spot.opts.clothImage) return;
+    const img = new Image();
+    img.onload = () => {
+      const w = 48, hh = Math.max(8, Math.round(48 * img.naturalHeight / img.naturalWidth));
+      const c = document.createElement('canvas');
+      c.width = w; c.height = hh;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(img, 0, 0, w, hh);
+      try { spot.mask = { w, h: hh, a: g.getImageData(0, 0, w, hh).data }; } catch (e) { /* cross-origin: count it all */ }
+    };
+    img.src = spot.opts.clothImage;
+  }
+
+  // a finger shows how: presses on the cloth, tugs it, lets go. Once or twice a visit, not every time.
+  async function coach(spot) {
+    let n = 0;
+    try { n = +sessionStorage.getItem('holo-coach') || 0; sessionStorage.setItem('holo-coach', n + 1); } catch (e) { /* private mode */ }
+    if (n >= 2 || reduce) return;
+    const h = spot.holo, host = spot.host, alive = () => spot.holo === h && host.isConnected && !spot.full && !spot.busy;
+    await wait(1100);
+    if (!alive() || performance.now() - (spot.touchedAt || -1e9) < 3000) return;
+    const [u, v] = spot.opts.hang ? [.5, .8] : [.66, .62];
+    const r = host.getBoundingClientRect(), p0 = h.screenAt(u, v);
+    const x0 = p0.x - r.left, y0 = p0.y - r.top;
+    const f = document.createElement('i');
+    f.className = 'holo-finger';
+    f.innerHTML = '<svg viewBox="0 0 44 44" width="44" height="44"><path d="M14 4c2.2 0 4 1.8 4 4v12l2-.6c1.8-.5 3.6.5 4.2 2.2l.3.9 1.8-.5c1.9-.5 3.8.6 4.3 2.4l.2.8 1.4-.3c2-.4 3.9.9 4.3 2.9l1.2 6.5c.6 3.3-.6 6.6-3.2 8.6L32 44H17l-8.6-9.4c-1.4-1.6-1.4-4 .1-5.5 1.5-1.4 3.8-1.4 5.3 0l.2.2V8c0-2.2 1.8-4 4-4z" transform="translate(-4 -2) scale(.98)" fill="#fff" stroke="#0A0A0A" stroke-width="2.6" stroke-linejoin="round"/></svg>';
+    host.append(f);
+    const pos = (x, y) => { f.style.transform = `translate(${x}px,${y}px)`; };
+    pos(x0 + 30, y0 + 40);
+    f.classList.add('on');
+    try {
+      await tween(450, (k) => pos(x0 + 30 * (1 - k), y0 + 40 * (1 - k)));
+      if (!alive()) return;
+      f.classList.add('press');
+      h.grabAt(u, v);
+      const dx = -Math.min(70, r.width * .16), dy = -Math.min(50, r.height * .1);
+      await tween(900, (k) => {
+        const e = Math.sin(k * Math.PI * 1.5) * (k < .67 ? 1 : 1 - (k - .67) * 3);
+        const x = x0 + dx * Math.sin(k * Math.PI), y = y0 + dy * e;
+        pos(x, y);
+        if (alive()) h.pullTo(r.left + x, r.top + y);
+      });
+    } finally {
+      try { h.letGo(); } catch (e) { /* gone */ }
+      f.classList.remove('on');
+      setTimeout(() => f.remove(), 300);
+      if (alive() && !spot.opts.hang && spot.opts.snapBack !== false) h.snapBack(900);
+    }
+  }
+
+  /* ---------------------------------------------------------------- touch: on the page, grab the cloth anywhere
+     A phone keeps scrolling the page except where a finger lands on the cloth itself: that touch holds the cloth
+     (double-tap crumples it). No spin or zoom on the page (the desktop wheel scrolls the page again). The ⤢ button
+     opens it full screen, where one finger on the cloth grabs it, one finger off it spins, and a pinch zooms. */
   function decorate(spot) {
     const h = spot.holo, host = spot.host, ctl = h.app.controls;
     const alive = () => spot.holo === h && host.isConnected;
@@ -252,51 +486,42 @@
     play.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); full(spot); });
     host.append(play);
     extras.push(play);
+    readMask(spot);
     if (phone) {
-      let snap = 0;
-      const dots = (spot.opts.hang ? HANDLES.hang : HANDLES.flat).map(([u, v]) => {
-        const d = document.createElement('button');
-        d.type = 'button';
-        d.className = 'holo-handle';
-        d.setAttribute('aria-label', 'Grab the cloth here');
-        d._uv = [u, v];
-        d.addEventListener('touchstart', (e) => {
-          e.preventDefault(); // this touch belongs to the cloth, not the page scroll
-          clearTimeout(snap);
-          spot.touchedAt = performance.now();
-          h.grabAt(u, v);
-        }, { passive: false });
-        d.addEventListener('touchmove', (e) => {
-          e.preventDefault();
-          const t = e.touches[0];
-          spot.touchedAt = performance.now();
-          h.pullTo(t.clientX, t.clientY);
-        }, { passive: false });
-        const end = () => {
-          h.letGo();
-          spot.touchedAt = performance.now();
-          if (!spot.opts.hang && spot.opts.snapBack !== false) snap = setTimeout(() => alive() && h.snapBack(900), 3500);
-        };
-        d.addEventListener('touchend', end);
-        d.addEventListener('touchcancel', end);
-        host.append(d);
-        return d;
-      });
-      extras.push(...dots);
-      const place = () => {
-        if (!alive()) return;
-        const hide = !!(spot.full || spot.busy);
-        const r = host.getBoundingClientRect();
-        dots.forEach((d) => {
-          d.hidden = hide;
-          if (hide) return;
-          const p = h.screenAt(d._uv[0], d._uv[1]);
-          d.style.transform = `translate(${p.x - r.left}px,${p.y - r.top}px)`;
-        });
-        requestAnimationFrame(place);
+      const stage = spot.stage;
+      let snap = 0, held = false, lastTap = 0;
+      // on the page the engine's own touch handling stays out of it (it would fight the page scroll)
+      stage.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch' && !spot.full) e.stopPropagation(); }, true);
+      stage.addEventListener('touchstart', (e) => {
+        if (spot.full || (spot.busy && !spot.yields) || !alive() || e.touches.length > 1) return;
+        const t = e.touches[0], uv = clothAt(spot, t.clientX, t.clientY);
+        if (!uv) return; // off the cloth: the page scrolls
+        e.preventDefault(); // this touch belongs to the cloth, not the page scroll
+        clearTimeout(snap);
+        spot.touchedAt = performance.now();
+        if (spot.touchedAt - lastTap < 350 && !spot.opts.hang && spot.opts.crumpleOnDoubleTap !== false) { lastTap = 0; h.crumple(); return; }
+        lastTap = spot.touchedAt;
+        held = true;
+        h.grabAt(uv[0], uv[1]);
+      }, { passive: false });
+      stage.addEventListener('touchmove', (e) => {
+        if (!held) return;
+        e.preventDefault();
+        const t = e.touches[0];
+        spot.touchedAt = performance.now();
+        h.pullTo(t.clientX, t.clientY);
+      }, { passive: false });
+      const end = () => {
+        if (!held) return;
+        held = false;
+        h.letGo();
+        spot.touchedAt = performance.now();
+        if (!spot.opts.hang && spot.opts.snapBack !== false) snap = setTimeout(() => alive() && !held && h.snapBack(900), 3500);
       };
-      requestAnimationFrame(place);
+      stage.addEventListener('touchend', end);
+      stage.addEventListener('touchcancel', end);
     }
+    coach(spot);
     const sync = () => { if (!alive()) return; play.hidden = !!(spot.busy || spot.full); setTimeout(sync, 300); };
     sync();
     spot.ui = extras; // kept apart from spot.extras, which the snatch scene resets
@@ -392,7 +617,7 @@
     spot.extras = [];
     spot.busy = false;
     if (!keep) spot.closed = true;
-    spot.host.classList.remove('holo-live');
+    spot.host.classList.remove('holo-live', 'holo-cloth');
   }
   views.forEach((v) => {
     const dlg = document.querySelector(v.dlg);
