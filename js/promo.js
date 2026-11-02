@@ -27,7 +27,7 @@
       return localStorage.getItem('jbpromo-preview') === '1';
     } catch (e) { return !!v && v !== 'off'; }
   })();
-  if (TEST && /(^|\.)jeromebaker\.cannacrypted\.com$/.test(location.hostname) && !optIn) return;
+  // (the live-site switch is off: David wants the test promos visible to everyone, 2026-11-02)
   window.JBPromoPreview = optIn;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
