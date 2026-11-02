@@ -63,11 +63,13 @@ with sync_playwright() as p:
     # ---- crew wall + a crew page
     pg.goto(BASE + 'crew/?f=1', wait_until='load'); pg.wait_for_timeout(800)
     check('crew wall: 20 pins', pg.locator('.pinboard .pin').count() == 20, str(pg.locator('.pinboard .pin').count()))
-    pg.goto(BASE + 'crew/cy/?f=1', wait_until='load'); pg.wait_for_timeout(800)
+    pg.goto(BASE + 'crew/dr-squint/?f=1', wait_until='load'); pg.wait_for_timeout(800)
     txt = pg.inner_text('body')
     check('crew page: who-they-are block', 'Brooklyn' in txt, '')
     check('crew page: merch links into shop', pg.locator('a[href*="shop/#p="]').count() >= 1)
     check('crew page: rap sheet + talk', 'Rap sheet' in txt)
+    pg.goto(BASE + 'crew/cy/?f=1', wait_until='load'); pg.wait_for_timeout(800)
+    check('crew page: old slug redirects to the new page', pg.url.split('?')[0].endswith('crew/dr-squint/'), pg.url)
 
     # ---- find your crew
     pg.goto(BASE + 'crew/match/?f=1', wait_until='load'); pg.wait_for_timeout(1000)
@@ -85,8 +87,8 @@ with sync_playwright() as p:
     body = pg.inner_text('main')
     check('quiz: reaches a result', 'your crew is' in body.lower(), body[:80].replace('\n', ' '))
     check('quiz: result shows merch links', pg.locator('a[href*="shop/#p="]').count() >= 1)
-    pg.goto(BASE + 'crew/match/#gray', wait_until='load'); pg.wait_for_timeout(1000)
-    check('quiz: shared #slug link shows that result', 'Gray' in pg.inner_text('main'))
+    pg.goto(BASE + 'crew/match/#beamer', wait_until='load'); pg.wait_for_timeout(1000)
+    check('quiz: shared #slug link shows that result', 'Beamer' in pg.inner_text('main'))
 
     # ---- glass
     pg.goto(BASE + 'glass/', wait_until='load'); pg.wait_for_timeout(1200)
