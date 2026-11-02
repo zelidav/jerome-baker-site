@@ -35,6 +35,20 @@
 .holo-poof{position:absolute;z-index:12;width:60%;aspect-ratio:1;translate:-50% -50%;pointer-events:none;
   background:radial-gradient(circle at 35% 40%,#fff 0 18%,transparent 19%),radial-gradient(circle at 62% 35%,#eee 0 20%,transparent 21%),radial-gradient(circle at 50% 62%,#f4f4f4 0 24%,transparent 25%),radial-gradient(circle at 28% 64%,#ddd 0 15%,transparent 16%),radial-gradient(circle at 72% 62%,#e8e8e8 0 16%,transparent 17%)}
 .holo-poof b{position:absolute;left:50%;top:50%;translate:-50% -50%;rotate:-8deg;font:900 clamp(28px,6vw,52px)/1 Montserrat,Helvetica,Arial,sans-serif;color:#FFF100;-webkit-text-stroke:2px #0A0A0A;paint-order:stroke;text-shadow:3px 3px 0 #DA2342}
+.holo-play{position:absolute;z-index:13;right:8px;bottom:8px;width:44px;height:44px;padding:0;border:3px solid #0A0A0A;background:#FFF100;color:#0A0A0A;font:900 22px/1 Montserrat,Helvetica,Arial,sans-serif;cursor:pointer;box-shadow:3px 3px 0 #0A0A0A}
+.holo-play[hidden],.holo-handle[hidden]{display:none}
+.holo-handle{position:absolute;z-index:12;left:0;top:0;width:48px;height:48px;margin:-24px 0 0 -24px;padding:0;border:0;background:none;touch-action:none;-webkit-tap-highlight-color:transparent}
+.holo-handle::after{content:"";position:absolute;inset:14px;border-radius:50%;background:#FFF100;border:3px solid #0A0A0A;animation:holo-ping 1.8s ease-out infinite}
+@keyframes holo-ping{0%{box-shadow:0 0 0 0 rgba(255,241,0,.85)}70%,100%{box-shadow:0 0 0 14px rgba(255,241,0,0)}}
+.holo-fs{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:radial-gradient(circle at 50% 38%,#fff,#e4e4e4 75%);overscroll-behavior:contain}
+.holo-fs .holo-stage{position:relative;inset:auto;flex:1;min-height:0;opacity:1}
+.holo-fs-top{position:absolute;z-index:3;top:calc(10px + env(safe-area-inset-top));left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
+.holo-fs-top button{pointer-events:auto;width:48px;height:48px;border:3px solid #0A0A0A;background:#fff;color:#0A0A0A;font:900 24px/1 Montserrat,Helvetica,Arial,sans-serif;cursor:pointer;box-shadow:3px 3px 0 #0A0A0A}
+.holo-fs-hint{position:absolute;z-index:3;left:50%;top:calc(70px + env(safe-area-inset-top));translate:-50% 0;margin:0;padding:8px 14px;background:#0A0A0A;color:#FFF100;font:800 13px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;pointer-events:none;transition:opacity .5s}
+.holo-fs-buy{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#0A0A0A;color:#fff}
+.holo-fs-buy b{font:900 26px/1 Montserrat,Helvetica,Arial,sans-serif;color:#FFF100}
+.holo-fs-buy span{display:block;font-size:13px;opacity:.8}
+.holo-fs-buy button{min-height:48px;padding:10px 18px;border:3px solid #FFF100;background:#DA2342;color:#fff;font:800 16px Montserrat,Helvetica,Arial,sans-serif;cursor:pointer}
 .holo-took{position:absolute;z-index:12;left:50%;top:12px;translate:-50% 0;margin:0;padding:8px 14px;background:#DA2342;color:#fff;font:800 14px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;rotate:-2deg;box-shadow:3px 3px 0 #0A0A0A}`;
   document.head.appendChild(css);
 
@@ -42,7 +56,7 @@
   const spots = [];
   const collage = document.querySelector('.hero .collage');
   if (collage) spots.push({
-    host: collage, hint: phone ? 'Swipe the box sideways. Double-tap to crumple it.' : 'Grab the box. Double-tap to crumple it.',
+    host: collage, hint: phone ? 'Drag a yellow dot.' : 'Grab the box. Double-tap to crumple it.',
     opts: { preset: 'jb-poster', clothImage: base + 'assets/img/box.webp' },
   });
   // on a crew page the sticker gets its own section, right after the GIF one (the hero stays the art, so it can still turn real)
@@ -56,7 +70,7 @@
     sec.querySelector('h2').textContent = name.trim() + ', in holo.';
     gif.after(sec);
     spots.push({
-      host: sec.querySelector('.holo-box'), hint: phone ? 'Swipe it sideways. Double-tap to crumple.' : 'Twist it. Double-tap to crumple.',
+      host: sec.querySelector('.holo-box'), hint: phone ? 'Drag a yellow dot.' : 'Twist it. Double-tap to crumple.',
       opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
     });
   }
@@ -85,7 +99,7 @@
     let touched = 0;
     spot.stage.addEventListener('pointerdown', () => (touched = performance.now()));
     await wait(phone ? 4000 : 5500);
-    while (alive() && performance.now() - touched < 2500) await wait(500);
+    while (alive() && (performance.now() - Math.max(touched, spot.touchedAt || 0) < 2500 || spot.full)) await wait(500);
     if (!alive()) return;
     const key = THIEF[spot.id];
     const who = Object.values((window.JBShop && window.JBShop.crew) || {}).find((c) => c.img === key);
@@ -97,6 +111,7 @@
     thief.className = 'holo-thief';
     await thief.decode().catch(() => {});
     if (!alive()) return;
+    spot.busy = true; // no handles or play button while the thief is on
     host.append(thief);
     spot.extras.push(thief);
     const W = host.clientWidth;
@@ -155,11 +170,11 @@
   // Mounted when it opens, dropped when it closes.
   const views = [
     { dlg: '#pd', name: '#pdTitle', test: /^Classic Tee/i, host: '.pd-big', img: '#pdImg',
-      hint: phone ? 'Swipe the tee sideways.' : 'Grab the tee.', opts: { preset: 'jb-poster' } },
+      hint: phone ? 'Drag a yellow dot.' : 'Grab the tee. ⤢ to spin it.', opts: { preset: 'jb-poster' } },
     { dlg: '#pd', name: '#pdTitle', test: /^Polo/i, host: '.pd-big', img: '#pdImg',
       // only the front photo has a cutout
       src: (src) => { const m = src.match(/shop\/(\d+)_0\.webp/); return m && THIEF[m[1]] ? { id: m[1], src: base + 'assets/holo/polo-' + m[1] + '.webp' } : null; },
-      hint: phone ? 'Swipe the polo sideways.' : 'Grab the polo.', scene: snatch,
+      hint: phone ? 'Drag a yellow dot.' : 'Grab the polo. ⤢ to spin it.', scene: snatch,
       opts: { preset: 'jb-fabric', dieCut: true, pokeOnEnter: false, crumpleOnDoubleTap: false, snapBack: false,
         hang: { pins: [[.27, .1], [.73, .1]], wind: 3.5, gravity: 9 } } },
   ].filter((v) => document.querySelector(v.dlg));
@@ -197,6 +212,7 @@
           spot.host.classList.add('holo-live');
           stage.classList.add('on');
           setTimeout(() => (hint.style.opacity = '0'), 5000);
+          decorate(spot);
           if (spot.scene) spot.scene(spot);
         },
       });
@@ -216,13 +232,165 @@
   }), { rootMargin: '300px 0px' });
   spots.forEach((s) => near.observe(s.host));
 
+  /* ---------------------------------------------------------------- touch: handles on the page, the rest full screen
+     On the page a phone keeps scrolling everywhere except the yellow dots: touch a dot and you're holding the
+     cloth. No spin or zoom on the page (the desktop wheel scrolls the page again). The ⤢ button opens it full
+     screen, where one finger on the cloth grabs it, one finger off it spins around it, and a pinch zooms. */
+  const HANDLES = { hang: [[.2, .9], [.8, .9], [.5, .55], [.06, .34], [.94, .34]], flat: [[.15, .85], [.85, .85], [.5, .5], [.15, .15], [.85, .15]] };
+  function decorate(spot) {
+    const h = spot.holo, host = spot.host, ctl = h.app.controls;
+    const alive = () => spot.holo === h && host.isConnected;
+    ctl.enableZoom = false;
+    ctl.enablePan = false;
+    if (phone) ctl.enableRotate = false;
+    const extras = [];
+    const play = document.createElement('button');
+    play.type = 'button';
+    play.className = 'holo-play';
+    play.textContent = '⤢';
+    play.setAttribute('aria-label', 'Play with it full screen');
+    play.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); full(spot); });
+    host.append(play);
+    extras.push(play);
+    if (phone) {
+      let snap = 0;
+      const dots = (spot.opts.hang ? HANDLES.hang : HANDLES.flat).map(([u, v]) => {
+        const d = document.createElement('button');
+        d.type = 'button';
+        d.className = 'holo-handle';
+        d.setAttribute('aria-label', 'Grab the cloth here');
+        d._uv = [u, v];
+        d.addEventListener('touchstart', (e) => {
+          e.preventDefault(); // this touch belongs to the cloth, not the page scroll
+          clearTimeout(snap);
+          spot.touchedAt = performance.now();
+          h.grabAt(u, v);
+        }, { passive: false });
+        d.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+          const t = e.touches[0];
+          spot.touchedAt = performance.now();
+          h.pullTo(t.clientX, t.clientY);
+        }, { passive: false });
+        const end = () => {
+          h.letGo();
+          spot.touchedAt = performance.now();
+          if (!spot.opts.hang && spot.opts.snapBack !== false) snap = setTimeout(() => alive() && h.snapBack(900), 3500);
+        };
+        d.addEventListener('touchend', end);
+        d.addEventListener('touchcancel', end);
+        host.append(d);
+        return d;
+      });
+      extras.push(...dots);
+      const place = () => {
+        if (!alive()) return;
+        const hide = !!(spot.full || spot.busy);
+        const r = host.getBoundingClientRect();
+        dots.forEach((d) => {
+          d.hidden = hide;
+          if (hide) return;
+          const p = h.screenAt(d._uv[0], d._uv[1]);
+          d.style.transform = `translate(${p.x - r.left}px,${p.y - r.top}px)`;
+        });
+        requestAnimationFrame(place);
+      };
+      requestAnimationFrame(place);
+    }
+    const sync = () => { if (!alive()) return; play.hidden = !!(spot.busy || spot.full); setTimeout(sync, 300); };
+    sync();
+    spot.ui = extras; // kept apart from spot.extras, which the snatch scene resets
+  }
+
+  // full screen: moves the stage into an overlay (the WebGL canvas resizes with it) and back again
+  function full(spot) {
+    const h = spot.holo;
+    if (!h || !h.app || spot.full) return;
+    const ctl = h.app.controls, cam = h.app.camera, stage = spot.stage, canvas = stage.querySelector('canvas');
+    const keep = {
+      pos: cam.position.clone(), tgt: ctl.target.clone(), rot: ctl.enableRotate, zoom: ctl.enableZoom, pan: ctl.enablePan,
+      min: ctl.minDistance, max: ctl.maxDistance, minP: ctl.minPolarAngle, maxP: ctl.maxPolarAngle,
+      ta: canvas.style.touchAction, ov: document.documentElement.style.overflow,
+    };
+    spot.full = true;
+    window.JBHoloFull = true;
+    const mark = document.createComment('holo');
+    stage.before(mark);
+    const fs = document.createElement('div');
+    fs.className = 'holo-fs';
+    fs.setAttribute('role', 'dialog');
+    fs.setAttribute('aria-label', 'Holo viewer');
+    fs.innerHTML = '<div class="holo-fs-top"><button type="button" class="x" aria-label="Close">×</button><button type="button" class="r" aria-label="Reset the view">↺</button></div>' +
+      '<p class="holo-fs-hint">' + (phone ? 'Drag it · spin around it · pinch to zoom' : 'Drag it · spin around it · scroll to zoom') + '</p>';
+    fs.append(stage);
+    // the buy bar comes along in the merch view
+    const price = spot.host.closest('#pd') && document.querySelector('#pd .pd-price');
+    let close = () => {};
+    if (price) {
+      const title = document.querySelector('#pdTitle');
+      const bar = document.createElement('div');
+      bar.className = 'holo-fs-buy';
+      bar.innerHTML = '<div><b></b><span></span></div><button type="button">Add to cart</button>';
+      bar.querySelector('b').textContent = price.textContent;
+      bar.querySelector('span').textContent = title ? title.textContent : '';
+      bar.querySelector('button').addEventListener('click', () => {
+        close();
+        const buy = document.getElementById('pdBuy');
+        if (buy && !buy.hasAttribute('aria-disabled') && buy.href) buy.click();
+        else (document.querySelector('#pd .opt') || buy)?.scrollIntoView({ block: 'center', behavior: 'smooth' }); // pick a size first
+      });
+      fs.append(bar);
+    }
+    (document.querySelector('dialog[open]') || document.body).append(fs);
+    document.documentElement.style.overflow = 'hidden';
+    canvas.style.touchAction = 'none';
+    ctl.enableRotate = true;
+    ctl.enableZoom = true;
+    ctl.enablePan = false;
+    const d = cam.position.distanceTo(ctl.target);
+    ctl.minDistance = d / 2.5;
+    ctl.maxDistance = d / 0.6;
+    ctl.minPolarAngle = Math.PI / 2 - 0.9;
+    ctl.maxPolarAngle = Math.PI / 2 + 0.55; // can't flip under the line
+    ctl.update();
+    setTimeout(() => { const t = fs.querySelector('.holo-fs-hint'); if (t) t.style.opacity = '0'; }, 3000);
+    const reset = () => { cam.position.copy(keep.pos); ctl.target.copy(keep.tgt); ctl.update(); };
+    fs.querySelector('.r').addEventListener('click', reset);
+    // the phone's back gesture closes it
+    history.pushState({ holoFull: 1 }, '');
+    let done = false;
+    const exit = () => {
+      if (done) return;
+      done = true;
+      removeEventListener('popstate', exit);
+      removeEventListener('keydown', esc);
+      reset();
+      Object.assign(ctl, { enableRotate: keep.rot, enableZoom: keep.zoom, enablePan: keep.pan, minDistance: keep.min, maxDistance: keep.max, minPolarAngle: keep.minP, maxPolarAngle: keep.maxP });
+      ctl.update();
+      canvas.style.touchAction = keep.ta;
+      document.documentElement.style.overflow = keep.ov;
+      if (mark.isConnected) mark.replaceWith(stage); else stop(spot);
+      fs.remove();
+      spot.full = false;
+      setTimeout(() => { window.JBHoloFull = false; }, 0);
+    };
+    close = () => { if (history.state && history.state.holoFull) history.back(); else exit(); };
+    const esc = (e) => { if (e.key === 'Escape') { e.preventDefault(); close(); } };
+    addEventListener('popstate', exit);
+    addEventListener('keydown', esc);
+    fs.querySelector('.x').addEventListener('click', () => close());
+  }
+
   function stop(spot, keep) {
     if (spot.holo && spot.holo.dispose) spot.holo.dispose();
     spot.holo = null;
     if (spot.stage) spot.stage.remove();
     if (spot.hintEl) spot.hintEl.remove();
     (spot.extras || []).forEach((el) => el.remove());
+    (spot.ui || []).forEach((el) => el.remove());
+    spot.ui = [];
     spot.extras = [];
+    spot.busy = false;
     if (!keep) spot.closed = true;
     spot.host.classList.remove('holo-live');
   }
