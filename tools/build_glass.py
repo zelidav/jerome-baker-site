@@ -18,9 +18,9 @@ HOST = 'https://jbcustomer.cannacrypted.com'
 SKIP_CATS = ('Drop Merch', 'Display Fixtures')
 # David 2026-11-03: our inventory sells through our own checkout (jbcustomer /buy), except Everyday Steeze, which
 # stays with JB's Shopify store. So our Steeze records are left off and the Shopify Steeze listings show instead,
-# and a Shopify listing for something we stock ourselves (the Skeeter kit) is left off.
+# and Shopify listings for things we stock ourselves (Skeeter kit, Nug Jug jars) are left off.
 OWN_CATS_ON_SHOPIFY = ('Everyday Steeze',)
-SHOPIFY_SKIP = ('skeeter',)
+SHOPIFY_SKIP = ('skeeter', 'nug jug')  # Nug Jug = our Large / Small Storage Jars
 
 # shelves, in page order: (key, title, line, match)
 SHELVES = [
