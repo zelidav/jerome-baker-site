@@ -42,7 +42,7 @@
 <span style="background:#FFFFFF;color:#2A3B8E;rotate:1.5deg">outran</span>
 <span style="background:#DA2342;color:#FFFFFF;rotate:-1deg">the feds.</span>
 </h1>
-<p class="lede">Hand-blown since 1991. Raided in 2003, back on the torch ever since. Every piece on this page is the only one of its kind, with its provenance on file the day you buy it.</p>
+<p class="lede">Hand-blown since 1991. Raided in 2003, back on the torch ever since. The one-of-ones carry their provenance on file the day you buy them. The studio store pieces check out on jeromebaker.com.</p>
 <div class="ctas"><a class="btn btn-red" href="#shelves">Shop the glass</a><button type="button" class="btn btn-yellow" id="heroHit">Take a hit</button></div>
 <p class="hint" id="heroHint">Hover any piece and it lights up. Open one and hold it down.</p>
 </div>
@@ -91,12 +91,6 @@
 
 <canvas class="smoke-layer" id="smoke" aria-hidden="true"></canvas>
 
-<dialog class="zoomer" id="zoomer" aria-label="Zoomed in">
-<button type="button" class="bench-x" id="zClose" aria-label="Close zoom">✕</button>
-<p class="z-hint">Drag or scroll to look around</p>
-<div class="z-pan" id="zPan"><img id="zImg" alt=""></div>
-</dialog>
-
 <dialog class="bench" id="bench" aria-labelledby="bName">
 <div class="bench-in">
 <button type="button" class="bench-x" id="bClose" aria-label="Close">✕</button>
@@ -105,7 +99,7 @@
 <canvas class="bench-smoke" id="bSmoke" aria-hidden="true"></canvas>
 <p class="say" id="bSay" aria-hidden="true"></p>
 <button type="button" class="snd" id="bSnd" aria-pressed="true">Sound on</button>
-<button type="button" class="bzoom" id="bZoom">Zoom in</button>
+<button type="button" class="bzoom" id="bZoom"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M15 15l6 6" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/></svg>Zoom in on the detail</button>
 <div class="bench-piece" id="bPiece">
 <img id="bImg" alt="">
 <div class="fill" id="bFill" aria-hidden="true"><div class="fill-smoke"></div><div class="bubbles" id="bBubbles"></div></div>
@@ -129,6 +123,7 @@
 <script src="../js/glass-data.js"></script>
 <script src="../js/anim-data.js"></script>
 <script src="../js/crewanim.js" defer></script>
+<script src="../js/zoomview.js" defer></script>
 <script src="../js/glass.js" defer></script>
 <script src="../js/antics.js" defer></script>
 <script src="../js/crew-data.js" defer></script>

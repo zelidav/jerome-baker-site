@@ -116,6 +116,10 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
   const match = (val, term) => !val || val.toLowerCase() === term[1] || val.toLowerCase() === term[0].toLowerCase();
   const findVar = (p, sel) => p.variations.find(([, va]) => p.attrs.every((a) => !sel[a.name] || match(va[a.name], sel[a.name])));
   const cartUrl = (p, sel, qty) => {
+    if (p.shop === 'shopify') {  // jeromebaker.com: a Shopify cart link goes straight to its checkout
+      const v = p.attrs.length ? findVar(p, sel) : p.variations[0];
+      return v ? `https://jeromebaker.com/cart/${v[0]}:${qty}` : '';
+    }
     let u = D.store + '/cart/?add-to-cart=' + p.id + '&quantity=' + qty;
     if (p.attrs.length) {
       const v = findVar(p, sel);
@@ -147,7 +151,7 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
     pd.innerHTML = `<button type="button" class="pd-x" aria-label="Close">×</button>
 <div class="pd-crumb"><a href="#collection" data-close>RITUAL MERCH</a>${firstCat ? ` / <a href="#cat=${slugify(firstCat[0])}" data-close>${esc(firstCat[0].toUpperCase())}</a>` : ''} / ${esc(title.toUpperCase())}</div>
 <div class="pd-main">
-<div class="pd-gal"><div class="pd-big"><img id="pdImg" src="${base}${p.imgs[0]}" alt="${esc(p.name)}"></div>
+<div class="pd-gal"><div class="pd-big"><img id="pdImg" src="${base}${p.imgs[0]}" alt="${esc(p.name)}"><button type="button" class="pd-zoom" aria-label="Zoom in on the photo"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M15 15l6 6M10 7v6M7 10h6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button></div>
 ${p.imgs.length > 1 ? `<div class="pd-thumbs">${p.imgs.map((s, i) => `<button type="button" data-img="${i}" class="${i ? '' : 'on'}" aria-label="Photo ${i + 1}"><img src="${base}${thumb(s)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}</div>
 <div class="pd-info">
 <h2 id="pdTitle">${esc(title)}</h2>${sub ? `<span class="sub">${esc(sub.toUpperCase())}</span>` : ''}
@@ -177,7 +181,7 @@ ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="gri
       if (url) { buy.href = url; buy.removeAttribute('aria-disabled'); } else { buy.removeAttribute('href'); buy.setAttribute('aria-disabled', 'true'); }
       buy.textContent = p.inStock ? 'Add to cart' : 'Gone forever';
       note.innerHTML = !p.inStock ? 'This one sold out. Told you.' : missing.length ? `Pick a ${esc(missing.join(' and a '))} first.` :
-        `Adds it to your cart on <a href="${esc(p.url)}" target="_blank" rel="noopener">jeromebakerny.com</a>, where checkout and shipping happen.`;
+        `Adds it to your cart on <a href="${esc(p.url)}" target="_blank" rel="noopener">${p.shop === 'shopify' ? 'jeromebaker.com' : 'jeromebakerny.com'}</a>, where checkout and shipping happen.`;
       $('pdQty').textContent = qty;
     };
     pd.onclick = (e) => {
@@ -192,6 +196,13 @@ ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="gri
       }
       const q = t.closest('[data-q]');
       if (q) { qty = Math.max(1, Math.min(20, qty + +q.dataset.q)); return sync(); }
+      const zb = t.closest('.pd-zoom'), big = t.closest('.pd-big');
+      if ((zb || (big && !big.classList.contains('holo-live'))) && window.JBZoom) {
+        const r = $('pdImg').getBoundingClientRect();
+        const at = !zb && r.width ? [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] : null;
+        JBZoom.open({ photos: p.imgs.map((s, i) => ({ src: base + s, thumb: base + thumb(s), alt: `${p.name}, photo ${i + 1}` })), index: img, at: at && at.every((v) => v >= 0 && v <= 1) ? at : null });
+        return;
+      }
       const th = t.closest('[data-img]');
       if (th) {
         img = +th.dataset.img; $('pdImg').src = base + p.imgs[img];

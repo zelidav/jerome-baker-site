@@ -130,6 +130,9 @@
     og: 'linear-gradient(125deg,#05B48F 0%,#2A8F9E 45%,#2A3B8E 100%)',
     second: 'linear-gradient(125deg,#DA2342 0%,#F06A2A 50%,#FDB514 100%)',
     daily: 'linear-gradient(125deg,#1A1A2E 0%,#2A3B8E 60%,#5266C4 100%)',
+    studio: 'linear-gradient(125deg,#4B2C8C 0%,#B0328F 50%,#FDB514 100%)',
+    creatures: 'linear-gradient(125deg,#05607E 0%,#05B48F 55%,#9FE3D5 100%)',
+    kit: 'linear-gradient(125deg,#2A2A2A 0%,#5A4A3A 55%,#C08A3A 100%)',
   };
   const sold = (p) => p.status !== 'available';
   const tagOf = (p) => (p.status === 'sold' ? 'Sold' : p.status === 'collected' ? 'In a collection' : '');
@@ -137,7 +140,7 @@
   const tile = (p, feature) => {
     const sub = [p.series === 'Limited Edition' || p.series === 'Original Series' || p.series === 'Giant B0ng Series' ? p.shape : p.series, p.inches && `${p.inches} in`].filter(Boolean).join(', ');
     return `<button type="button" class="tile${feature ? ' feature' : ''}${sold(p) ? ' out' : ''}${p.w > p.h * .8 ? ' wide' : ''}" data-id="${p.id}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}">`
-      + `<span class="frame"><span class="pill">${esc(p.edition || '1 of 1')}</span>${sold(p) ? `<span class="pill gone">${tagOf(p)}</span>` : ''}`
+      + `<span class="frame"><span class="pill">${esc(p.edition || (p.shop ? 'In stock' : '1 of 1'))}</span>${sold(p) ? `<span class="pill gone">${tagOf(p)}</span>` : ''}`
       + `<img class="cut" src="${img(p, !feature)}" alt="" loading="lazy" decoding="async"></span>`
       + `<span class="t-name">${esc(p.name)}</span><span class="t-sub">${esc(sub)}</span>`
       + `<span class="t-price">${sold(p) ? `<s>${money(p.price)}</s>` : money(p.price)}</span></button>`;
@@ -201,7 +204,8 @@
     if (!ph) {
       ph = document.createElement('img');
       ph.className = 'photo'; ph.alt = ''; ph.decoding = 'async';
-      ph.src = `${HOST}/piece/${el.dataset.id}/image.jpg`;
+      const pp = byId[el.dataset.id];
+      ph.src = pp.shop ? (pp.photos[0] || '').replace(/width=\d+/, 'width=800') : `${HOST}/piece/${el.dataset.id}/image.jpg`;
       el.querySelector('.frame').appendChild(ph);
     }
     el._flip = setTimeout(() => { if (el.classList.contains('lit')) { page.off(el); el.classList.add('flip'); } }, 1600);
@@ -217,21 +221,12 @@
   aisles.addEventListener('focusout', (e) => { const el = e.target.closest('.tile'); if (el) light(el, false); });
   aisles.addEventListener('click', (e) => { const el = e.target.closest('.tile'); if (el) open(el.dataset.id); });
 
-  // zoom (from the bench)
-  const zoomer = $('#zoomer'), zImg = $('#zImg'), zPan = $('#zPan');
-  const zoom = (p) => {
-    zImg.src = `../assets/glass/${p.id}_z.webp`;
-    zImg.alt = `${p.name}, close up`;
-    zImg.width = p.zw; zImg.height = p.zh;
-    zoomer.showModal();
-    requestAnimationFrame(() => { zPan.scrollLeft = (zPan.scrollWidth - zPan.clientWidth) / 2; zPan.scrollTop = 0; });
-  };
-  $('#zClose').onclick = () => zoomer.close();
-  zoomer.addEventListener('click', (e) => { if (e.target === zoomer) zoomer.close(); });
-  let drag = null;
-  zPan.addEventListener('pointerdown', (e) => { if (e.pointerType !== 'mouse') return; drag = [e.clientX, e.clientY, zPan.scrollLeft, zPan.scrollTop]; zPan.classList.add('drag'); zPan.setPointerCapture(e.pointerId); });
-  zPan.addEventListener('pointermove', (e) => { if (!drag) return; zPan.scrollLeft = drag[2] - (e.clientX - drag[0]); zPan.scrollTop = drag[3] - (e.clientY - drag[1]); });
-  zPan.addEventListener('pointerup', () => { drag = null; zPan.classList.remove('drag'); });
+  // zoom (from the bench): the full-resolution cutout first, then the original photos
+  const photosOf = (p) => [
+    { src: `../assets/glass/${p.id}_z.webp`, w: p.zw, h: p.zh, alt: `${p.name}, close up` },
+    ...(p.photos || (p.shop ? [] : [`${HOST}/piece/${p.id}/image.jpg`])).map((src, i) => ({ src, alt: `${p.name}, photo ${i + 2}` })),
+  ];
+  const zoom = (p, at) => window.JBZoom && JBZoom.open({ photos: photosOf(p), at });
 
   const visible = () => [...aisles.querySelectorAll('.tile:not([hidden])')].map((el) => el.dataset.id);
   new IntersectionObserver(([e]) => document.body.classList.toggle('in-shop', e.isIntersecting), { rootMargin: '-50% 0px -50% 0px' }).observe(aisles);
@@ -271,8 +266,15 @@
       return;
     }
     box.innerHTML = p.online
-      ? `<a class="btn btn-red" id="bBuy" href="${p.buy}" target="_blank" rel="noopener">Buy it, ${money(p.price)}</a>`
+      ? `${p.variants && p.variants.length > 1 ? `<label class="bvar"><span>${esc(p.opt || 'Option')}</span><select id="bVar">${p.variants.map(([id, t, pr]) => `<option value="${id}" data-pr="${pr}">${esc(t)}, ${money(pr)}</option>`).join('')}</select></label>` : ''}<a class="btn btn-red" id="bBuy" href="${p.buy}" target="_blank" rel="noopener">Buy it, ${money(p.price)}</a>`
       : `<a class="btn btn-red" id="bBuy" href="mailto:sales@jeromebakerny.com?subject=${encodeURIComponent(`Jerome Baker glass: ${p.name} (${p.id})`)}">Ask to buy this piece</a>`;
+    const sel = $('#bVar');
+    if (sel) sel.onchange = () => {
+      const o = sel.selectedOptions[0];
+      $('#bBuy').href = `https://jeromebaker.com/cart/${sel.value}:1`;
+      $('#bBuy').textContent = `Buy it, ${money(o.dataset.pr)}`;
+      $('#bPrice').textContent = money(o.dataset.pr);
+    };
   }
 
   function show(p) {
@@ -282,6 +284,7 @@
     if (typeof clearActor === 'function') clearActor();  // a new piece gets a fresh visitor
     bImg.src = img(p);
     bImg.alt = `${p.name}, hand-blown Jerome Baker glass`;
+    bPiece.classList.toggle('wide', p.w > p.h * .9);
     bFill.style.webkitMaskImage = bFill.style.maskImage = `url(${img(p)})`;
     setLvl(0);
     $('#bSeries').textContent = [p.series, p.shape].filter(Boolean).join(', ');
@@ -290,16 +293,17 @@
     pr.textContent = money(p.price);
     pr.classList.toggle('sold', p.status !== 'available');
     $('#bStatus').textContent = p.status === 'available'
-      ? (p.online ? 'Available. Ships from the studio with its provenance record.' : 'Available through our team. Ask and we will hold it for you.')
+      ? (p.shop ? 'Available. Checkout and shipping happen on jeromebaker.com.' : p.online ? 'Available. Ships from the studio with its provenance record.' : 'Available through our team. Ask and we will hold it for you.')
       : p.status === 'sold' ? 'Sold. Somebody already took this one home.' : 'In a collection. It is registered to its owner.';
     ctas(p);
     $('#bDesc').textContent = p.desc;
     $('#bFacts').innerHTML = [
-      ['Edition', p.edition || '1 of 1'],
+      p.edition && ['Edition', p.edition],
       ['Series', p.series],
+      p.shape && p.shop && ['Type', p.shape],
       p.inches && ['Height', `About ${p.inches} in`],
-      ['Provenance', `<a href="${p.verify}" target="_blank" rel="noopener">${p.id}</a>`],
-    ].filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${k === 'Provenance' ? v : esc(v)}</dd>`).join('');
+      p.shop ? ['Order', `<a href="${p.verify}" target="_blank" rel="noopener">jeromebaker.com</a>`] : ['Provenance', `<a href="${p.verify}" target="_blank" rel="noopener">${p.id}</a>`],
+    ].filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${k === 'Provenance' || k === 'Order' ? v : esc(v)}</dd>`).join('');
     history.replaceState(null, '', '#p=' + p.id);
     if (!calm) bSmoke.on('idle', () => (bImg.complete ? benchMouth() : null), .18, { ...wisp, size: 16 });
   }
@@ -322,6 +326,42 @@
   });
   $('#bClose').onclick = close;
   $('#bZoom').onclick = () => cur && zoom(cur);
+  // straight to the detail: double-click the piece, or put two fingers on it, and the zoom opens on that spot
+  const zspot = (cx, cy) => { const r = bImg.getBoundingClientRect(); return [Math.min(1, Math.max(0, (cx - r.left) / r.width)), Math.min(1, Math.max(0, (cy - r.top) / r.height))]; };
+  bPiece.addEventListener('dblclick', (e) => { if (cur) { release(true); zoom(cur, zspot(e.clientX, e.clientY)); } });
+  const touches = new Map();
+  bPiece.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'touch') return;
+    touches.set(e.pointerId, [e.clientX, e.clientY]);
+    if (touches.size === 2 && cur) {
+      const [a, b] = [...touches.values()];
+      touches.clear(); release(true);
+      zoom(cur, zspot((a[0] + b[0]) / 2, (a[1] + b[1]) / 2));
+    }
+  }, true);
+  for (const ev of ['pointerup', 'pointercancel']) bPiece.addEventListener(ev, (e) => touches.delete(e.pointerId), true);
+  // a magnifier that follows the mouse over the piece, showing the real pixels
+  if (!coarse) {
+    const lens = document.createElement('div');
+    lens.className = 'loupe'; lens.setAttribute('aria-hidden', 'true');
+    bPiece.append(lens);
+    const LK = 2.6;
+    bPiece.addEventListener('pointermove', (e) => {
+      if (!cur || e.pointerType !== 'mouse' || e.buttons) { lens.classList.remove('on'); return; }
+      const r = bImg.getBoundingClientRect(), pr = bPiece.getBoundingClientRect();
+      const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
+      if (fx < 0 || fx > 1 || fy < 0 || fy > 1) { lens.classList.remove('on'); return; }
+      const url = `../assets/glass/${cur.id}_z.webp`;
+      if (lens.dataset.src !== url) { lens.dataset.src = url; lens.style.backgroundImage = `url(${url})`; }
+      const L = lens.offsetWidth || 190;
+      lens.style.backgroundSize = `${r.width * LK}px ${r.height * LK}px`;
+      lens.style.backgroundPosition = `${L / 2 - fx * r.width * LK}px ${L / 2 - fy * r.height * LK}px`;
+      lens.style.left = `${e.clientX - pr.left - L / 2}px`; lens.style.top = `${e.clientY - pr.top - L / 2}px`;
+      lens.classList.add('on');
+    });
+    bPiece.addEventListener('pointerleave', () => lens.classList.remove('on'));
+    bPiece.addEventListener('pointerdown', () => lens.classList.remove('on'));
+  }
   bench.addEventListener('click', (e) => { if (e.target === bench) close(); });
   const step = (d) => {
     const ids = visible();
@@ -641,7 +681,7 @@
 
   /* deep links: #p=<provenance id> opens that piece */
   const route = () => {
-    const m = location.hash.match(/^#p=(JBD-[A-F0-9]+)$/);
+    const m = location.hash.match(/^#p=(JBD-[A-F0-9]+|SHP-\d+)$/);
     if (m && byId[m[1]]) open(m[1]);
   };
   addEventListener('hashchange', route);
