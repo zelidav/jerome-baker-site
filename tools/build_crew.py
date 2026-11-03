@@ -369,6 +369,10 @@ def redirect_page(old, new):
 
 
 def write(path, text):
+    # site-wide feedback button (js/feedback.js) on every generated page
+    if path.endswith(".html") and "site-foot" in text and "js/feedback.js" not in text:
+        up = "../" * path.replace("\\", "/").count("/")
+        text = text.replace("</body>", f'<script src="{up}js/feedback.js" defer></script>\n</body>', 1)
     full = os.path.join(ROOT, path)
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, "w", encoding="utf-8", newline="\n") as f:
