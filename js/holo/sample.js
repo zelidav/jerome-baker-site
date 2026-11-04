@@ -397,6 +397,15 @@
     else if (spot.holo && spot.holo.pause) e.isIntersecting ? spot.holo.resume() : spot.holo.pause();
   }), { rootMargin: '300px 0px' });
   spots.forEach((s) => near.observe(s.host));
+  window.JBHoloSpots = () => spots.concat(views).map((s) => s.holo).filter((h) => h && h.pause);
+  // a background tab draws nothing: pause every cloth, and wake the ones on screen when it comes back
+  document.addEventListener('visibilitychange', () => {
+    for (const s of spots.concat(views)) {
+      const h = s.holo;
+      if (!h || !h.pause) continue;
+      if (document.hidden) h.pause(); else if (s.seen !== false) h.resume();
+    }
+  });
 
   // which bit of cloth is under a screen point? Project a grid of the cloth's (u,v) points to the screen, find the
   // little triangle the point is in, and (for die-cut art) check the picture isn't see-through there.

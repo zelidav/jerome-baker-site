@@ -73,7 +73,7 @@
       if (bench.open && location.hash === '#p=' + BAKER) dance(bench);
       else if (!bench.open && live && live.parentNode === bench) { live.remove(); live = null; }
     }).observe(bench, { attributes: true, attributeFilter: ['open'] });
-    // switching pieces inside the bench changes the hash with replaceState, which fires no event: check on clicks
+    // switching pieces inside the bench changes the h@sh with replaceState, which fires no event: check on clicks
     bench.addEventListener('click', () => setTimeout(() => { if (bench.open && location.hash === '#p=' + BAKER) dance(bench); }, 60));
   }
 

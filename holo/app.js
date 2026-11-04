@@ -154,6 +154,7 @@
       p.y += b * base.length();
       cam.position.copy(ctl.target).add(p);
       cam.lookAt(ctl.target);
+      if (api.wake) api.wake(); // the render loop sleeps at rest: the sway moves the camera from outside
       if (now - lastNudge > 7000) {
         lastNudge = now; n++;
         if (n % 4 === 0) api.crumple(); else api.poke(0.55); // it snaps back out on its own
@@ -194,6 +195,7 @@
     app.scene.background = app.background;
     // frames are pushed by hand right after each render (captureStream(0) + requestFrame), which is steadier than a
     // timed capture on a WebGL canvas that doesn't keep its drawing buffer
+    if (h.keepAwake) { h.keepAwake(true); h.setMaxFps(60); } // full rate, no sleeping, while it records
     const stream = canvas.captureStream(0), track = stream.getVideoTracks()[0];
     let pump = 0;
     const push = () => { pump = requestAnimationFrame(push); track.requestFrame && track.requestFrame(); };
@@ -209,6 +211,7 @@
     rec.stop();
     await done;
     cancelAnimationFrame(pump);
+    if (h && h.keepAwake) { h.keepAwake(false); h.setMaxFps(30); }
     stream.getTracks().forEach((t) => t.stop());
     if (h && h.app) h.app.scene.background = null;
     recording = false;

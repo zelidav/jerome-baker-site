@@ -42,6 +42,14 @@ export interface HoloClothHandle {
   /** stop / restart the render loop (e.g. when scrolled off screen) */
   pause: () => void;
   resume: () => void;
+  /** the loop sleeps when the cloth is at rest; wake it after moving things from outside */
+  wake: () => void;
+  /** frame-rate ceiling (default 30) */
+  setMaxFps: (n: number) => void;
+  /** keep rendering while something outside (a camera sway) animates it */
+  keepAwake: (on: boolean) => void;
+  /** is the render loop running right now */
+  readonly running: boolean;
   dispose: () => void;
   /** breeze strength (hung cloth only) */
   wind: (n: number) => void;
@@ -153,16 +161,18 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
   canvas.style.touchAction = opts.touchAction || (interactive ? 'none' : 'pan-y');
   if (!interactive) canvas.style.pointerEvents = 'none';
 
+  const wake = () => app.wake();
   const handle: HoloClothHandle = {
     app,
-    poke: (s = 1) => sim().poke(s),
-    crumple: () => { sim().crumple(); idle(); },
+    poke: (s = 1) => { wake(); sim().poke(s); },
+    crumple: () => { wake(); sim().crumple(); idle(); },
     snapBack: (ms = 700) => new Promise((done) => {
       const t0 = performance.now();
       const go = () => {
         if (disposed) return done();
         const k = Math.min(1, (performance.now() - t0) / ms);
         // ease-out: each frame closes a growing share of what's left
+        wake();
         sim().settle(k >= 1 ? 1 : 0.06 + 0.25 * k * k);
         k < 1 ? requestAnimationFrame(go) : done();
       };
@@ -175,13 +185,18 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
     },
     setClothImage: async (src) => { const img = await load(src); if (!disposed) app.setClothImage(img); },
     addDecal: async (src) => { const img = await load(src); if (!disposed) app.addDecal(img); },
-    pause: () => raw.renderer.setAnimationLoop(null),
-    resume: () => { if (!disposed) raw.renderer.setAnimationLoop(raw.tick); },
+    pause: () => app.pause(),
+    resume: () => { if (!disposed) app.resume(); },
+    wake,
+    setMaxFps: (n) => { app.maxFps = n; },
+    keepAwake: (on) => { app.keepAwake = on; if (on) wake(); },
+    get running() { return app.running; },
     dispose: () => { if (disposed) return; disposed = true; clearTimeout(idleT); app.dispose(); },
-    wind: (n) => { sim().force.wind = n; },
-    release: () => sim().unpin(),
+    wind: (n) => { sim().force.wind = n; wake(); },
+    release: () => { wake(); sim().unpin(); },
     grabAt: (u, v) => {
       const s = sim(), i = s.vertexAt(u, v) * 3;
+      wake();
       s.startGrab(new THREE.Vector3(s.positions[i], s.positions[i + 1], s.positions[i + 2]), 0.32);
     },
     pullTo: (cx, cy) => {
@@ -191,9 +206,10 @@ export function mountHoloCloth(el: HTMLElement, opts: HoloClothOptions = {}): Ho
       const ndc = new THREE.Vector3(((cx - r.left) / r.width) * 2 - 1, -((cy - r.top) / r.height) * 2 + 1, 0.5).unproject(cam);
       const dir = ndc.sub(cam.position).normalize();
       const t = -cam.position.z / dir.z;
+      wake();
       sim().moveGrab(cam.position.clone().addScaledVector(dir, t));
     },
-    letGo: () => sim().endGrab(),
+    letGo: () => { wake(); sim().endGrab(); },
     screenAt: (u, v) => {
       const s = sim(), i = s.vertexAt(u, v) * 3, r = canvas.getBoundingClientRect();
       raw.camera.updateMatrixWorld();

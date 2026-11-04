@@ -1,4 +1,8 @@
-(() => {
+// waits for the first screen and an idle moment: the crew is decoration, not first paint
+((go) => {
+  const run = () => ('requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 2500 }) : setTimeout(go, 300));
+  document.readyState === 'complete' ? run() : addEventListener('load', run, { once: true });
+})(() => {
   // The JB Crew floats over every page. They drift, bounce off the edges and each other,
   // talk when they bump, and can be grabbed and thrown. Needs window.JB_CREW (js/crew-data.js).
   const crew = window.JB_CREW;
@@ -211,4 +215,4 @@
     s.defer = true;
     document.head.appendChild(s);
   }
-})();
+});

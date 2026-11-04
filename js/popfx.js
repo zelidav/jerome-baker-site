@@ -41,20 +41,27 @@
   window.JBHalftone = filterFor; // the header tear uses it too
 
   const INK = /rgb\(10, 10, 10\) (-?\d+(?:\.\d+)?)px (-?\d+(?:\.\d+)?)px 0px(?: 0px)?$/;
-  // Pinned things (fixed or sticky) and anything sitting on a live canvas keep a plain solid shadow: phone browsers
-  // (iOS Safari above all) redraw an SVG filter on every scroll or canvas frame, and the button flashes.
+  // Phones and tablets (and Safari) don't get the live SVG filter: it is redrawn on every scroll and canvas frame,
+  // which costs a lot and makes pinned buttons flash. They get the same dots as a plain painted layer instead: a
+  // ::before behind the element, offset like the shadow, tiled with the dot image and cut out where the element
+  // sits, so it never repaints on its own. Elements that already use ::before keep a solid shadow.
   const touch = matchMedia('(pointer: coarse)').matches || /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg/.test(navigator.userAgent);
-  const pinned = (el) => {
-    if (!touch) return false;
-    if (el.closest('.holo-sec,.holo-fs,.holo-stage,.crew-layer,.dock,.promo')) return true;
-    for (let e = el; e && e !== document.body; e = e.parentElement) {
-      const p = getComputedStyle(e).position;
-      if (p === 'fixed' || p === 'sticky') return true;
+  const dotsLayer = (el, cs, dx, dy) => {
+    if (getComputedStyle(el, '::before').content !== 'none') return false;
+    if (cs.position === 'static') {
+      // a static box only becomes the dots' anchor when that can't move anything inside it
+      if (el.children.length && !/^(A|BUTTON|LABEL)$/.test(el.tagName)) return false;
+      el.style.position = 'relative';
     }
-    return false;
+    el.classList.add('jb-htd');
+    el.style.setProperty('--hx', dx + 'px');
+    el.style.setProperty('--hy', dy + 'px');
+    el.style.setProperty('--ht', `url("${Math.max(Math.abs(dx), Math.abs(dy)) <= 4 ? DOT_FINE : DOT}")`);
+    el.style.setProperty('--hs', Math.max(Math.abs(dx), Math.abs(dy)) <= 4 ? '4px' : '6px');
+    return true;
   };
   const halftone = (el) => {
-    if (el.dataset.ht || pinned(el)) return;
+    if (el.dataset.ht) return;
     const cs = getComputedStyle(el);
     if (cs.boxShadow === 'none' || (cs.boxShadow.match(/rgb/g) || []).length > 1 || cs.boxShadow.includes('inset')) return;
     const m = cs.boxShadow.match(INK);
@@ -62,6 +69,7 @@
     const dx = Math.round(+m[1]), dy = Math.round(+m[2]);
     if (Math.max(Math.abs(dx), Math.abs(dy)) < 3) return; // tiny ones stay crisp
     el.dataset.ht = '1';
+    if (touch) { if (dotsLayer(el, cs, dx, dy)) el.style.boxShadow = 'none'; return; }
     el.style.boxShadow = 'none';
     const f = `url(#${filterFor(dx, dy)})`;
     el.style.filter = cs.filter && cs.filter !== 'none' ? cs.filter + ' ' + f : f;
@@ -104,6 +112,10 @@
   css.textContent = `
 .jb-ol{--o:1.5px;text-shadow:calc(var(--o)*-1) calc(var(--o)*-1) 0 var(--olc),var(--o) calc(var(--o)*-1) 0 var(--olc),calc(var(--o)*-1) var(--o) 0 var(--olc),var(--o) var(--o) 0 var(--olc),0 calc(var(--o)*-1) 0 var(--olc),0 var(--o) 0 var(--olc),calc(var(--o)*-1) 0 0 var(--olc),var(--o) 0 0 var(--olc)}
 .jb-ol-big{--o:3px}
+.jb-htd{isolation:isolate}
+.jb-htd::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;translate:var(--hx) var(--hy);background:var(--ht) 0 0/var(--hs) var(--hs) repeat;
+  -webkit-mask:linear-gradient(#000 0 0) 0 0/100% 100% no-repeat,linear-gradient(#000 0 0) calc(-1 * var(--hx)) calc(-1 * var(--hy))/100% 100% no-repeat;-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) 0 0/100% 100% no-repeat exclude,linear-gradient(#000 0 0) calc(-1 * var(--hx)) calc(-1 * var(--hy))/100% 100% no-repeat}
 .lxw{display:inline}
 /* section rules like ".chips a span" or ".ticker span" must not restyle the swap wrappers */
 :is(.lxw,.lx){padding:0!important;margin:0!important;border:0!important;background:none!important;box-shadow:none!important;opacity:1!important;filter:none!important;color:inherit!important;font:inherit!important;letter-spacing:inherit!important;text-decoration:inherit}
@@ -151,13 +163,16 @@
       outline(el);
     }
   };
-  const run = () => scan(document.body);
-  if (document.readyState === 'complete') setTimeout(run, 50);
-  else addEventListener('load', () => setTimeout(run, 50));
+  const idle = (f) => ('requestIdleCallback' in window ? requestIdleCallback(f, { timeout: 1500 }) : setTimeout(f, 50));
+  const run = () => idle(() => scan(document.body));
+  if (document.readyState === 'complete') run();
+  else addEventListener('load', run, { once: true });
+  // the floating crew, effect layers and the holo canvas change all the time and have nothing to finish
+  const QUIET = '.crew-layer,.fx-layer,.holo-stage,.bubble,.jbz';
   // pages build parts of themselves later (shop grid, crew wall, dialogs): pick those up as they come
   let queue = new Set(), t = 0;
   new MutationObserver((ms) => {
-    for (const m of ms) m.addedNodes.forEach((n) => { if (n.nodeType === 1) queue.add(n); });
-    if (!t && queue.size) t = setTimeout(() => { t = 0; const q = queue; queue = new Set(); q.forEach((n) => n.isConnected && scan(n)); }, 250);
+    for (const m of ms) m.addedNodes.forEach((n) => { if (n.nodeType === 1 && !n.closest(QUIET)) queue.add(n); });
+    if (!t && queue.size) t = setTimeout(() => { t = 0; const q = queue; queue = new Set(); idle(() => q.forEach((n) => n.isConnected && scan(n))); }, 250);
   }).observe(document.body, { childList: true, subtree: true });
 })();
