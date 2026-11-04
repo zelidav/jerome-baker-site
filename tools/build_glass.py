@@ -107,11 +107,27 @@ def get(url):
         return r.read()
 
 
-def make_images(pid):
+def shape_cut(p):
+    """Stock items (Clearboys, Skeeters, jars) are many identical units: the app's gallery shows whichever unit is
+    next in line, so its id changes as units sell. Their cutout is keyed by shape (and variant) instead,
+    cut/shape-<CODE>[-<VARIANT>].png, so a new unit picks it up with no new cutout."""
+    if not p.get('is_grouped'):
+        return None
+    code = (p.get('shape_code') or '').upper()
+    var = (p.get('variant_code') or '').upper()
+    for name in ([f'shape-{code}-{var}.png'] if var else []) + [f'shape-{code}.png']:
+        if (CUTS / name).exists():
+            return CUTS / name
+    return None
+
+
+def make_images(pid, fallback=None):
     """Trim the cutout to the glass, save two sizes, and find the mouthpiece and the base."""
     from PIL import Image
     full, thumb, zoom = OUT / f'{pid}.webp', OUT / f'{pid}_t.webp', OUT / f'{pid}_z.webp'
     src = CUTS / f'{pid}.png'
+    if not src.exists() and fallback:
+        src = fallback
     if not zoom.exists() or FX_STALE or (src.exists() and src.stat().st_mtime > zoom.stat().st_mtime):
         if not src.exists():
             return None
@@ -155,7 +171,7 @@ def main():
         if not p.get('has_image') or (p.get('category') or '').startswith(SKIP_CATS + OWN_CATS_ON_SHOPIFY):
             continue
         pid = p['provenance_id']
-        img = make_images(pid)
+        img = make_images(pid, shape_cut(p))
         if not img:
             missing.append(f"{p['name']} ({pid})")
             continue
