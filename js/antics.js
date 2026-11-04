@@ -23,7 +23,7 @@
 
   // where the products are, list and detail, on the two shopping pages
   const PAGES = [
-    { test: () => document.getElementById('bench'), list: '.tile:not([hidden]) .cut', dialog: '#bench', detail: '#bImg', stage: '.bench-stage', busy: () => document.querySelector('#bHit.on') || document.querySelector('.bench-stage .actor') },
+    { test: () => document.getElementById('bench'), list: '.tile:not([hidden]) .cut', dialog: '#bench', detail: '#bImg', stage: '.bench-stage', busy: () => document.documentElement.dataset.dancing || document.querySelector('#bHit.on') || document.querySelector('.bench-stage .actor') },
     { test: () => document.getElementById('pd'), list: '.pcard img.main', dialog: '#pd', detail: '#pdImg', stage: '.pd-big', busy: () => false },
   ];
   const P = PAGES.find((p) => p.test());
