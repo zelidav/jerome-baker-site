@@ -17,7 +17,9 @@
   if (off || weak || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const dir = (document.documentElement.dataset.base || '../') + 'assets/dance/';
-  const safari = ios || (/Safari\//.test(ua) && !/Chrome|Chromium|Edg|Android|Firefox/.test(ua));
+  // the WebM's alpha channel is dropped by some browsers and GPUs (she waltzes in a black box), so everyone gets the
+  // animated WebP, which keeps its transparency everywhere
+  const safari = true;
   const css = document.createElement('style');
   css.textContent = `
 .jb-dance{position:fixed;z-index:60;bottom:2vh;left:0;height:min(62vh,520px);aspect-ratio:466/600;pointer-events:none;opacity:0;
