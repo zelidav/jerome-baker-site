@@ -95,7 +95,7 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
     }[st.sort];
     list = list.slice().sort(cmp);
     grid.innerHTML = list.length ? list.map(card).join('') :
-      `<div class="empty" style="grid-column:1/-1"><img src="${base}assets/crew/peeper_s.webp" alt="">Lookie Lou looked everywhere. Nothing matches that. <button type="button" class="clear" data-clear>Clear the filters</button></div>`;
+      `<div class="empty" style="grid-column:1/-1"><img src="${base}assets/crew/peeper_s.webp" alt="" loading="lazy" decoding="async">Lookie Lou looked everywhere. Nothing matches that. <button type="button" class="clear" data-clear>Clear the filters</button></div>`;
     $('count').textContent = `SHOWING ${list.length} OF ${D.items.length}` + (st.cat ? ` · ${st.cat.toUpperCase()}` : '');
     document.querySelectorAll('#cats button').forEach((b) => b.classList.toggle('on', b.dataset.cat === st.cat));
     document.querySelectorAll('.subnav a').forEach((a) => a.classList.toggle('on', a.dataset.cat === st.cat));
@@ -182,7 +182,7 @@ ${p.attrs.map((a) => `<div class="opt" data-attr="${esc(a.name)}"><h4>${esc(a.na
 <div class="buy"><div class="qty"><button type="button" data-q="-1" aria-label="One less">−</button><output id="pdQty">1</output><button type="button" data-q="1" aria-label="One more">+</button></div>
 <a class="btn btn-red" id="pdBuy" target="_blank" rel="noopener">Add to cart</a></div>
 <p class="pd-note" id="pdNote"></p>
-${c ? `<a class="wornby" href="${base}crew/${p.crew}/" style="--wc:${c.color}"><img src="${base}assets/crew/${c.img}_s.webp" alt=""><span><small>WORN BY</small><b>${esc(c.name)}</b></span></a>` : ''}
+${c ? `<a class="wornby" href="${base}crew/${p.crew}/" style="--wc:${c.color}"><img src="${base}assets/crew/${c.img}_s.webp" alt="" loading="lazy" decoding="async"><span><small>WORN BY</small><b>${esc(c.name)}</b></span></a>` : ''}
 </div></div>
 ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="grid">${rec.map(card).join('')}</div></div>` : ''}`;
 

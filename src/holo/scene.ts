@@ -164,6 +164,34 @@ export class HoloApp {
   private resizeObserver: ResizeObserver;
   private params: HoloParams | null = null;
   private disposed = false;
+  // power governor (JB): cap the frame rate, and stop rendering once the cloth is at rest
+  /** frames per second ceiling for the render loop */
+  maxFps = 30;
+  /** keep rendering even when nothing moves (e.g. an outside camera sway) */
+  keepAwake = false;
+  private paused = false;
+  private asleep = false;
+  /** when the cloth came to rest (0 = moving) */
+  private stillFrames = 0;
+  private lastFrame = 0;
+  private loop = (t: number) => {
+    if (t - this.lastFrame < 1000 / this.maxFps - 2) return;
+    this.lastFrame = t;
+    this.tick();
+  };
+  /** true while the render loop is running */
+  get running() { return !this.paused && !this.asleep && !this.disposed; }
+  /** start rendering again after it went to sleep (cheap when already awake) */
+  wake = () => {
+    this.stillFrames = 0;
+    if (this.disposed || this.paused || !this.asleep) return;
+    this.asleep = false;
+    this.clock.getDelta();
+    this.renderer.setAnimationLoop(this.loop);
+  };
+  /** stop the loop, e.g. off screen or tab hidden */
+  pause() { this.paused = true; this.renderer.setAnimationLoop(null); }
+  resume() { if (this.disposed) return; this.paused = false; this.asleep = false; this.stillFrames = 0; this.clock.getDelta(); this.renderer.setAnimationLoop(this.loop); }
 
   /** App-level hook: fired when a decal is selected or resized via wheel. */
   onDecalSelect: ((scale: number, rotation: number) => void) | null = null;
@@ -261,7 +289,9 @@ export class HoloApp {
     this.resizeObserver = new ResizeObserver(() => this.onResize());
     this.resizeObserver.observe(host);
 
-    this.renderer.setAnimationLoop(this.tick);
+    this.renderer.setAnimationLoop(this.loop);
+    for (const ev of ['pointerdown', 'pointermove', 'wheel', 'touchstart']) canvas.addEventListener(ev, this.wake, { passive: true });
+    this.controls.addEventListener('start', this.wake);
 
     if (import.meta.env.DEV) {
       (window as unknown as Record<string, unknown>).__holo = this;
@@ -311,6 +341,7 @@ export class HoloApp {
   }
 
   applyParams(p: HoloParams) {
+    this.wake();
     this.params = p;
     if (p.performance !== this.perfProfile) this.applyPerfProfile(p.performance);
     const m = this.holoMaterial;
@@ -382,12 +413,14 @@ export class HoloApp {
   }
 
   addDecal(img: HTMLImageElement) {
+    this.wake();
     const item = this.surface.addDecal(img);
     this.onDecalSelect?.(item.scale, item.rotation);
     this.onImagesChanged?.();
   }
 
   setClothImage(img: HTMLImageElement) {
+    this.wake();
     const iw = img.naturalWidth || img.width || 1;
     const ih = img.naturalHeight || img.height || 1;
     const aspect = Math.min(3, Math.max(1 / 3, iw / ih));
@@ -418,6 +451,7 @@ export class HoloApp {
 
   /** Show the cloth once the app's assets are in place. */
   reveal() {
+    this.wake();
     this.clothMesh.visible = true;
   }
 
@@ -508,6 +542,7 @@ export class HoloApp {
 
   /** Swap the cloth's bump/normal map; null removes it entirely. */
   setBumpMap(img: HTMLImageElement | null) {
+    this.wake();
     const old = this.holoMaterial.normalMap;
     let tex: THREE.Texture | null = null;
     if (img) {
@@ -733,6 +768,7 @@ export class HoloApp {
   };
 
   private onResize() {
+    this.wake();
     const width = this.host.clientWidth || window.innerWidth;
     const height = this.host.clientHeight || window.innerHeight;
     if (width === 0 || height === 0) return;
@@ -791,9 +827,29 @@ export class HoloApp {
       }
     }
 
-    this.controls.update();
+    const moved = this.controls.update();
     this.composer.render();
+
+    // at rest: nothing moved this frame (cloth, camera), nobody holding it, no breeze
+    // (a step under ~0.001 of a unit is the solver's own jitter: not visible)
+    if (!this.keepAwake && !this.grabbing && !moved && !this.sim.force.wind && this.restless() < 1e-3) {
+      const now = performance.now();
+      if (!this.stillFrames) this.stillFrames = now;
+      else if (now - this.stillFrames > 1500) { this.asleep = true; this.renderer.setAnimationLoop(null); }
+    } else this.stillFrames = 0;
   };
+
+  /** largest per-vertex move in the last physics step */
+  private restless() {
+    const sim = this.sim as unknown as { positions: Float32Array; prev: Float32Array };
+    const p = sim.positions, q = sim.prev;
+    let m = 0;
+    for (let i = 0; i < p.length; i += 3) {
+      const d = Math.abs(p[i] - q[i]) + Math.abs(p[i + 1] - q[i + 1]) + Math.abs(p[i + 2] - q[i + 2]);
+      if (d > m) m = d;
+    }
+    return m;
+  }
 
   dispose() {
     this.disposed = true;

@@ -146,8 +146,23 @@
   addEventListener('scroll', () => { boxes = null; }, { passive: true });
 })();
 
-// crew promos (js/promo.js) ride along with the dock, which every page except the comics loads
+// power saving + the ?perf=1 meter (js/perf.js), every page with the dock
 (() => {
+  if (document.querySelector('script[src$="js/perf.js"]')) return;
+  const s = document.createElement('script');
+  s.src = (document.documentElement.dataset.base || '') + 'js/perf.js';
+  s.defer = true;
+  document.head.appendChild(s);
+})();
+
+// after the first screen is drawn and the browser is idle (the promos, the fit bundles, nothing the first paint needs)
+const jbIdle = (go) => {
+  const run = () => ('requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 2500 }) : setTimeout(go, 300));
+  document.readyState === 'complete' ? run() : addEventListener('load', run, { once: true });
+};
+
+// crew promos (js/promo.js) ride along with the dock, which every page except the comics loads
+jbIdle(() => {
   if (/\/(travel|comics)\//.test(location.pathname) || document.querySelector('script[src$="js/promo.js"]')) return;
   const base = document.documentElement.dataset.base || '';
   const css = document.createElement('link');
@@ -169,7 +184,7 @@
     f.defer = true;
     document.head.appendChild(f);
   }
-})();
+});
 
 // the header effects (js/header.js): genie links, the living logo, a torn edge that's different on every page
 (() => {

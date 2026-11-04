@@ -171,6 +171,8 @@
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-  else init();
+  // after the first screen is drawn, when the browser is idle
+  var later = function () { ("requestIdleCallback" in window) ? requestIdleCallback(init, { timeout: 3000 }) : setTimeout(init, 400); };
+  if (document.readyState === "complete") later();
+  else window.addEventListener("load", later, { once: true });
 })();

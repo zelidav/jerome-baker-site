@@ -1,4 +1,8 @@
-(() => {
+// waits for the first screen and an idle moment: the crew is decoration, not first paint
+((go) => {
+  const run = () => ('requestIdleCallback' in window ? requestIdleCallback(go, { timeout: 2500 }) : setTimeout(go, 300));
+  document.readyState === 'complete' ? run() : addEventListener('load', run, { once: true });
+})(() => {
   // The JB Crew floats over every page. They drift, bounce off the edges and each other,
   // talk when they bump, and can be grabbed and thrown. Needs window.JB_CREW (js/crew-data.js).
   const crew = window.JB_CREW;
@@ -152,7 +156,10 @@
 
   // ---------- Physics ----------
   let running = true, last = performance.now(), chatter = 0;
+  // phones move the crew at 30 frames a second: it looks the same at drifting speed and costs half
+  const lite = document.documentElement.classList.contains('lite') || matchMedia('(pointer: coarse)').matches;
   const step = (now) => {
+    if (lite && now - last < 30) { requestAnimationFrame(step); return; }
     const dt = Math.min(48, now - last) / 16; last = now;
     if (running && !document.body.classList.contains('no-crew')) {
       const W = innerWidth, H = innerHeight;
@@ -190,7 +197,7 @@
           }
         }
       }
-      for (const b of bodies) b.el.style.transform = `translate3d(${b.x.toFixed(1)}px,${b.y.toFixed(1)}px,0) rotate(${b.r.toFixed(1)}deg)`;
+      for (const b of bodies) if (!b.el.classList.contains('out')) b.el.style.transform = `translate3d(${b.x.toFixed(1)}px,${b.y.toFixed(1)}px,0) rotate(${b.r.toFixed(1)}deg)`;
     }
     requestAnimationFrame(step);
   };
@@ -211,4 +218,4 @@
     s.defer = true;
     document.head.appendChild(s);
   }
-})();
+});
