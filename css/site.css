@@ -99,6 +99,12 @@ img.sticker{height:auto}
 .site-foot b{display:block;color:var(--yellow);font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;margin:14px 0 2px}
 .site-foot b:first-child{margin-top:0}
 .site-foot a{color:var(--white);text-decoration:none;display:inline-block;padding:4px 0}
+.site-foot b + a + a{display:block;padding-top:0}
 .site-foot a:hover{color:var(--yellow)}
 .site-foot ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px}
 .site-foot .sf-legal{max-width:1344px;margin:36px auto 0;padding-top:18px;border-top:2px dotted #444;font-size:12px;color:#9d9d9d}
+/* the home page CTA */
+.fam-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:24px;background:var(--yellow);border-top:4px solid var(--ink);border-bottom:4px solid var(--ink);padding-top:44px;padding-bottom:44px}
+.fam-cta h2{margin:0;font-family:var(--display);font-weight:900;font-size:clamp(34px,5vw,60px);line-height:.92;letter-spacing:-.02em}
+.fam-cta p{margin:8px 0 0;font-size:17px;font-weight:600;max-width:52ch}
+.fam-cta .acts{display:flex;flex-wrap:wrap;gap:16px}
