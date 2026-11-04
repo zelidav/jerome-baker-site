@@ -14,6 +14,7 @@ from PIL import Image
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'tools'))
 import crew_data  # noqa: E402
+import shopify  # noqa: E402
 
 API = 'https://jeromebakerny.com/wp-json/wc/store/v1/products?per_page=100&page={}'
 UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
@@ -27,7 +28,19 @@ TREE = [
     ('Accessories', ['Bags & Backpacks', 'Hats']),
     ('Footwear', ['Flip Flops', 'Men’s Sneakers', 'Women’s Sneakers']),
     ('Tops', ['Hoodies & Sweatshirts', 'Polos', 'T-Shirts']),
-    ('Collections', ['JB Signature', 'NY Drop 1']),
+    ('Art & Home', ['Prints & Paintings', 'Home & Kitchen', 'Gift Cards']),
+    ('Collections', ['JB Signature', 'NY Drop 1', 'Studio Store']),
+]
+# jeromebaker.com Shopify product type / title -> the categories above (first match wins)
+SHOPIFY_CATS = [
+    (r'gift card', 'Gift Cards'),
+    (r'painting|poster|still life|further|adrenochrome', 'Prints & Paintings'),
+    (r'rug|bento|lunchbox|decor', 'Home & Kitchen'),
+    (r'hat|cap', 'Hats'),
+    (r'hood|sweatshirt', 'Hoodies & Sweatshirts'),
+    (r'tote|bag', 'Bags & Backpacks'),
+    (r'sneaker|shoe', 'Men’s Sneakers'),
+    (r'tee|t-shirt|tank|sleeve', 'T-Shirts'),
 ]
 MERCH_CATS = {c for top, kids in TREE for c in [top, *kids]}
 HIDDEN_CATS = {'Kaleidoscope Collab'}
@@ -110,6 +123,40 @@ def save_img(src, dest):
     t.save(thumb, 'WEBP', quality=76, method=6)
 
 
+def shopify_items(jobs):
+    """Merch for sale on the jeromebaker.com Shopify store. These check out on jeromebaker.com through a Shopify
+    cart link; the WooCommerce items keep checking out on jeromebakerny.com."""
+    out = []
+    for x in shopify.pull():
+        if not shopify.is_merch(x):
+            continue
+        key = (x['product_type'] + ' ' + x['title'] + ' ' + ' '.join(x['tags'][:3])).lower()
+        cat = next((c for rx, c in SHOPIFY_CATS if re.search(rx, key)), 'Studio Store')
+        imgs = []
+        for n, im in enumerate(x['images'][:MAX_IMGS]):
+            rel = f"assets/shop/shp{x['id']}_{n}.webp"
+            jobs.append((shopify.img_url(im['src'], 1400), os.path.join(ROOT, rel)))
+            imgs.append(rel)
+        vs = shopify.variants(x)
+        opts = [o for o in x['options'] if o['name'] != 'Title' or len(o['values']) > 1]
+        attrs = []
+        for o in opts:
+            vals = []
+            for v in vs:
+                val = v[3].get(o['name'])
+                if val and val not in vals:
+                    vals.append(val)
+            if len(vals) > 1 or len(opts) > 1:
+                attrs.append(dict(name='Amount' if o['name'] == 'Title' else o['name'], src=o['name'], key='', terms=[[v, v.lower()] for v in vals]))
+        out.append(dict(
+            id=x['id'], name=shopify.short_name(x['title']), slug='shp-' + x['handle'], url=shopify.page_url(x),
+            price=min(v[2] for v in vs), cats=[cat, 'Studio Store'], imgs=imgs, inStock=True, type='variable' if attrs else 'simple',
+            desc=shopify.clean(x['body_html'])[:1200], attrs=attrs,
+            variations=[[v[0], {a['name']: v[3].get(a['src']) for a in attrs}] for v in vs], shop='shopify',
+        ))
+    return out
+
+
 def main():
     os.makedirs(IMG_DIR, exist_ok=True)
     raw = pull()
@@ -138,6 +185,7 @@ def main():
             attrs=attrs, variations=variations,
         ))
 
+    items += shopify_items(jobs)
     for it in items:
         it['crew'] = crew_for(it, worn)
     names = {it['name']: it['id'] for it in items}

@@ -6,14 +6,21 @@ published once it has a cutout in assets/glass/, so a new piece in the app waits
 
 Writes js/glass-data.js and assets/glass/<id>.webp (1000px tall), <id>_t.webp (440px tall) and
 <id>_z.webp (the cutout at full photo resolution, for the zoom loupe)."""
-import json, os, sys, urllib.request
+import json, os, re, sys, urllib.request
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import shopify  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'assets' / 'glass'
 CUTS = Path(os.path.expanduser('~/code/jbsite-work/glass/cut'))
 HOST = 'https://jbcustomer.cannacrypted.com'
 SKIP_CATS = ('Drop Merch', 'Display Fixtures')
+# David 2026-11-03: our inventory sells through our own checkout (jbcustomer /buy), except Everyday Steeze, which
+# stays with JB's Shopify store. So our Steeze records are left off and the Shopify Steeze listings show instead,
+# and Shopify listings for things we stock ourselves (Skeeter kit, Nug Jug jars) are left off.
+OWN_CATS_ON_SHOPIFY = ('Everyday Steeze',)
+SHOPIFY_SKIP = ('skeeter', 'nug jug')  # Nug Jug = our Large / Small Storage Jars
 
 # shelves, in page order: (key, title, line, match)
 SHELVES = [
@@ -21,8 +28,52 @@ SHELVES = [
     ('le', 'Limited Edition', 'The crown pieces. Wig-wag, millies, knuckles and marbles, worked at the bench and signed off as one of one.', lambda p: p['series'] == 'Limited Edition' and p['category'] == 'Signature Glass'),
     ('og', 'Original Series', 'The fifteen-inch Baker silhouette that started it. Fumed bulb, straight tube, built to hit and built to last.', lambda p: p['series'] == 'Original Series'),
     ('second', 'Second Life', 'Worked tubes rebuilt into cork-top jars. Each one was something else first.', lambda p: p['category'] == 'Second Life Series'),
+    ('studio', 'Studio one-offs', 'Rigs, calumets and showpieces off the bench, sold straight from the studio store.', None),
+    ('creatures', 'Spirit Creatures', 'Little sea animals worked in clear and color, each one numbered. Turtles, whales, octopus, starfish.', None),
     ('daily', 'Everyday glass', 'The pieces you actually reach for. Beakers, tubes, jars, Clearboys and the Skeeter lunch boxes.', lambda p: True),
+    ('kit', 'Bowls, stems and kit', 'The parts that keep a piece working. Bowls, downstems, tips, trays and the fix-it kit.', None),
 ]
+SHELF_KEYS = [k for k, *_ in SHELVES]
+
+
+def shopify_shelf(p):
+    t = p['title'].lower()
+    if 'spirit creature' in t:
+        return 'creatures'
+    if re.search(r'evo |steeze|nug jug|dipper', t):
+        return 'daily'
+    if float(p['variants'][0]['price']) >= 300:
+        return 'studio'
+    return 'kit'
+
+
+def shopify_pieces():
+    """Glass for sale on the jeromebaker.com Shopify store. Ordering happens there (cart link to Shopify checkout)."""
+    out, missing = [], []
+    for p in shopify.pull():
+        if shopify.is_merch(p) or any(k in p['title'].lower() for k in SHOPIFY_SKIP):
+            continue
+        pid = f"SHP-{p['id']}"
+        img = make_images(pid)
+        if not img:
+            missing.append(f"{p['title']} ({pid})")
+            continue
+        vs = shopify.variants(p)
+        shelf = shopify_shelf(p)
+        one = shelf in ('studio', 'creatures')
+        opt = shopify.options(p)
+        out.append({
+            'id': pid, 'name': shopify.short_name(p['title']), 'shelf': shelf,
+            'series': 'Studio store', 'shape': p['product_type'] if p['product_type'] not in ('', 'Glass') else '',
+            'price': min(v[2] for v in vs), 'status': 'available', 'online': True, 'shop': 'shopify',
+            'edition': '1 of 1' if one else '', 'inches': None,
+            'desc': shopify.clean(p['body_html'])[:900],
+            'buy': shopify.cart(vs[0][0]), 'verify': shopify.page_url(p),
+            'opt': opt[0]['name'] if opt else '',
+            'variants': [[v[0], ' / '.join(x for x in v[3].values() if x) or v[1], v[2]] for v in vs] if opt else [],
+            'photos': [shopify.img_url(im['src'], 2400) for im in p['images'][:8]],
+            **img})
+    return out, missing
 # nominal height in inches, for the size line in the piece view
 HEIGHT = {'GBG': 44, 'LEB': 15, 'OSB': 15, 'SPC': 15, 'CUJ': 7, 'BKR': 12, 'STR': 12, 'JRL': 5, 'JRS': 3}
 
@@ -76,14 +127,14 @@ def main():
     gallery = json.loads(get(HOST + '/api/gallery'))
     pieces, missing = [], []
     for p in gallery:
-        if not p.get('has_image') or (p.get('category') or '').startswith(SKIP_CATS):
+        if not p.get('has_image') or (p.get('category') or '').startswith(SKIP_CATS + OWN_CATS_ON_SHOPIFY):
             continue
         pid = p['provenance_id']
         img = make_images(pid)
         if not img:
             missing.append(f"{p['name']} ({pid})")
             continue
-        shelf = next(k for k, _, _, match in SHELVES if match(p))
+        shelf = next(k for k, _, _, match in SHELVES if match and match(p))
         status = {'available': 'available', 'sold': 'sold'}.get(p['status'], 'collected')
         pieces.append({
             'id': pid, 'name': p['name'], 'shelf': shelf, 'series': p.get('series') or '', 'shape': p.get('shape') or '',
@@ -91,6 +142,9 @@ def main():
             'edition': p.get('edition') or '', 'inches': HEIGHT.get(p.get('shape_code') or ''),
             'desc': (p.get('description') or '').strip(),
             'buy': f'{HOST}/buy/{pid}', 'verify': f'{HOST}/c/piece/{pid}?prov=1', **img})
+    shop, shop_missing = shopify_pieces()
+    pieces += shop
+    missing += shop_missing
     order = {k: i for i, (k, *_) in enumerate(SHELVES)}
     rank = {'available': 0, 'sold': 1, 'collected': 2}
     pieces.sort(key=lambda x: (order[x['shelf']], rank[x['status']], -x['price'], x['name']))
