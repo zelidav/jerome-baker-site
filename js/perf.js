@@ -1,7 +1,8 @@
 /* Power saving, every page (loaded by js/dock.js; the holo app loads it itself).
    1. Looping CSS animations (ticker, bobbing stickers, the drifting box-art collage, glitch text) pause while their
       element is off screen, and everything pauses while the tab is in the background.
-   2. Phones and tablets get the lighter finish (html.lite): the big collage background stops drifting.
+   2. Phones and tablets get the lighter finish (html.lite): the big collage background stops drifting, the glitch
+      text holds still and the logo's glint stays put (the crew drifts at 30 frames a second, see crew.js).
    3. ?perf=1 shows a small meter (frame rate, long tasks, memory, holo loop); ?perf=0 hides it. It sticks for the
       session, so it can be switched on once on a phone and left on while browsing. */
 (() => {
@@ -14,11 +15,13 @@
   css.textContent = `
 .jb-ofs,.jb-ofs *,.jb-ofs::before,.jb-ofs::after,.jb-ofs *::before,.jb-ofs *::after,
 html.jb-bg *,html.jb-bg *::before,html.jb-bg *::after{animation-play-state:paused!important}
-html.lite .boxbg::before{animation:none}`;
+html.lite .boxbg::before{animation:none}
+html.lite .glt,html.lite .glt::before,html.lite .glt::after,html.lite .hdr-logo *,html.lite .hdr-logo::before,html.lite .hdr-logo::after{animation-play-state:paused!important}`;
   document.head.append(css);
 
   // ---------- 1. pause what's off screen ----------
-  const LOOPS = '.marq,.bob,.bob2,.spin,.spinr,.jig,.boxbg,.glt,.hero-piece,.hero-tag,.zg,.hdr-logo';
+  // (phones hold the glitch text still anyway, so they don't watch it: fewer intersection checks per frame)
+  const LOOPS = '.marq,.bob,.bob2,.spin,.spinr,.jig,.boxbg,.hero-piece,.hero-tag,.zg' + (lite ? '' : ',.glt');
   const io = 'IntersectionObserver' in window ? new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('jb-ofs', !e.isIntersecting)), { rootMargin: '120px 0px' }) : null;
   const watched = new WeakSet();
   const watch = (scope) => {
