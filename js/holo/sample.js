@@ -23,7 +23,13 @@
 .holo-hint{position:absolute;z-index:10;left:50%;bottom:8px;translate:-50% 0;margin:0;padding:6px 12px;background:#0A0A0A;color:#FCD804;font:800 13px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s}
 .holo-stage.on + .holo-hint{opacity:1}
 @media (max-width:700px){.holo-hint{white-space:normal;width:max-content;max-width:calc(100% - 80px);text-align:center;left:8px;translate:none}}
-.collage.holo-live > :not(.holo-stage):not(.holo-hint){visibility:hidden}
+.collage.holo-live > :not(.holo-stage):not(.holo-hint):not(.holo-play):not(.holo-finger){visibility:hidden}
+/* floating: the stage covers the whole section; only the cloth itself takes the pointer, so text and links under it still work */
+.holo-float{position:relative}
+.holo-stage.float{pointer-events:none;z-index:9}
+.holo-stage.float.hit{pointer-events:auto}
+.holo-fs .holo-stage{pointer-events:auto!important}
+.holo-anchor{position:relative}
 .holo-sec{background:#233671;color:#fff;padding-top:64px;padding-bottom:64px;border-top:4px solid #DA2342}
 .holo-box{position:relative;flex:0 1 480px;width:min(480px,100%);aspect-ratio:1;max-width:100%}
 .holo-box .holo-hint{bottom:0}
@@ -61,8 +67,9 @@
   // the spots: where it goes, and what it shows
   const spots = [];
   const collage = document.querySelector('.hero .collage');
+  // the box flag floats over the whole hero: it rests where the collage was and can be dragged anywhere in it
   if (collage) spots.push({
-    host: collage, hint: phone ? 'Grab it anywhere to twist and curl.' : 'Grab the box. Double-tap to crumple it.',
+    host: collage.closest('.hero') || collage, anchor: collage.closest('.hero') ? collage : null, hint: phone ? 'Grab it anywhere to twist and curl.' : 'Grab the box. Double-tap to crumple it.',
     opts: { preset: 'jb-poster', clothImage: base + 'assets/img/box.webp' },
   });
   // on a crew page the sticker gets its own section, right after the GIF one (the hero stays the art, so it can still turn real)
@@ -75,8 +82,9 @@
     sec.innerHTML = '<div class="wrap gif-in"><div class="holo-box"></div><div><h2 class="display"></h2><p>The sticker, in holographic foil. Grab it and twist it, or double-tap to crumple it into a ball. Leave it alone and it flattens back out.</p></div></div>';
     sec.querySelector('h2').textContent = name.trim() + ', in holo.';
     gif.after(sec);
+    // the sticker floats over the whole section: it rests in the box spot, but there's no box around it
     spots.push({
-      host: sec.querySelector('.holo-box'), hint: phone ? 'Grab it anywhere to twist and curl.' : 'Twist it. Double-tap to crumple.',
+      host: sec, anchor: sec.querySelector('.holo-box'), hint: phone ? 'Grab it anywhere to twist and curl.' : 'Twist it. Double-tap to crumple.',
       opts: { preset: 'jb-sticker', clothImage: crewImg.currentSrc || crewImg.src, dieCut: true },
     });
   }
@@ -338,12 +346,13 @@
     let mountHoloCloth;
     try { ({ mountHoloCloth } = await loadLib()); } catch (e) { return; } // the bundle didn't load: the art stays
     const stage = document.createElement('div');
-    stage.className = 'holo-stage';
+    stage.className = 'holo-stage' + (spot.anchor ? ' float' : '');
+    if (spot.anchor) { spot.host.classList.add('holo-float'); spot.anchor.classList.add('holo-anchor'); }
     const hint = document.createElement('p');
     hint.className = 'holo-hint';
     hint.textContent = spot.hint;
     spot.host.append(stage);
-    if (spot.hint) spot.host.append(hint);
+    if (spot.hint) (spot.anchor || spot.host).append(hint);
     spot.stage = stage; spot.hintEl = hint;
     // if it isn't drawing within 8s, drop it and keep the art
     const bail = setTimeout(() => { try { spot.holo.dispose(); } catch (e) { /* never mounted */ } stage.remove(); hint.remove(); spot.holo = 'off'; }, 8000);
@@ -356,6 +365,7 @@
         onReady: () => {
           clearTimeout(bail);
           spot.host.classList.add('holo-live');
+          if (spot.anchor) spot.anchor.classList.add('holo-live');
           if (spot.opts.dieCut && spot.host.classList.contains('pd-big')) spot.host.classList.add('holo-cloth'); // white tees need a shade behind them
           stage.classList.add('on');
           setTimeout(() => (hint.style.opacity = '0'), 5000);
@@ -511,12 +521,14 @@
     play.textContent = '⤢';
     play.setAttribute('aria-label', 'Play with it full screen');
     play.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); full(spot); });
-    host.append(play);
+    (spot.anchor || host).append(play);
     extras.push(play);
+    if (spot.anchor) floatOver(spot);
     readMask(spot);
     if (spot.opts.stiff) lieFlat(spot);
     if (phone) {
-      const stage = spot.stage;
+      // floating: the stage lets touches through, so the section listens and keeps the ones that land on the cloth
+      const stage = spot.anchor ? host : spot.stage;
       let snap = 0, held = false, lastTap = 0;
       // on the page the engine's own touch handling stays out of it (it would fight the page scroll)
       stage.addEventListener('pointerdown', (e) => { if (e.pointerType === 'touch' && !spot.full) e.stopPropagation(); }, true);
@@ -553,6 +565,38 @@
     const sync = () => { if (!alive()) return; play.hidden = !!(spot.busy || spot.full); setTimeout(sync, 300); };
     sync();
     spot.ui = extras; // kept apart from spot.extras, which the snatch scene resets
+  }
+
+  /* floating: the canvas is the size of the whole section, but the camera still frames the cloth as if the canvas
+     were only the anchor's box (a view offset), so it rests in the same spot at the same size and can be dragged
+     anywhere over the section. On desktop the stage only takes the pointer while it's over the cloth. */
+  function floatOver(spot) {
+    const h = spot.holo, cam = h.app.camera, orig = cam.updateProjectionMatrix, stage = spot.stage;
+    const alive = () => spot.holo === h && spot.host.isConnected;
+    cam.updateProjectionMatrix = function () {
+      const s = stage.getBoundingClientRect(), a = spot.anchor.getBoundingClientRect();
+      if (!spot.full && s.width && s.height && a.width && a.height) {
+        this.aspect = a.width / a.height;
+        this.view = { enabled: true, fullWidth: a.width, fullHeight: a.height, offsetX: s.left - a.left, offsetY: s.top - a.top, width: s.width, height: s.height };
+      } else if (this.view) this.view.enabled = false;
+      return orig.call(this);
+    };
+    cam.updateProjectionMatrix();
+    const ro = new ResizeObserver(() => alive() && !spot.full && cam.updateProjectionMatrix());
+    ro.observe(spot.anchor);
+    ro.observe(spot.host);
+    spot.refit = () => cam.updateProjectionMatrix();
+    if (phone) return;
+    let raf = 0, last = null;
+    const check = () => {
+      raf = 0;
+      if (!alive() || !last) return;
+      const held = last.buttons && stage.classList.contains('hit');
+      stage.classList.toggle('hit', !spot.full && (held || (!spot.busy && !!clothAt(spot, last.clientX, last.clientY))));
+    };
+    spot.host.addEventListener('pointermove', (e) => { if (e.pointerType === 'touch') return; last = e; if (!raf) raf = requestAnimationFrame(check); });
+    spot.host.addEventListener('pointerleave', (e) => { if (!e.buttons) stage.classList.remove('hit'); });
+    addEventListener('pointerup', () => { if (last) { last = { clientX: last.clientX, clientY: last.clientY, buttons: 0 }; check(); } });
   }
 
   // full screen: moves the stage into an overlay (the WebGL canvas resizes with it) and back again
@@ -625,6 +669,7 @@
       if (mark.isConnected) mark.replaceWith(stage); else stop(spot);
       fs.remove();
       spot.full = false;
+      if (spot.refit) requestAnimationFrame(spot.refit);
       setTimeout(() => { window.JBHoloFull = false; }, 0);
     };
     close = () => { if (history.state && history.state.holoFull) history.back(); else exit(); };
@@ -646,6 +691,7 @@
     spot.busy = false;
     if (!keep) spot.closed = true;
     spot.host.classList.remove('holo-live', 'holo-cloth');
+    if (spot.anchor) spot.anchor.classList.remove('holo-live');
   }
   views.forEach((v) => {
     const dlg = document.querySelector(v.dlg);
