@@ -2,15 +2,15 @@
  * Drop-in: <script src="js/feedback.js" defer></script> (relative path per page)
  * On send it emails the feedback plus exactly where the person was on the site
  * (page, tab, section in view, element under the screen centre, scroll position,
- * selected text, device). Delivery is FormSubmit for now (short-term), so there is
- * no backend to deploy. To change the destination, edit FEEDBACK_TO below.
+ * selected text, device). Delivery is the JB app's /api/leads (saved to the lead
+ * list, then emailed through Resend); ENDPOINT below.
  */
 (function () {
   if (window.__jbFeedback) return;
   window.__jbFeedback = true;
 
-  var FEEDBACK_TO = "david@canismajorpartners.com";
-  var ENDPOINT = "https://formsubmit.co/ajax/" + FEEDBACK_TO;
+  // the JB app's lead list (jbd-glass /api/leads): saved first, then emailed to David through Resend
+  var ENDPOINT = "https://jbcustomer.cannacrypted.com/api/leads";
 
   function txt(el, n) {
     if (!el) return "";
@@ -143,14 +143,16 @@
       var m = $("jbfb-msg");
       if (!msg) { m.textContent = "Type something first."; m.className = "err"; return; }
       try { localStorage.setItem("jbfb.name", name); } catch (e) {}
+      // where it was left goes into the message too, so the email says exactly which spot
+      var spot = [];
+      for (var k in where) if (where[k]) spot.push(k + ": " + where[k]);
       var payload = {
-        _subject: "Site feedback: " + (where["Section in view"] || where["Page title"] || location.pathname),
-        _template: "table",
-        _captcha: "false",
-        Feedback: msg,
-        From: name || "(anonymous)"
+        lead_type: "feedback",
+        name: name || "(anonymous)",
+        message: msg + (spot.length ? "\n\n" + spot.join("\n") : ""),
+        source_page: location.href,
+        where: where
       };
-      for (var k in where) if (where[k]) payload[k] = where[k];
       var send = $("jbfb-send");
       send.disabled = true; m.textContent = "Sending…"; m.className = "";
       fetch(ENDPOINT, {
@@ -159,7 +161,7 @@
         body: JSON.stringify(payload)
       }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); })
         .then(function (res) {
-          if (!res.ok || String(res.j.success) === "false") throw new Error(res.j.message || "send failed");
+          if (!res.ok || !res.j.ok) throw new Error(res.j.error || "send failed");
           m.textContent = "Thanks! Sent."; m.className = "ok";
           $("jbfb-text").value = "";
           setTimeout(close, 1400);
