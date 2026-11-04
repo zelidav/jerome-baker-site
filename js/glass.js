@@ -498,23 +498,44 @@
     return { blip, startGurgle, level, stopGurgle, cough, flick, douse, on: () => on };
   })();
 
-  /* the crew member who takes the hit: animated (js/crewanim.js), on milk crates if the mouthpiece is high */
+  /* the crew member who takes the hit: animated (js/crewanim.js), up a stepladder if the mouthpiece is high */
   const say = $('#bSay'), stageEl = $('#bStage');
   const COUGHS = ['*cough* worth it', '*hack* okay. OKAY.', 'smooth. *cough*', 'who cleaned this?? *cough*', 'one more. *wheeze*', '*cough* I need this one'];
   // recorded-style sounds in assets/sfx (shared with the antics, js/crewanim.js), behind the same sound switch
   const sound = (name) => { if (Sfx.on() && window.JBCrewAnim) JBCrewAnim.play(name); };
   const hush = (name) => { if (window.JBCrewAnim) JBCrewAnim.hush(name); };
-  let actor = null, crates = null, layer = null, run = 0, spot = null;
+  let actor = null, ladder = null, layer = null, run = 0, spot = null;
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const actLayer = () => {
     if (!layer) { layer = document.createElement('div'); layer.className = 'act-layer'; stageEl.appendChild(layer); }
     return layer;
   };
+  // a pop-art A-frame stepladder drawn at its real size (so the ink lines stay one weight): yellow rails, red treads,
+  // a top cap to stand on
+  function stepladder(w, h) {
+    const el = document.createElement('div');
+    el.className = 'ladder';
+    const ink = '#0A0A0A', n = Math.max(2, Math.min(6, Math.round(h / 46)));
+    const capH = Math.max(10, Math.min(18, h * .08)), top = capH;
+    const lx0 = w * .14, lx1 = w * .02, rx0 = w * .86, rx1 = w * .98;   // front legs splay out toward the floor
+    const at = (t, a, b) => a + (b - a) * t;
+    let treads = '';
+    for (let i = 1; i <= n; i++) {
+      const t = i / (n + 1), y = at(t, top, h);
+      treads += `<rect x="${at(t, lx0, lx1) + 3}" y="${y - 5}" width="${at(t, rx0, rx1) - at(t, lx0, lx1) - 6}" height="10" rx="2" fill="#DA2342" stroke="${ink}" stroke-width="3"/>`;
+    }
+    el.innerHTML = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" aria-hidden="true">
+<path d="M${w * .3} ${top} L${w * .42} ${h} M${w * .7} ${top} L${w * .58} ${h}" stroke="${ink}" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+<path d="M${lx0} ${top} L${lx1} ${h}" stroke="${ink}" stroke-width="9" stroke-linecap="round"/><path d="M${lx0} ${top} L${lx1} ${h}" stroke="#FFF100" stroke-width="4" stroke-linecap="round"/>
+<path d="M${rx0} ${top} L${rx1} ${h}" stroke="${ink}" stroke-width="9" stroke-linecap="round"/><path d="M${rx0} ${top} L${rx1} ${h}" stroke="#FFF100" stroke-width="4" stroke-linecap="round"/>
+${treads}<rect x="${lx0 - 6}" y="0" width="${rx0 - lx0 + 12}" height="${capH}" rx="3" fill="#FFF100" stroke="${ink}" stroke-width="3"/></svg>`;
+    return el;
+  }
   function clearActor() {
     run++;
     if (actor) actor.remove();
-    if (crates) crates.remove();
-    actor = crates = spot = null;
+    if (ladder) ladder.remove();
+    actor = ladder = spot = null;
     say.classList.remove('on');
   }
   async function walkUp() {
@@ -533,19 +554,16 @@
     const lift = floor - feet;
     spot = { x, feet, floor, hw, lift };
     if (lift > 8) {
-      // not tall enough: a stack of milk crates appears
-      crates = document.createElement('div');
-      crates.className = 'crates';
-      const n = Math.max(1, Math.round(lift / (H * .24)));
-      crates.innerHTML = '<i></i>'.repeat(n);
-      crates.style.cssText = `left:${x - hw * .38}px;width:${hw * .76}px;top:${feet}px;height:${lift}px`;
-      stageEl.insertBefore(crates, bPiece);  // behind the glass, so the piece stays in view
-      crates.animate([{ translate: `0 -${floor}px` }, { translate: '0 0' }], { duration: 380, easing: 'cubic-bezier(.5,0,.8,1.4)' });
+      // not tall enough: a stepladder unfolds under them
+      ladder = stepladder(hw * .78, lift);
+      ladder.style.cssText = `left:${x - hw * .39}px;top:${feet}px;width:${hw * .78}px;height:${lift}px`;
+      stageEl.insertBefore(ladder, bPiece);  // behind the glass, so the piece stays in view
+      ladder.animate([{ scale: '1 .08', opacity: 0 }, { scale: '1 1.04', opacity: 1, offset: .7 }, { scale: '1 1', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.3,.8,.3,1)' });
     }
     actor.at(-hw, floor);
     await actor.walk(x - hw * .55, 620);
     if (me !== run) return;
-    if (lift > 8) await actor.hop(x, feet); else actor.at(x, feet);
+    if (lift > 8) { await actor.hop(x, feet); if (ladder) ladder.classList.add('creak'); } else actor.at(x, feet);
     if (me !== run) return;
     actor.pose('lean');
     await wait(140);
@@ -586,7 +604,8 @@
       await a.walk(-s.hw * 2, 900);
     }
     if (me !== run) return;
-    if (crates) await crates.animate([{ opacity: 1 }, { opacity: 0, translate: '0 20px' }], { duration: 250, fill: 'forwards' }).finished;
+    // fold the ladder and take it away
+    if (ladder) await ladder.animate([{ scale: '1 1', opacity: 1 }, { scale: '.35 1', opacity: 1, offset: .5 }, { scale: '.35 1', opacity: 0, translate: '0 16px' }], { duration: 380, easing: 'ease-in', fill: 'forwards' }).finished;
     if (me === run) clearActor();
   }
   function speak(text) {
