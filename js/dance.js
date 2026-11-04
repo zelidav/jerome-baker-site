@@ -9,12 +9,15 @@
   try { if (q.has('dance')) sessionStorage.setItem('jb-dance', q.get('dance')); } catch (e) { /* storage blocked */ }
   let off = false;
   try { off = sessionStorage.getItem('jb-dance') === '0'; } catch (e) { /* storage blocked */ }
-  const weak = (navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 3) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4);
+  const ua = navigator.userAgent;
+  // every browser on an iPhone or iPad is WebKit underneath (Chrome there is CriOS): none of them play WebM with alpha,
+  // and iOS reports a low core count for privacy, so it must not count as a weak device
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const weak = (navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 3) || (!ios && navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4);
   if (off || weak || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const dir = (document.documentElement.dataset.base || '../') + 'assets/dance/';
-  const ua = navigator.userAgent;
-  const safari = /Safari\//.test(ua) && !/Chrome|Chromium|CriOS|Edg|Android|FxiOS|Firefox/.test(ua);
+  const safari = ios || (/Safari\//.test(ua) && !/Chrome|Chromium|Edg|Android|Firefox/.test(ua));
   const css = document.createElement('style');
   css.textContent = `
 .jb-dance{position:fixed;z-index:60;bottom:2vh;left:0;height:min(62vh,520px);aspect-ratio:466/600;pointer-events:none;opacity:0;
@@ -75,6 +78,11 @@
     }).observe(bench, { attributes: true, attributeFilter: ['open'] });
     // switching pieces inside the bench changes the hash with replaceState, which fires no event: check on clicks
     bench.addEventListener('click', () => setTimeout(() => { if (bench.open && location.hash === '#p=' + BAKER) dance(bench); }, 60));
+    // a link straight to Baker opens the bench before this script runs, so check now and whenever the hash changes
+    const check = () => { if (bench.open && location.hash === '#p=' + BAKER) dance(bench); };
+    check();
+    addEventListener('hashchange', () => setTimeout(check, 60));
+    addEventListener('load', () => setTimeout(check, 300));
   }
 
   // once per visit, when the Baker tile on the Giant shelf comes into view
