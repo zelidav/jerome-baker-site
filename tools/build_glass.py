@@ -31,9 +31,9 @@ EXTRA_PHOTOS = json.loads(_GP.read_text(encoding='utf-8')) if _GP.exists() else 
 # stays with JB's Shopify store. So our Steeze records are left off and the Shopify Steeze listings show instead,
 # and Shopify listings for things we stock ourselves (Skeeter kit, Nug Jug jars) are left off.
 OWN_CATS_ON_SHOPIFY = ('Everyday Steeze',)
-SHOPIFY_SKIP = ('skeeter', 'nug jug')
-# made in runs, not one of one: their tile says In stock instead of 1 of 1
-STANDARD_CATS = ('Classic Clearboy', 'Skeeters')  # Nug Jug = our Large / Small Storage Jars
+SHOPIFY_SKIP = ('skeeter', 'nug jug')  # Nug Jug = our Large / Small Storage Jars
+# made in runs, not one of one: their tile says In stock instead of 1 of 1 (each Keiki is handmade and different, so not them)
+STANDARD_CATS = ('Classic Clearboy', 'Skeeters')
 
 # shelves, in page order: (key, title, line, match)
 SHELVES = [
