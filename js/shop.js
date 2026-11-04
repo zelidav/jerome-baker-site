@@ -37,10 +37,30 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
 
   // ---------- Featured rail ----------
   const rail = $('rail');
-  rail.innerHTML = D.featured.map((id, i) => byId.get(id)).filter(Boolean).map(card).join('');
-  const nudge = (dir) => rail.scrollBy({ left: dir * rail.clientWidth * 0.8, behavior: 'smooth' });
-  $('railPrev').onclick = () => nudge(-1);
-  $('railNext').onclick = () => nudge(1);
+  // the picks, with a few of the jeromebaker.com merch mixed in (a different few each visit)
+  const shopifyPicks = D.items.filter((p) => p.shop === 'shopify' && p.inStock && !/gift card/i.test(p.name)).sort(() => Math.random() - .5).slice(0, 5);
+  const picks = D.featured.map((id) => byId.get(id)).filter(Boolean);
+  shopifyPicks.forEach((p, i) => picks.splice(Math.min(picks.length, 1 + i * 2), 0, p));
+  rail.innerHTML = picks.map(card).join('');
+  const reduceRail = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const railStep = () => { const a = rail.children[0], b = rail.children[1]; return a && b ? b.offsetLeft - a.offsetLeft : rail.clientWidth * .8; };
+  const nudge = (dir) => {
+    const end = rail.scrollWidth - rail.clientWidth - 4, how = reduceRail ? 'auto' : 'smooth';
+    if (dir > 0 && rail.scrollLeft >= end) rail.scrollTo({ left: 0, behavior: how });
+    else rail.scrollBy({ left: dir * railStep(), behavior: how });
+  };
+  let railHold = 0, railIn = false, railSeen = false;
+  $('railPrev').onclick = () => { nudge(-1); railHold = performance.now() + 6000; };
+  $('railNext').onclick = () => { nudge(1); railHold = performance.now() + 6000; };
+  // it drifts one card every few seconds; touching, hovering or focusing it stops it
+  if (!reduceRail) {
+    ['pointerenter', 'focusin'].forEach((ev) => rail.addEventListener(ev, () => (railIn = true)));
+    ['pointerleave', 'focusout'].forEach((ev) => rail.addEventListener(ev, () => { railIn = false; railHold = performance.now() + 2500; }));
+    rail.addEventListener('touchstart', () => (railIn = true), { passive: true });
+    rail.addEventListener('touchend', () => { railIn = false; railHold = performance.now() + 5000; }, { passive: true });
+    new IntersectionObserver((es) => es.forEach((e) => (railSeen = e.isIntersecting)), { threshold: .3 }).observe(rail);
+    setInterval(() => { if (railSeen && !railIn && !document.hidden && performance.now() > railHold) nudge(1); }, 4000);
+  }
 
   // ---------- Collection filters ----------
   const tree = D.tree;
@@ -90,7 +110,8 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
     const h = cat ? '#cat=' + slugify(cat) : '#collection';
     if (location.hash !== h) history.replaceState(null, '', h);
     render();
-    if (scroll) $('collection').scrollIntoView({ behavior: 'smooth' });
+    // land on the results, not the heading, so the items are on screen (the heading pushes them off a phone)
+    if (scroll) ($('count') || $('collection')).scrollIntoView({ behavior: 'smooth' });
   };
   $('cats').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setCat(b.dataset.cat); });
   $('sort').onchange = (e) => { st.sort = e.target.value; render(); };

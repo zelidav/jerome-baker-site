@@ -18,6 +18,7 @@
   css.textContent = `
 .holo-stage{position:absolute;inset:0;z-index:9;opacity:0;transition:opacity .5s ease}
 .holo-stage.on{opacity:1}
+.holo-stage,.holo-stage canvas{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .holo-stage canvas{display:block;width:100%!important;height:100%!important;cursor:grab}
 .holo-stage canvas:active{cursor:grabbing}
 .holo-hint{position:absolute;z-index:10;left:50%;bottom:8px;translate:-50% 0;margin:0;padding:6px 12px;background:#0A0A0A;color:#FCD804;font:800 13px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s}
@@ -34,6 +35,7 @@
 .holo-box{position:relative;flex:0 1 480px;width:min(480px,100%);aspect-ratio:1;max-width:100%}
 .holo-box .holo-hint{bottom:0}
 .holo-sec h2{color:#FFF100}
+.holo-save{display:inline-flex;align-items:center;min-height:44px;margin-top:10px;padding:8px 14px;border:3px solid #0A0A0A;background:#FFF100;color:#0A0A0A;font:800 15px Montserrat,Helvetica,Arial,sans-serif;text-decoration:none;box-shadow:3px 3px 0 #0A0A0A}
 .pd-big.holo-live > img:not(.holo-thief){visibility:hidden}
 .pd-big.holo-cloth{background:radial-gradient(ellipse at 50% 42%,#fafafa 0,#e9e9ea 45%,#c9cacd 100%)}
 .pd-big:has(.holo-thief,.holo-line,.holo-say){overflow:hidden}
@@ -81,6 +83,13 @@
     sec.className = 'holo-sec pad';
     sec.innerHTML = '<div class="wrap gif-in"><div class="holo-box"></div><div><h2 class="display"></h2><p>The sticker, in holographic foil. Grab it and twist it, or double-tap to crumple it into a ball. Leave it alone and it flattens back out.</p></div></div>';
     sec.querySelector('h2').textContent = name.trim() + ', in holo.';
+    // long-pressing a canvas can't save it, so the right sticker gets its own save button
+    const save = document.createElement('a');
+    save.className = 'holo-save';
+    save.href = crewImg.currentSrc || crewImg.src;
+    save.download = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-sticker.webp';
+    save.textContent = 'Save the sticker';
+    sec.querySelector('p').after(save);
     gif.after(sec);
     // the sticker floats over the whole section: it rests in the box spot, but there's no box around it
     spots.push({

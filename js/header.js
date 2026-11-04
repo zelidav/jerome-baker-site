@@ -41,23 +41,30 @@
     const rnd = () => { seed = Math.imul(seed ^ (seed >>> 15), 2246822507); seed = Math.imul(seed ^ (seed >>> 13), 3266489909); return ((seed ^= seed >>> 16) >>> 0) / 4294967296; };
     // midpoint displacement: long rolling swells, smaller jags riding on them
     const fractal = (amp, rough) => {
-      const ys = new Array(N + 1);
-      ys[0] = (rnd() - .5) * amp; ys[N] = (rnd() - .5) * amp;
-      for (let step = N, a = amp; step > 1; step = Math.floor(step / 2), a *= rough) {
-        const h = Math.floor(step / 2);
-        for (let i = h; i < N; i += step) if (ys[i] === undefined) ys[i] = (ys[i - h] + ys[Math.min(N, i + h)]) / 2 + (rnd() - .5) * a;
+      // built on a power-of-two grid (so every midpoint has both neighbors), then sampled at the N steps
+      const M = 1024, g = new Array(M + 1);
+      g[0] = (rnd() - .5) * amp; g[M] = (rnd() - .5) * amp;
+      for (let step = M, a = amp; step > 1; step /= 2, a *= rough) {
+        const h = step / 2;
+        for (let i = h; i < M; i += step) g[i] = (g[i - h] + g[i + h]) / 2 + (rnd() - .5) * a;
       }
-      for (let i = 0; i <= N; i++) if (ys[i] === undefined) ys[i] = ys[i - 1];
-      return ys;
+      return Array.from({ length: N + 1 }, (_, i) => { const x = i * M / N, k = Math.floor(x), f = x - k; return g[k] + ((g[Math.min(M, k + 1)] - g[k]) * f); });
     };
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
-    const waves = [[520, 900, 8], [180, 320, 4.5], [60, 120, 2.2]].map(([a, b, amp]) => [a + rnd() * (b - a), rnd() * 6.28, amp * (.7 + rnd() * .6)]);
-    const swell = Array.from({ length: N + 1 }, (_, i) => waves.reduce((y, [per, ph, amp]) => y + amp * Math.sin((i * W / N) / per * 6.28 + ph), 0));
-    // the bottom of the paper: the swell plus fine, sharp teeth
-    const paper = swell.map((v) => clamp(H * .55 + v + (rnd() - .5) * 4.5, 12, H - 6));
-    // the white band: thin in places, fat in others, changing slowly
-    const band = fractal(16, .5);
-    const ink = paper.map((y, i) => clamp(y - (5 + Math.abs(band[i]) * 1.1) + (rnd() - .5) * 3, 2, y - 3));
+    // each layer tears on its own: its own rolling swells, its own mid-size jags, its own sharp teeth. The swells
+    // and jags are seeded by the page (stable per page, different across pages); the finest teeth shift a little
+    // on every visit.
+    const tearLine = (mid, swellAmp, jagAmp, teeth) => {
+      const waves = [[520, 900, 1], [180, 320, .56], [60, 120, .28]].map(([lo, hi, k]) => [lo + rnd() * (hi - lo), rnd() * 6.28, swellAmp * k * (.7 + rnd() * .6)]);
+      const jag = fractal(jagAmp, .55);
+      return Array.from({ length: N + 1 }, (_, i) => mid + jag[i]
+        + waves.reduce((y, [per, ph, amp]) => y + amp * Math.sin((i * W / N) / per * 6.28 + ph), 0)
+        + (Math.random() - .5) * teeth);
+    };
+    // the white paper underneath, torn at the bottom
+    const paper = tearLine(H * .64, 6, 9, 3.2).map((y) => clamp(y, 14, H - 4));
+    // the blue print on top, torn its own way, always leaving at least a sliver of the white showing
+    const ink = tearLine(H * .3, 5, 8, 2.6).map((y, i) => clamp(y, 2, paper[i] - 2.5));
     const line = (ys) => {
       let d = `M0 -2 H${W}`;
       for (let i = N; i >= 0; i--) d += ` L${(i * W / N).toFixed(1)} ${ys[i].toFixed(1)}`;
@@ -76,14 +83,32 @@
     const color = getComputedStyle(el).backgroundColor || '#2A3B8E';
     edge.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(tearSvg(salt, color))}")`;
     el.append(edge);
-    // halftone dot shadow under the paper (js/popfx.js makes the filter), like the rest of the page
-    const dots = () => { if (window.JBHalftone) edge.style.filter = `url(#${window.JBHalftone(0, 6)})`; };
-    window.JBHalftone ? dots() : addEventListener('load', () => setTimeout(dots, 80));
+    // a soft shadow under the paper (the halftone dot filter broke into dotted lines along a thin edge)
+    edge.style.filter = 'drop-shadow(0 3px 2px rgba(10,10,10,.35))';
   };
   tear(head, 'menu');
   // a bar of links right under the menu (the shop's yellow categories) is the next layer down, torn its own way
   const under = head.nextElementSibling;
   if (under && under.matches('.subnav')) { under.classList.add('hdr-under'); tear(under, 'under'); }
+
+  // ---------- links to a spot on the page land below whatever sticks to the top ----------
+  // (the menu, the shop's yellow bar and its tear, the glass filter bar), so the section and its items show
+  const stick = () => {
+    let h = 0;
+    for (const el of document.querySelectorAll('header.top, header.topbar, .subnav, .sbar')) {
+      const cs = getComputedStyle(el);
+      if ((cs.position !== 'sticky' && cs.position !== 'fixed') || cs.display === 'none') continue;
+      const rip = el.querySelector(':scope > .hdr-tear');
+      h = Math.max(h, (parseFloat(cs.top) || 0) + el.offsetHeight + (rip ? rip.offsetHeight * .7 : 0));
+    }
+    document.documentElement.style.setProperty('--stick', Math.round(h + 14) + 'px');
+  };
+  const stickCss = document.createElement('style');
+  stickCss.textContent = '[id]{scroll-margin-top:var(--stick,110px)}';
+  document.head.append(stickCss);
+  stick();
+  addEventListener('resize', stick);
+  addEventListener('load', stick);
 
   // ---------- the logo ----------
   const logo = head.querySelector('a.logo, :scope > a:first-child');
