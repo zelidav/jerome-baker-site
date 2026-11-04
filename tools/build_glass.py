@@ -16,6 +16,10 @@ OUT = ROOT / 'assets' / 'glass'
 CUTS = Path(os.path.expanduser('~/code/jbsite-work/glass/cut'))
 HOST = 'https://jbcustomer.cannacrypted.com'
 SKIP_CATS = ('Drop Merch', 'Display Fixtures')
+# extra photos for the zoom strip (angles, then marble closeups): assets/glass/hires/, from the 2019 giant-bong
+# studio shoot. Written by jbsite-work/glass/giant/giant_hires.py.
+_GP = Path(__file__).resolve().parent / 'giant_photos.json'
+EXTRA_PHOTOS = json.loads(_GP.read_text(encoding='utf-8')) if _GP.exists() else {}
 # David 2026-11-03: our inventory sells through our own checkout (jbcustomer /buy), except Everyday Steeze, which
 # stays with JB's Shopify store. So our Steeze records are left off and the Shopify Steeze listings show instead,
 # and Shopify listings for things we stock ourselves (Skeeter kit, Nug Jug jars) are left off.
@@ -142,6 +146,8 @@ def main():
             'edition': p.get('edition') or '', 'inches': HEIGHT.get(p.get('shape_code') or ''),
             'desc': (p.get('description') or '').strip(),
             'buy': f'{HOST}/buy/{pid}', 'verify': f'{HOST}/c/piece/{pid}?prov=1', **img})
+        if pid in EXTRA_PHOTOS:
+            pieces[-1]['photos'] = EXTRA_PHOTOS[pid]
     shop, shop_missing = shopify_pieces()
     pieces += shop
     missing += shop_missing

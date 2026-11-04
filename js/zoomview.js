@@ -21,6 +21,9 @@
 .jbz-hint.gone{opacity:0;pointer-events:none}
 .jbz-pct{position:absolute;left:50%;top:calc(18px + env(safe-area-inset-top));translate:-50% 0;z-index:3;background:rgba(10,10,10,.7);padding:4px 10px;font:700 13px JetBrains Mono,monospace;opacity:0;transition:opacity .3s}
 .jbz-pct.on{opacity:1}
+.jbz-cap{position:absolute;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));translate:-50% 0;z-index:3;margin:0;max-width:calc(100% - 28px);background:#0A0A0A;color:#FCD804;border:3px solid #FCD804;padding:6px 12px;font:800 14px/1.2 Montserrat,system-ui,sans-serif;text-align:center;pointer-events:none}
+.jbz-cap[hidden]{display:none}
+@media (max-width:560px){.jbz-cap{bottom:calc(146px + env(safe-area-inset-bottom))}}
 .jbz-strip{position:absolute;left:14px;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;gap:6px;z-index:3;max-width:calc(100% - 230px);overflow-x:auto}
 .jbz-strip button{flex:none;width:52px;height:52px;padding:0;border:3px solid #0A0A0A;background:#fff;cursor:pointer;opacity:.7}
 .jbz-strip button.on{opacity:1;outline:3px solid #FCD804}
@@ -34,6 +37,7 @@
   dlg.innerHTML = `<div class="jbz-stage"><img alt=""></div>
 <p class="jbz-hint">Pinch, scroll or double-tap to zoom in. Drag to look around.</p>
 <span class="jbz-pct" aria-hidden="true"></span>
+<p class="jbz-cap" hidden></p>
 <button type="button" class="jbz-x" aria-label="Close zoom">✕</button>
 <div class="jbz-strip" hidden></div>
 <div class="jbz-bar"><button type="button" data-z="-1" aria-label="Zoom out">−</button><button type="button" data-z="1" aria-label="Zoom in">+</button><button type="button" class="fit" data-z="0">Fit</button></div>`;
@@ -41,7 +45,7 @@
   document.body ? ready() : addEventListener('DOMContentLoaded', ready);
 
   const stage = dlg.querySelector('.jbz-stage'), im = stage.querySelector('img');
-  const hint = dlg.querySelector('.jbz-hint'), pct = dlg.querySelector('.jbz-pct'), strip = dlg.querySelector('.jbz-strip');
+  const hint = dlg.querySelector('.jbz-hint'), cap = dlg.querySelector('.jbz-cap'), pct = dlg.querySelector('.jbz-pct'), strip = dlg.querySelector('.jbz-strip');
   let photos = [], idx = 0, W = 1, H = 1, fit = 1, max = 4, s = 1, x = 0, y = 0, pctT = 0;
 
   const view = () => [stage.clientWidth, stage.clientHeight];
@@ -82,6 +86,8 @@
     const ph = photos[i];
     strip.querySelectorAll('button').forEach((b, k) => b.classList.toggle('on', k === i));
     im.alt = ph.alt || '';
+    cap.textContent = ph.label || '';
+    cap.hidden = !ph.label;
     const go = () => {
       W = im.naturalWidth || ph.w || 1000; H = im.naturalHeight || ph.h || 1000;
       im.style.width = W + 'px'; im.style.height = H + 'px';

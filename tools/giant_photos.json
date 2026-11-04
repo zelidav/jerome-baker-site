@@ -1,0 +1,98 @@
+{
+ "JBD-595E91DF67DE": [
+  {
+   "src": "hires/baker-1.webp",
+   "label": "Next to a person, for scale",
+   "w": 1535,
+   "h": 2400
+  },
+  {
+   "src": "hires/baker-2.webp",
+   "label": "The mouth, wrapped",
+   "w": 2400,
+   "h": 2400
+  },
+  {
+   "src": "hires/baker-3.webp",
+   "label": "Marbles, close up",
+   "w": 1600,
+   "h": 2400
+  },
+  {
+   "src": "hires/baker-4.webp",
+   "label": "Marbles, closer",
+   "w": 1600,
+   "h": 2400
+  },
+  {
+   "src": "hires/baker-5.webp",
+   "label": "Marble detail",
+   "w": 1600,
+   "h": 2400
+  }
+ ],
+ "JBD-5261B7223810": [
+  {
+   "src": "hires/mellow-yellow-1.webp",
+   "label": "Next to a person, for scale",
+   "w": 1544,
+   "h": 2400
+  },
+  {
+   "src": "hires/mellow-yellow-2.webp",
+   "label": "Carried out of the studio",
+   "w": 1600,
+   "h": 2400
+  },
+  {
+   "src": "hires/mellow-yellow-3.webp",
+   "label": "The mouth, wrapped",
+   "w": 2400,
+   "h": 2102
+  },
+  {
+   "src": "hires/mellow-yellow-4.webp",
+   "label": "Marbles, close up",
+   "w": 1600,
+   "h": 2400
+  },
+  {
+   "src": "hires/mellow-yellow-5.webp",
+   "label": "Marbles on the neck",
+   "w": 1600,
+   "h": 2400
+  },
+  {
+   "src": "hires/mellow-yellow-6.webp",
+   "label": "Marble detail",
+   "w": 1600,
+   "h": 2400
+  }
+ ],
+ "JBD-7F9BF1B7B45F": [
+  {
+   "src": "hires/agent-orange-1.webp",
+   "label": "Next to a person, for scale",
+   "w": 1520,
+   "h": 2400
+  },
+  {
+   "src": "hires/agent-orange-2.webp",
+   "label": "The mouth, wrapped",
+   "w": 2400,
+   "h": 2400
+  },
+  {
+   "src": "hires/agent-orange-3.webp",
+   "label": "Marbles, close up",
+   "w": 1600,
+   "h": 2400
+  },
+  {
+   "src": "hires/agent-orange-4.webp",
+   "label": "Marble detail",
+   "w": 1600,
+   "h": 2400
+  }
+ ]
+}
