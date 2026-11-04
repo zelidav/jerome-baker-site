@@ -80,7 +80,7 @@
     }).observe(bench, { attributes: true, attributeFilter: ['open'] });
     // switching pieces inside the bench changes the h@sh with replaceState, which fires no event: check on clicks
     bench.addEventListener('click', () => setTimeout(() => { if (bench.open && location.hash === '#p=' + BAKER) dance(bench); }, 60));
-    // a link straight to Baker opens the bench before this script runs, so check now and whenever the hash changes
+    // a link straight to Baker opens the bench before this script runs, so check now and whenever the fragment changes
     const check = () => { if (bench.open && location.hash === '#p=' + BAKER) dance(bench); };
     check();
     addEventListener('hashchange', () => setTimeout(check, 60));
