@@ -140,7 +140,7 @@
   const tile = (p, feature) => {
     const sub = [p.series === 'Limited Edition' || p.series === 'Original Series' || p.series === 'Giant B0ng Series' ? p.shape : p.series, p.inches && `${p.inches} in`].filter(Boolean).join(', ');
     return `<button type="button" class="tile${feature ? ' feature' : ''}${sold(p) ? ' out' : ''}${p.w > p.h * .8 ? ' wide' : ''}" data-id="${p.id}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}">`
-      + `<span class="frame"><span class="pill">${esc(p.edition || (p.shop ? 'In stock' : '1 of 1'))}</span>${sold(p) ? `<span class="pill gone">${tagOf(p)}</span>` : ''}`
+      + `<span class="frame">${p.standard && !p.edition && sold(p) ? '' : `<span class="pill">${esc(p.edition || (p.shop || p.standard ? 'In stock' : '1 of 1'))}</span>`}${sold(p) ? `<span class="pill gone">${tagOf(p)}</span>` : ''}`
       + `<img class="cut" src="${img(p, !feature)}" alt="" loading="lazy" decoding="async"></span>`
       + `<span class="t-name">${esc(p.name)}</span><span class="t-sub">${esc(sub)}</span>`
       + `<span class="t-price">${sold(p) ? `<s>${money(p.price)}</s>` : money(p.price)}</span></button>`;
