@@ -104,8 +104,11 @@
   css.textContent = `
 .jb-ol{--o:1.5px;text-shadow:calc(var(--o)*-1) calc(var(--o)*-1) 0 var(--olc),var(--o) calc(var(--o)*-1) 0 var(--olc),calc(var(--o)*-1) var(--o) 0 var(--olc),var(--o) var(--o) 0 var(--olc),0 calc(var(--o)*-1) 0 var(--olc),0 var(--o) 0 var(--olc),calc(var(--o)*-1) 0 0 var(--olc),var(--o) 0 0 var(--olc)}
 .jb-ol-big{--o:3px}
-.lx{display:inline-block;rotate:-11deg;translate:0 -.05em;font-weight:900;scale:1.08;margin:0 .01em}
-.lx:nth-of-type(2n){rotate:9deg}`;
+.lxw{display:inline}
+/* section rules like ".chips a span" or ".ticker span" must not restyle the swap wrappers */
+:is(.lxw,.lx){padding:0!important;margin:0!important;border:0!important;background:none!important;box-shadow:none!important;opacity:1!important;filter:none!important;color:inherit!important;font:inherit!important;letter-spacing:inherit!important;text-decoration:inherit}
+.lx{display:inline-block;rotate:-6deg;translate:0 -.03em;margin:0;letter-spacing:inherit}
+.lx:nth-of-type(2n){rotate:5deg}`;
   document.head.append(css);
 
   // ---------- swapped letters (tools/scrub.py writes b0ng, p!pe, sm0ke...): the swapped character gets a little
@@ -130,7 +133,12 @@
         return m;
       });
       frag.append(n.nodeValue.slice(last));
-      n.replaceWith(frag);
+      // one wrapper per text run, so a flex or grid parent (the glass shelf tabs) still sees one word, not three
+      // items with gaps between them ("Giant b 0 ngs")
+      const run = document.createElement('span');
+      run.className = 'lxw';
+      run.append(frag);
+      n.replaceWith(run);
     }
   };
 

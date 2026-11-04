@@ -32,7 +32,7 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-off
 
 /* box-art backdrop: oversized layer that drifts on the compositor */
 .boxbg{position:relative;isolation:isolate;overflow:hidden}
-.boxbg::before{content:"";position:absolute;inset:-260px;z-index:-1;background:url(../assets/img/box.webp) 0 0/1500px auto repeat;animation:boxdrift 80s linear infinite alternate;will-change:transform}
+.boxbg::before{content:"";position:absolute;inset:-260px;z-index:-1;background:url(../assets/img/box-tile.webp) 0 0/1360px auto repeat;animation:boxdrift 80s linear infinite alternate;will-change:transform}
 .boxbg.still::before{animation:none;inset:0}
 @keyframes boxdrift{from{transform:translate3d(0,0,0)}to{transform:translate3d(-240px,-200px,0)}}
 .dots{background-image:radial-gradient(rgba(255,241,0,.22) 2px,transparent 2.5px);background-size:14px 14px}
