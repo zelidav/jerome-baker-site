@@ -4,7 +4,18 @@
    Needs js/anim-data.js + js/crewanim.js. Test hook: JBAntics.run('snatch' | 'stroke' | 'tryon' | 'bust'). */
 (() => {
   const CA = window.JBCrewAnim;
-  if (!CA || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let saver = false;
+  try { saver = localStorage.getItem('jb-lite') === '1'; } catch (e) { /* storage blocked */ }
+  if (!CA || saver || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // one show at a time (same lock as js/crew.js): never during the dance, never on top of another bit
+  const STAGE = window.JBStage = window.JBStage || (() => {
+    const st = { who: null, until: 0,
+      busy() { return document.documentElement.dataset.dancing === '1' || !!st.who || performance.now() < st.until; },
+      claim(name) { if (st.busy()) return false; st.who = name; return true; },
+      release(name, rest = 2500) { if (st.who === name) { st.who = null; st.until = performance.now() + rest; } } };
+    addEventListener('jb:dance', (e) => { if (e.detail && e.detail.state === 'done') st.until = performance.now() + 4000; });
+    return st;
+  })();
   const { Actor, humanoids, wait, preload, cast } = CA;
   const base = document.documentElement.dataset.base || '';
   const pick = (a) => a[(Math.random() * a.length) | 0];
@@ -55,6 +66,35 @@
     return im.decode().then(() => url, () => { console.warn('antics: no cutout for', m[1], '- skipped'); return null; });
   };
   const itemSrc = (t) => t._cut || t.currentSrc || t.src;
+  // how big the real thing is. Glass pieces carry their height in inches (js/glass-data.js); merch is hand-sized.
+  // Anything 30 in and up is a giant: heavier than the crew, taller than the crew, and nobody walks off with it.
+  const pieceOf = (t) => {
+    const tile = t.closest('[data-id]');
+    let id = tile && tile.dataset.id;
+    if (!id && t.matches(P.detail)) { const m = location.hash.match(/#p=([^&]+)/); id = m && decodeURIComponent(m[1]); }
+    const g = window.JB_GLASS;
+    return (g && id && g.pieces.find((x) => x.id === id)) || null;
+  };
+  const inchesOf = (t) => { const p = pieceOf(t); return (p && Number(p.inches)) || 0; };
+  const heavy = (t) => inchesOf(t) >= 30;
+  // against a giant the crew stands a head shorter than the glass: the piece is the big thing in the room
+  const sizeFor = (t, b) => {
+    const inch = inchesOf(t);
+    if (inch >= 30) return Math.max(120, Math.min(520, b.h * Math.min(.78, 44 / inch)));
+    return Math.max(150, Math.min(280, b.h * .8));
+  };
+  const sweat = (layer, a, n = 3) => {
+    const [w, h] = a.size();
+    for (let i = 0; i < n; i++) {
+      const d = document.createElement('i');
+      d.className = 'ant-sweat';
+      d.style.left = a.x + (Math.random() - .5) * w * .5 + 'px';
+      d.style.top = a.feet - h * (.8 + Math.random() * .12) + 'px';
+      layer.appendChild(d);
+      d.animate([{ opacity: 0, translate: '0 0' }, { opacity: 1, offset: .2 }, { opacity: 0, translate: `${(Math.random() - .5) * 30}px 46px` }],
+        { duration: 900, delay: i * 160, easing: 'ease-in', fill: 'forwards' }).finished.then(() => d.remove());
+    }
+  };
   // a copy of the product that the crew member can carry around
   const ghost = (layer, src, b) => {
     const g = document.createElement('img');
@@ -98,7 +138,7 @@
   const BITS = {
     // grabs it and runs
     async snatch(t, host, layer, W) {
-      const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
+      const b = box(t, host), H = sizeFor(t, b), floor = b.y + b.h;
       const a = new Actor(layer, cast(['torch']), H);
       const fromLeft = b.x + b.w / 2 > W / 2;
       a.at(fromLeft ? -H * .5 : W + H * .5, floor);
@@ -120,7 +160,7 @@
     },
     // slowly, lovingly strokes the glass
     async stroke(t, host, layer, W) {
-      const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
+      const b = box(t, host), H = sizeFor(t, b), floor = b.y + b.h;
       const a = new Actor(layer, cast(), H);
       const left = b.x + b.w / 2 > W / 2;
       a.at(left ? -H * .5 : W + H * .5, floor);
@@ -136,7 +176,7 @@
     },
     // tries it on
     async tryon(t, host, layer, W) {
-      const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
+      const b = box(t, host), H = sizeFor(t, b), floor = b.y + b.h;
       const a = new Actor(layer, cast(), H);
       const fromLeft = b.x + b.w / 2 > W / 2;
       a.at(fromLeft ? -H * .5 : W + H * .5, floor);
@@ -159,7 +199,7 @@
     },
     // grabs it, Torch pops him in the face and puts it back
     async bust(t, host, layer, W) {
-      const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
+      const b = box(t, host), H = sizeFor(t, b), floor = b.y + b.h;
       const fromLeft = b.x + b.w / 2 > W / 2;
       const thief = new Actor(layer, cast(['torch']), H);
       const torch = new Actor(layer, 'torch', H * 1.05);
@@ -200,7 +240,7 @@
     },
     // walks up and takes a rip off it: lighter, pull, a cloud, a deep cough (glass only)
     async sesh(t, host, layer, W) {
-      const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
+      const b = box(t, host), H = sizeFor(t, b), floor = b.y + b.h;
       const a = new Actor(layer, cast(), H);
       const left = b.x + b.w / 2 > W / 2;
       a.at(left ? -H * .5 : W + H * .5, floor);
@@ -227,7 +267,7 @@
     },
     // two of them grab it at once and play tug of war till it snaps back where it was
     async tug(t, host, layer, W) {
-      const b = box(t, host), H = Math.max(140, Math.min(250, b.h * .72)), floor = b.y + b.h;
+      const b = box(t, host), H = sizeFor(t, b) * .9, floor = b.y + b.h;
       const l = new Actor(layer, cast(), H), r = new Actor(layer, cast([l.slug]), H);
       l.at(-H * .5, floor); r.at(W + H * .5, floor);
       await Promise.all([l.walk(b.x - H * .2, 900), r.walk(b.x + b.w + H * .2, 900)]);
@@ -253,9 +293,75 @@
       await Promise.all([l.walk(-H, 1000), r.walk(W + H, 1000)]);
       l.remove(); r.remove();
     },
+    // a giant: two of them try to lift it together. It comes up an inch, they strain, sweat, and set it back down.
+    async teamlift(t, host, layer, W) {
+      const b = box(t, host), H = sizeFor(t, b), floor = b.y + b.h;
+      const l = new Actor(layer, cast(), H), r = new Actor(layer, cast([l.slug]), H);
+      l.at(-H * .5, floor); r.at(W + H * .5, floor);
+      await Promise.all([l.walk(b.x + b.w * .12 - H * .18, 1000), r.walk(b.x + b.w * .88 + H * .18, 1000)]);
+      l.face(true).pose('reach'); r.face(false).pose('reach');
+      say(layer, l, pick(['On three.', 'Lift with your legs.', 'Ready? Go.']), 1300);
+      await wait(900);
+      const g = ghost(layer, itemSrc(t), b);
+      g.style.transformOrigin = '50% 100%';
+      t.style.visibility = 'hidden';
+      // hands on the glass (the carry pose holds its own prop over its head, so not that one)
+      l.pose('reach'); r.pose('reach');
+      // it barely leaves the ground, and it wobbles
+      for (let i = 0; i < 5; i++) {
+        const up = i % 2 ? 4 : 10, tilt = (i % 2 ? -1 : 1) * 1.8;
+        g.animate([{ translate: '0 0', rotate: '0deg' }, { translate: `0 ${-up}px`, rotate: `${tilt}deg` }], { duration: 300, fill: 'forwards', easing: 'ease-out' });
+        l.shake(280, 1); r.shake(280, 1);
+        if (i === 1) { sweat(layer, l); sweat(layer, r); say(layer, r, pick(['OOF.', 'Why is it so heavy?!', 'My back.', 'It weighs a ton.']), 1500); }
+        await wait(320);
+      }
+      g.animate([{ translate: '0 -6px' }, { translate: '0 0' }], { duration: 260, fill: 'forwards', easing: 'ease-in' });
+      await wait(280);
+      g.remove();
+      t.style.visibility = '';
+      t.animate([{ translate: '0 2px' }, { translate: '0 0' }], { duration: 160 });
+      l.pose('dizzy'); r.pose('dizzy');
+      say(layer, l, pick(["We'll get a dolly.", 'It lives here now.', 'Next time.']), 1600);
+      await wait(1000);
+      await Promise.all([l.walk(-H, 1100), r.walk(W + H, 1100)]);
+      l.remove(); r.remove();
+    },
+    // a giant: one of them tips it and tries to walk it off, corner by corner. It goes a few inches and slides home.
+    async tipwalk(t, host, layer, W) {
+      const b = box(t, host), H = sizeFor(t, b), floor = b.y + b.h;
+      const a = new Actor(layer, cast(), H);
+      const fromLeft = b.x + b.w / 2 > W / 2;
+      a.at(fromLeft ? -H * .5 : W + H * .5, floor);
+      await a.walk(fromLeft ? b.x - H * .1 : b.x + b.w + H * .1, 1100);
+      a.face(fromLeft).pose('reach');
+      say(layer, a, pick(['Nobody look.', 'Just gonna borrow this.', 'Easy does it.']), 1400);
+      await wait(600);
+      const g = ghost(layer, itemSrc(t), b);
+      g.style.transformOrigin = '50% 100%';
+      t.style.visibility = 'hidden';
+      const dir = fromLeft ? -1 : 1, stepPx = Math.min(12, b.w * .06);
+      let dx = 0;
+      for (let i = 0; i < 4; i++) {
+        const tilt = (i % 2 ? 1 : -1) * 6;
+        dx += dir * stepPx;
+        g.animate([{ rotate: '0deg', translate: `${dx - dir * stepPx}px 0` }, { rotate: `${tilt}deg`, translate: `${dx}px 0`, offset: .5 }, { rotate: '0deg', translate: `${dx}px 0` }], { duration: 420, fill: 'forwards', easing: 'ease-in-out' });
+        a.at(a.x + dir * stepPx, floor).shake(380, 1);
+        if (i === 2) { sweat(layer, a, 4); say(layer, a, pick(['Heavier than it looks.', 'OOF.', 'Nope. Nope.']), 1500); }
+        await wait(440);
+      }
+      a.pose('dizzy');
+      await wait(400);
+      // it slides back where it lives
+      g.animate([{ translate: `${dx}px 0` }, { translate: '0 0' }], { duration: 500, fill: 'forwards', easing: 'ease-in-out' });
+      await wait(520);
+      g.remove();
+      t.style.visibility = '';
+      await a.walk(fromLeft ? -H : W + H, 1200);
+      a.remove();
+    },
     // gets one good look and passes out
     async faint(t, host, layer, W) {
-      const b = box(t, host), H = Math.max(150, Math.min(280, b.h * .8)), floor = b.y + b.h;
+      const b = box(t, host), H = sizeFor(t, b), floor = b.y + b.h;
       const a = new Actor(layer, cast(), H);
       const left = b.x + b.w / 2 > W / 2;
       a.at(left ? -H * .5 : W + H * .5, floor);
@@ -286,9 +392,12 @@
   }
   // glass gets the sesh; everything gets the rest
   const WEIGHTS = [['snatch', 3], ['tryon', 3], ['bust', 2], ['stroke', 2], ['tug', 2], ['faint', 2], ...(P.list.includes('.tile') ? [['sesh', 4]] : [])];
+  // a giant can't be pocketed, worn or run off with: it gets lifted (badly), tipped and walked (barely), admired,
+  // sm0ked or fainted at
+  const HEAVY = [['teamlift', 4], ['tipwalk', 3], ['stroke', 2], ['sesh', 3], ['faint', 2]];
   let lastBit = '';
-  const choose = () => {
-    const ws = WEIGHTS.filter(([k]) => k !== lastBit);
+  const choose = (t) => {
+    const ws = (t && heavy(t) ? HEAVY : WEIGHTS).filter(([k]) => k !== lastBit);
     let r = Math.random() * ws.reduce((s, [, w]) => s + w, 0);
     for (const [k, w] of ws) if ((r -= w) < 0) return (lastBit = k);
     return (lastBit = ws[0][0]);
@@ -303,7 +412,7 @@
     return r.width > 40 && vis > r.height * .75 && r.left >= 0 && r.right <= innerWidth && getComputedStyle(el).visibility !== 'hidden';
   };
   async function run(kind, where) {
-    if (running) return false;
+    if (running || STAGE.busy()) return false;
     const dlg = document.querySelector(P.dialog);
     const detail = where === 'detail' || (where == null && dlg && dlg.open);
     let target, host;
@@ -318,15 +427,19 @@
     running = true; // held while the cutout loads so two bits can't start at once
     target._cut = await cutFor(target);
     if (!target._cut) { running = false; return false; }
-    if (detail && (host.classList.contains('holo-live') || host.querySelector('.holo-live'))) return false; // the holo has the stage
+    if (detail && (host.classList.contains('holo-live') || host.querySelector('.holo-live'))) { running = false; return false; } // the holo has the stage
+    if (!STAGE.claim('antics')) { running = false; return false; }
     running = true;
     const layer = layerIn(host);
     const W = host === document.body ? innerWidth : host.clientWidth;
-    try { await BITS[kind || choose()](target, host, layer, W); } catch (e) { target.style.visibility = ''; console.warn('antics', e); }
+    // a forced light bit on a giant becomes a heavy one: nobody pockets 58 inches of glass
+    if (kind && heavy(target) && !HEAVY.some(([k]) => k === kind)) kind = 'teamlift';
+    try { await BITS[kind || choose(target)](target, host, layer, W); } catch (e) { target.style.visibility = ''; console.warn('antics', e); }
     // someone who went real mid-bit finishes before they're cleared away
     await Promise.all([...layer.children].map((el) => el._real).filter(Boolean));
     layer.replaceChildren();
     running = false;
+    STAGE.release('antics');
     return true;
   }
   window.JBAntics = { run };
@@ -357,7 +470,9 @@
       const ran = !P.busy() && !document.hidden && await run(null, 'detail');
       again(me, ran ? rand(4000, 7000) : 1500);
     }, ms);
-    new MutationObserver(() => { loop++; if (dlg.open) again(loop, rand(500, 1100)); })
+    // a giant may be dancing when it opens (js/dance.js): wait for it to claim the stage, then for it to finish
+    const giantOpen = () => { const m = location.hash.match(/#p=([^&]+)/), g = window.JB_GLASS, p = m && g && g.pieces.find((x) => x.id === decodeURIComponent(m[1])); return !!(p && Number(p.inches) >= 30); };
+    new MutationObserver(() => { loop++; if (dlg.open) again(loop, giantOpen() ? rand(3500, 4500) : rand(500, 1100)); })
       .observe(dlg, { attributes: true, attributeFilter: ['open'] });
   }
 })();

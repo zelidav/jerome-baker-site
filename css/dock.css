@@ -6,7 +6,8 @@
   body.has-dock header nav[aria-label="Main"] a:not(.cartbtn){display:none}
   body.has-dock header nav[aria-label="Main"] li:not(:has(.cartbtn)){display:none}
   body.has-dock header.top,body.has-dock .topbar{padding-top:8px;padding-bottom:8px}
-  body.has-dock .crew-toggle{bottom:calc(92px + env(safe-area-inset-bottom))}
+  body.has-dock .crew-toggle,body.has-dock .jb-corner{bottom:calc(92px + env(safe-area-inset-bottom))}
+  body.has-dock .jb-corner .crew-toggle{bottom:auto}
   body.has-dock .toast{bottom:calc(100px + env(safe-area-inset-bottom));pointer-events:none}
   body.has-dock .toast:not(.show){visibility:hidden}
 
@@ -72,7 +73,7 @@
   .pile .white{background:var(--white);color:var(--ink)}
   .pile-x{display:block;margin:22px auto 0;min-height:44px;padding:0 18px;background:none;border:2px solid var(--white);color:var(--white);font-family:var(--display);font-weight:800;font-size:15px;cursor:pointer}
   body.dock-open{overflow:hidden}
-  body.dock-open .crew-toggle,body.dock-open .crew-layer{visibility:hidden}
+  body.dock-open .crew-toggle,body.dock-open .crew-layer,body.dock-open .jb-corner{visibility:hidden}
 }
 /* the magnifying glass on the desktop top menu (js/dock.js): links swell under the mouse and drop out of the bar */
 @media (min-width:761px){

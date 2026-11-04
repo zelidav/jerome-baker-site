@@ -7,7 +7,14 @@
   try { if (q.has('holo')) sessionStorage.setItem('jb-holo', q.get('holo')); } catch (e) { /* storage blocked */ }
   let flag = null;
   try { flag = sessionStorage.getItem('jb-holo'); } catch (e) { /* storage blocked */ }
-  const HOLO_SAMPLE = flag != null ? flag !== '0' : true;
+  // Lite mode (js/litemode.js) keeps the original art: no WebGL at all
+  let saver = false;
+  try { saver = localStorage.getItem('jb-lite') === '1'; } catch (e) { /* storage blocked */ }
+  const HOLO_SAMPLE = !saver && (flag != null ? flag !== '0' : true);
+  // one show at a time (same lock as js/crew.js and js/antics.js)
+  const stageBusy = () => document.documentElement.dataset.dancing === '1' || !!(window.JBStage && window.JBStage.busy());
+  const stageClaim = (n) => !window.JBStage || window.JBStage.claim(n);
+  const stageRelease = (n) => { if (window.JBStage) window.JBStage.release(n); };
   // the original art stays for reduced motion, data saver and weak devices
   const weak = (navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 3) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4);
   if (!HOLO_SAMPLE || weak || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -123,8 +130,8 @@
     let touched = 0;
     spot.stage.addEventListener('pointerdown', () => (touched = performance.now()));
     await wait(phone ? 4000 : 5500);
-    while (alive() && (performance.now() - Math.max(touched, spot.touchedAt || 0) < 2500 || spot.full)) await wait(500);
-    if (!alive()) return;
+    while (alive() && (performance.now() - Math.max(touched, spot.touchedAt || 0) < 2500 || spot.full || stageBusy() || !stageClaim('thief'))) await wait(500);
+    if (!alive()) { stageRelease('thief'); return; }
     const key = THIEF[spot.id];
     const who = Object.values((window.JBShop && window.JBShop.crew) || {}).find((c) => c.img === key);
     const thief = new Image();
@@ -184,6 +191,7 @@
     took.className = 'holo-took';
     took.textContent = (who ? who.name : 'Somebody') + ' took it. Hang on.';
     host.append(took);
+    stageRelease('thief');
     spot.extras = [took];
     await wait(3200);
     if (spot.holo !== null || spot.closed || !host.isConnected) return;
@@ -214,8 +222,8 @@
     const acts = towel ? [shake, scrunch] : [scrunch, shake];
     for (let n = 0; n < acts.length; n++) {
       await wait(n ? 16000 : phone ? 3500 : 4500);
-      while (alive() && (performance.now() - (spot.touchedAt || 0) < 3000 || spot.full)) await wait(500);
-      if (!alive()) return;
+      while (alive() && (performance.now() - (spot.touchedAt || 0) < 3000 || spot.full || stageBusy() || !stageClaim('mess'))) await wait(500);
+      if (!alive()) { stageRelease('mess'); return; }
       const t0 = performance.now();
       const ok = () => alive() && !spot.full && (spot.touchedAt || 0) < t0;
       const guy = new Image();
@@ -258,6 +266,7 @@
       try {
         await acts[n]({ h, at, put, pos, walk, frame, talk, drag, ok, W, H });
       } finally {
+        stageRelease('mess');
         try { h.letGo(); } catch (e) { /* already let go */ }
         if (alive()) {
           // walks off, or just ducks out if someone grabbed the cloth

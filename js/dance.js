@@ -23,7 +23,9 @@
   const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   const weak = (navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 3) || (!ios && navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4);
   const bench = document.getElementById('bench');
-  if (off || weak || !bench || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // Lite mode (js/litemode.js) turns the dance off with everything else that's heavy
+  const saver = (() => { try { return localStorage.getItem('jb-lite') === '1'; } catch (e) { return false; } })();
+  if (off || weak || saver || !bench || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const dir = (root.dataset.base || '../') + 'assets/dance/';
   const css = document.createElement('style');

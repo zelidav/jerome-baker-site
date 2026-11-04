@@ -1,0 +1,82 @@
+/* Drop-down menus on the top bar (js/megamenu.js): a torn sheet of paper drops out of the blue header,
+   a halftone dot shadow under it, stickers that tilt, a crew member peeking over the edge. */
+.mm{--paper:#fffdf7;--tear:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 24' preserveAspectRatio='none'%3E%3Cpath d='M0 0H1000V10L984 16 966 9 947 18 931 11 912 19 893 10 874 17 858 8 839 15 821 9 800 20 783 12 765 18 744 9 728 16 707 11 690 21 671 12 652 17 634 8 615 16 597 10 577 19 559 11 540 17 522 9 502 18 486 12 466 20 448 10 430 16 410 9 393 18 374 12 356 19 337 10 318 16 300 8 281 17 263 11 244 20 226 12 207 17 188 9 170 18 151 11 132 19 114 10 95 16 77 9 58 18 40 12 21 19 0 11Z' fill='%23000'/%3E%3C/svg%3E");
+  position:absolute;z-index:72;width:min(880px,calc(100vw - 32px));padding-top:14px;color:var(--ink,#0A0A0A);transform-origin:var(--nub,30%) 0}
+.mm[hidden]{display:none}
+.mm.in{animation:mm-drop .42s cubic-bezier(.2,1.45,.45,1) both}
+@keyframes mm-drop{0%{opacity:0;transform:translateY(-18px) rotate(-1.6deg) scaleY(.94)}60%{opacity:1}100%{opacity:1;transform:none}}
+/* the nub: a tab of the same paper reaching up to the link */
+.mm::before{content:"";position:absolute;top:2px;left:calc(var(--nub,30%) - 14px);width:28px;height:16px;background:var(--paper);clip-path:polygon(50% 0,100% 100%,0 100%);z-index:2}
+.mm-sheet{position:relative;rotate:-.6deg}
+/* halftone dot shadow, torn the same way as the sheet */
+.mm-sheet::before{content:"";position:absolute;inset:0;translate:10px 12px;z-index:-1;
+  background:radial-gradient(circle,var(--ink,#0A0A0A) 1.5px,transparent 1.8px) 0 0/6px 6px;
+  -webkit-mask:linear-gradient(#000,#000) top/100% calc(100% - 22px) no-repeat,var(--tear) bottom/100% 24px no-repeat;mask:linear-gradient(#000,#000) top/100% calc(100% - 22px) no-repeat,var(--tear) bottom/100% 24px no-repeat}
+.mm-in{position:relative;background:var(--paper);border:3px solid var(--ink,#0A0A0A);border-bottom:0;padding:22px 26px 46px;
+  -webkit-mask:linear-gradient(#000,#000) top/100% calc(100% - 22px) no-repeat,var(--tear) bottom/100% 24px no-repeat;mask:linear-gradient(#000,#000) top/100% calc(100% - 22px) no-repeat,var(--tear) bottom/100% 24px no-repeat}
+.mm-h{margin:0 0 16px;font-family:var(--display,Montserrat,sans-serif);font-weight:900;font-size:26px;line-height:1;letter-spacing:-.02em;rotate:-1.5deg;display:inline-block;background:var(--yellow,#FFF100);padding:6px 12px 7px;box-shadow:4px 4px 0 var(--ink,#0A0A0A)}
+.mm[data-k="shop"] .mm-h{background:var(--red,#DA2342);color:#fff}
+.mm[data-k="crew"] .mm-h{background:var(--blue,#2A3B8E);color:var(--yellow,#FFF100)}
+.mm[data-k="wholesale"] .mm-h{background:#05B48F;color:var(--ink,#0A0A0A)}
+.mm ul{list-style:none;margin:0;padding:0}
+.mm a{color:inherit;text-decoration:none}
+.mm a:focus-visible{outline:3px solid var(--red,#DA2342);outline-offset:3px}
+
+/* glass: shelves as stickers with a piece on each */
+.mm-shelves{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 16px}
+.mm-shelves li{rotate:var(--t)}
+.mm-stk{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px;background:#fff;border:3px solid var(--ink,#0A0A0A);border-radius:14px;box-shadow:3px 3px 0 var(--ink,#0A0A0A);transition:transform .18s cubic-bezier(.2,1.6,.4,1),box-shadow .18s,background .18s}
+.mm-stk:hover,.mm-stk:focus-visible{transform:translate(-2px,-3px) rotate(calc(var(--t) * -2.4));box-shadow:6px 7px 0 var(--ink,#0A0A0A);background:var(--yellow,#FFF100)}
+.mm-pic{flex:none;width:44px;height:58px;display:flex;align-items:flex-end;justify-content:center}
+.mm-pic img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(1px 2px 0 rgba(10,10,10,.25));transition:transform .25s cubic-bezier(.2,1.6,.4,1)}
+.mm-stk:hover .mm-pic img{transform:translateY(-4px) rotate(-6deg) scale(1.12)}
+.mm-tx{min-width:0;display:flex;flex-direction:column;gap:2px}
+.mm-tx b{font-family:var(--display,Montserrat,sans-serif);font-weight:900;font-size:15px;line-height:1.1}
+.mm-tx small{font-size:12px;font-weight:600;opacity:.75}
+
+/* merch: columns of chips, the non-apparel first */
+.mm-cols{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+.mm-top{display:flex;align-items:baseline;justify-content:space-between;gap:6px;font-family:var(--display,Montserrat,sans-serif);font-weight:900;font-size:16px;padding-bottom:6px;margin-bottom:8px;border-bottom:3px solid var(--ink,#0A0A0A)}
+.mm-top small{font-family:var(--body,inherit);font-weight:700;font-size:12px;opacity:.7}
+.mm-col.hot .mm-top{color:var(--red,#DA2342)}
+.mm-col li{margin:0 0 7px;rotate:var(--t)}
+.mm-chip{display:flex;align-items:center;gap:8px;padding:5px 9px 5px 5px;background:#fff;border:2px solid var(--ink,#0A0A0A);border-radius:999px;font-weight:700;font-size:13px;line-height:1.15;transition:transform .16s cubic-bezier(.2,1.6,.4,1),background .16s}
+.mm-chip small{margin-left:auto;font-size:11px;opacity:.6}
+.mm-chip:hover,.mm-chip:focus-visible{transform:translateX(3px) rotate(calc(var(--t) * -2));background:var(--yellow,#FFF100)}
+.mm-dot{flex:none;width:30px;height:30px;border-radius:50%;overflow:hidden;background:#f1efe8;border:2px solid var(--ink,#0A0A0A)}
+.mm-dot img{width:100%;height:100%;object-fit:cover}
+
+/* crew: the stickers */
+.mm-crew{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px 6px}
+.mm-crew li{rotate:var(--t)}
+.mm-crew a{display:flex;flex-direction:column;align-items:center;gap:2px;font:800 11px/1.1 var(--display,Montserrat,sans-serif);text-align:center}
+.mm-crew img{width:62px;height:62px;object-fit:contain;filter:drop-shadow(2px 3px 0 rgba(10,10,10,.45));transition:transform .2s cubic-bezier(.2,1.7,.4,1)}
+.mm-crew a:hover img,.mm-crew a:focus-visible img{transform:translateY(-6px) rotate(-10deg) scale(1.18)}
+
+/* wholesale: two tracks */
+.mm-tracks{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.mm-track{display:flex;flex-direction:column;gap:6px;padding:16px 18px;background:#fff;border:3px solid var(--ink,#0A0A0A);box-shadow:5px 5px 0 var(--ink,#0A0A0A);rotate:-1deg;transition:transform .18s cubic-bezier(.2,1.6,.4,1)}
+.mm-track.ny{rotate:1deg;background:var(--blue,#2A3B8E);color:#fff}
+.mm-track b{font-family:var(--display,Montserrat,sans-serif);font-weight:900;font-size:19px;line-height:1.1}
+.mm-track span{font-size:14px;line-height:1.4}
+.mm-track:hover,.mm-track:focus-visible{transform:translate(-2px,-3px) rotate(0deg)}
+
+.mm-foot{display:flex;flex-wrap:wrap;gap:10px 22px;margin:18px 0 0;font-weight:800;font-size:14px}
+.mm-foot a{border-bottom:3px solid var(--red,#DA2342);padding-bottom:1px}
+.mm-foot a:hover{color:var(--red,#DA2342)}
+
+/* the crew member peeking over the bottom-right corner */
+.mm-peek{position:absolute;right:-26px;bottom:-34px;width:96px;rotate:-14deg;z-index:3;pointer-events:none;filter:drop-shadow(3px 4px 0 rgba(10,10,10,.5))}
+.mm.in .mm-peek{animation:mm-peek .7s cubic-bezier(.2,1.6,.4,1) .18s both}
+@keyframes mm-peek{0%{transform:translate(30px,40px) rotate(20deg);opacity:0}100%{transform:none;opacity:1}}
+.mm-say{position:absolute;right:58px;bottom:44px;z-index:3;margin:0;background:#fff;border:3px solid var(--ink,#0A0A0A);box-shadow:3px 3px 0 var(--ink,#0A0A0A);padding:5px 10px;font:800 13px/1.2 var(--display,Montserrat,sans-serif);rotate:-3deg;pointer-events:none;white-space:nowrap}
+.mm.in .mm-say{animation:mm-say .3s ease-out .6s both}
+@keyframes mm-say{from{opacity:0;scale:.6}to{opacity:1;scale:1}}
+
+@media (max-width:1100px){.mm-shelves{grid-template-columns:repeat(3,minmax(0,1fr))}.mm-cols{grid-template-columns:repeat(3,minmax(0,1fr))}.mm-crew{grid-template-columns:repeat(7,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.mm.in,.mm.in .mm-peek,.mm.in .mm-say{animation:none}}
+html.saver .mm.in,html.saver .mm.in .mm-peek{animation:none}
+
+/* phones: chips under Glass and Ritual Merch in the dock's sticker pile */
+.mm-pile{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px;justify-content:center}
+.mm-pile a{padding:5px 10px;background:#fff;color:var(--ink,#0A0A0A);border:2px solid var(--ink,#0A0A0A);border-radius:999px;font:800 12px/1.2 var(--display,Montserrat,sans-serif);text-decoration:none;box-shadow:2px 2px 0 var(--ink,#0A0A0A)}
