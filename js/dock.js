@@ -36,6 +36,8 @@
     ['The Hot Shop', 'comics/', 'red', 'The comic. 21+.'],
     ['The Story', '#made', 'white', 'Since 1991.'],
     ['Travel Guide', 'travel/', 'yellow', 'Where to go next.'],
+    ['Join the JB Fam', 'join/', 'red', 'First look at every drop.'],
+    ['Wholesale', 'wholesale/', 'teal', 'Carry JB in your store.'],
     ['Home', '', 'blue', 'Back to the chaos.'],
   ];
   const href = (h) => base + h || './';

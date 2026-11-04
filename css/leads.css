@@ -1,0 +1,62 @@
+/* The two lead pages: Join the JB fam (/join/) and Wholesale (/wholesale/). Built on css/site.css tokens. */
+body{background:var(--ink)}
+.ticker{background:var(--yellow);overflow:hidden;border-bottom:3px solid var(--ink)}
+.ticker .marq{padding:8px 0;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.12em;white-space:nowrap}
+.ticker span{padding-right:40px}
+.topbar nav a[aria-current]{color:var(--yellow)}
+.lhero{position:relative;padding-top:64px;padding-bottom:72px;color:var(--white);border-bottom:4px solid var(--ink)}
+.lhero .wash{position:absolute;inset:0;background:var(--blue);opacity:.86;z-index:0}
+.lhero.red .wash{background:var(--red);opacity:.9}
+.lhero .wrap{position:relative;z-index:2;display:flex;flex-wrap:wrap;gap:32px;align-items:center;justify-content:space-between}
+.lhero .kicker{font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.2em;color:var(--ink);background:var(--yellow);display:inline-block;padding:6px 10px;rotate:-2deg;margin:0 0 18px}
+.lhero h1{margin:0;font-family:var(--display);font-weight:900;font-size:clamp(52px,10vw,148px);line-height:.84;letter-spacing:-.03em;color:var(--yellow);text-shadow:6px 6px 0 var(--ink);max-width:11ch}
+.lhero .lede{max-width:46ch;font-size:19px;line-height:1.5;margin:22px 0 0;font-weight:600}
+.lhero .cast{display:flex;align-items:flex-end;gap:0;flex:0 1 420px;justify-content:center}
+.lhero .cast img{width:clamp(110px,16vw,200px);height:auto;filter:drop-shadow(6px 8px 0 rgba(10,10,10,.5))}
+.lhero .cast img:nth-child(2){margin-left:-28px;rotate:6deg}
+.lhero .cast img:nth-child(1){rotate:-5deg}
+
+.lbody{background:var(--white);padding-top:64px;padding-bottom:88px}
+.lbody.yellow{background:var(--yellow)}
+.lbody h2{margin:0 0 14px;font-family:var(--display);font-weight:900;font-size:clamp(34px,5vw,64px);line-height:.92;letter-spacing:-.02em}
+.lbody p{font-size:17px;line-height:1.55;max-width:62ch}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:22px;margin-top:28px}
+.card-l{background:var(--white);border:4px solid var(--ink);padding:22px;box-shadow:8px 8px 0 var(--ink)}
+.card-l h3{margin:0 0 8px;font-family:var(--display);font-weight:900;font-size:24px;line-height:1.05}
+.card-l p{margin:0;font-size:16px}
+.card-l ul{margin:10px 0 0;padding-left:20px;font-size:16px;line-height:1.55}
+.card-l.blue{background:var(--blue);color:var(--white)}
+.card-l.blue h3{color:var(--yellow)}
+.track{margin-top:56px}
+.track:first-child{margin-top:0}
+.track .tag{display:inline-block;font-family:var(--mono);font-weight:700;font-size:12px;letter-spacing:.18em;background:var(--ink);color:var(--yellow);padding:6px 10px;margin-bottom:12px}
+.lineup{width:100%;border-collapse:collapse;margin-top:18px;font-size:16px;background:var(--white);border:4px solid var(--ink)}
+.lineup th,.lineup td{text-align:left;padding:10px 14px;border-bottom:2px solid var(--ink);vertical-align:top}
+.lineup th{font-family:var(--mono);font-size:12px;letter-spacing:.14em;background:var(--ink);color:var(--yellow)}
+.lineup td:last-child{white-space:nowrap;font-weight:800}
+.fine{font-size:14px!important;opacity:.8;margin-top:14px}
+
+/* the forms */
+.lform{background:var(--white);border:4px solid var(--ink);box-shadow:10px 10px 0 var(--red);padding:clamp(18px,3vw,32px);max-width:760px;margin-top:28px}
+.lform .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px}
+.lform label{display:block;font-weight:800;font-size:15px;margin:0 0 6px}
+.lform .f{margin-bottom:16px}
+.lform input[type=text],.lform input[type=email],.lform input[type=tel],.lform select,.lform textarea{width:100%;min-height:48px;padding:10px 12px;border:3px solid var(--ink);background:var(--white);font:600 16px var(--body);color:var(--ink);border-radius:0}
+.lform textarea{min-height:120px;resize:vertical}
+.lform input:focus,.lform select:focus,.lform textarea:focus{outline:3px solid var(--yellow);outline-offset:0;border-color:var(--blue)}
+.lform fieldset{border:3px solid var(--ink);padding:12px 14px 6px;margin:0 0 16px}
+.lform legend{font-weight:800;font-size:15px;padding:0 6px}
+.lform .chk{display:flex;gap:10px;align-items:flex-start;font-weight:600;font-size:15px;line-height:1.4;margin:0 0 10px;cursor:pointer}
+.lform .chk input{width:22px;height:22px;flex:none;margin:1px 0 0;accent-color:var(--blue)}
+.lform .req{color:var(--red)}
+.lform .hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+.lform .send{margin-top:8px}
+.lform .err{color:var(--red);font-weight:800;margin:10px 0 0;min-height:1.2em}
+.lform .small{font-size:13px;font-weight:600;opacity:.75;margin:6px 0 0}
+.thanks{display:none;background:var(--yellow);border:4px solid var(--ink);box-shadow:10px 10px 0 var(--ink);padding:28px;max-width:760px;margin-top:28px}
+.thanks h3{margin:0 0 8px;font-family:var(--display);font-weight:900;font-size:clamp(30px,5vw,48px);line-height:.95}
+.thanks p{margin:0;font-weight:600}
+.sent .lform{display:none}
+.sent .thanks{display:block}
+
+@media (max-width:700px){.lhero .cast{display:none}.lineup td:last-child{white-space:normal}}

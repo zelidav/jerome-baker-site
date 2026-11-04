@@ -106,7 +106,7 @@ def head(title, desc, up, extra=""):
 
 def topbar(up):
     return (f'<header class="topbar pad"><a href="{up}" aria-label="Jerome Baker home"><img src="{up}assets/img/jb-mark.webp" alt="Jerome Baker" width="90" height="69"></a>'
-            f'<nav aria-label="Main"><a href="{up}glass/">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}comics/">The Hot Shop</a> <a href="{up}#made">The story</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a></nav></header>')
+            f'<nav aria-label="Main"><a href="{up}glass/">Glass</a> <a href="{up}shop/">Ritual merch</a> <a href="{up}crew/">The JB Crew</a> <a href="{up}crew/match/">Find your crew</a> <a href="{up}comics/">The Hot Shop</a> <a href="{up}#made">The story</a> <a href="{up}travel/" style="color:#FFF100">Travel guide</a> <a href="{up}wholesale/">Wholesale</a></nav></header>')
 
 
 def scripts(up, weird=False):
@@ -123,12 +123,12 @@ def site_footer(up, note=CREW_NOTE):
     """The one footer for home, crew pages and comics (the shop keeps its own contact-heavy one).
     index.html, comics/ and glass/ get it through their <!-- FOOT --> markers."""
     links = [("glass/", "Glass"), ("shop/", "Ritual merch"), ("crew/", "The JB Crew"), ("crew/match/", "Find your crew"),
-             ("comics/", "The Hot Shop"), ("#made", "The story"), ("travel/", "Travel guide")]
+             ("comics/", "The Hot Shop"), ("#made", "The story"), ("travel/", "Travel guide"), ("join/", "Join the JB fam")]
     nav = "".join(f'<li><a href="{up}{h}">{t}</a></li>' for h, t in links)
     return (f'<footer class="site-foot pad"><div class="sf-cols">'
             f'<img src="{up}assets/cut/tealjbd.webp" alt="JBD" width="200" height="122" loading="lazy" class="sf-mark">'
             f'<div><b>Say hi</b><a href="mailto:info@jeromebakerny.com">info@jeromebakerny.com</a>'
-            f'<b>Wholesale</b><a href="mailto:sales@jeromebakerny.com">sales@jeromebakerny.com</a></div>'
+            f'<b>Wholesale</b><a href="{up}wholesale/">Stores and the NY program</a><a href="mailto:sales@jeromebakerny.com">sales@jeromebakerny.com</a></div>'
             f'<div><b>Explore</b><ul>{nav}</ul></div>'
             f'<div><b>Follow</b><a href="https://www.instagram.com/jerome_baker" target="_blank" rel="noopener">@jerome_baker</a>'
             f'<b>Find the glass</b><a href="https://jeromebaker.com/" target="_blank" rel="noopener">jeromebaker.com</a>'

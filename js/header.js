@@ -14,7 +14,7 @@
   // the crew pages are built by a script, so their menu labels are brought in line here:
   // same words as the home, shop, glass and comics menus, and the page you're on lights up
   const LABEL = { 'glass/': 'Glass', 'shop/': 'Ritual Merch', 'crew/': 'The JB Crew', 'crew/match/': 'Find Your Crew',
-    'comics/': 'The Hot Shop', '#made': 'The Story', 'travel/': 'Travel Guide' };
+    'comics/': 'The Hot Shop', '#made': 'The Story', 'travel/': 'Travel Guide', 'wholesale/': 'Wholesale', 'join/': 'Join the JB Fam' };
   const page = location.pathname.replace(/index\.html$/, '');
   head.querySelectorAll('nav[aria-label="Main"] a:not(.btn):not(.cartbtn)').forEach((a) => {
     const key = Object.keys(LABEL).find((k) => (a.getAttribute('href') || '').replace(/^(\.\.\/)+/, '') === k);
