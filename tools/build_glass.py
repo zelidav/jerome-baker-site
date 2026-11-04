@@ -16,7 +16,7 @@ OUT = ROOT / 'assets' / 'glass'
 CUTS = Path(os.path.expanduser('~/code/jbsite-work/glass/cut'))
 HOST = 'https://jbcustomer.cannacrypted.com'
 SKIP_CATS = ('Drop Merch', 'Display Fixtures')
-# extra photos for the zoom strip (angles, then marble closeups): assets/glass/hires/, from the 2019 giant-bong
+# extra photos for the zoom strip (scale shot, collar, then marble closeups; the first one is also the tile's flip photo): assets/glass/hires/, from the 2019 giant-bong
 # studio shoot. Written by jbsite-work/glass/giant/giant_hires.py.
 _GP = Path(__file__).resolve().parent / 'giant_photos.json'
 EXTRA_PHOTOS = json.loads(_GP.read_text(encoding='utf-8')) if _GP.exists() else {}
@@ -28,7 +28,7 @@ SHOPIFY_SKIP = ('skeeter', 'nug jug')  # Nug Jug = our Large / Small Storage Jar
 
 # shelves, in page order: (key, title, line, match)
 SHELVES = [
-    ('giant', 'Giant bongs', 'Four feet of glass, pulled by a team of fifteen. One of each, ever.', lambda p: p['shape_code'] == 'GBG'),
+    ('giant', 'Giant bongs', 'Four feet of glass and up, pulled by a team of fifteen. One of each, ever.', lambda p: p['shape_code'] == 'GBG'),
     ('le', 'Limited Edition', 'The crown pieces. Wig-wag, millies, knuckles and marbles, worked at the bench and signed off as one of one.', lambda p: p['series'] == 'Limited Edition' and p['category'] == 'Signature Glass'),
     ('og', 'Original Series', 'The fifteen-inch Baker silhouette that started it. Fumed bulb, straight tube, built to hit and built to last.', lambda p: p['series'] == 'Original Series'),
     ('second', 'Second Life', 'Worked tubes rebuilt into cork-top jars. Each one was something else first.', lambda p: p['category'] == 'Second Life Series'),
@@ -148,6 +148,7 @@ def main():
             'buy': f'{HOST}/buy/{pid}', 'verify': f'{HOST}/c/piece/{pid}?prov=1', **img})
         if pid in EXTRA_PHOTOS:
             pieces[-1]['photos'] = EXTRA_PHOTOS[pid]
+            pieces[-1]['flip'] = EXTRA_PHOTOS[pid][0]['src']  # the tile's second look: our own photo, not the app's
     shop, shop_missing = shopify_pieces()
     pieces += shop
     missing += shop_missing

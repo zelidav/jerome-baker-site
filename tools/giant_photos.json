@@ -8,7 +8,7 @@
   },
   {
    "src": "hires/baker-2.webp",
-   "label": "The mouth, wrapped",
+   "label": "The collar, close up",
    "w": 2400,
    "h": 2400
   },
@@ -46,7 +46,7 @@
   },
   {
    "src": "hires/mellow-yellow-3.webp",
-   "label": "The mouth, wrapped",
+   "label": "The collar, close up",
    "w": 2400,
    "h": 2102
   },
@@ -78,7 +78,7 @@
   },
   {
    "src": "hires/agent-orange-2.webp",
-   "label": "The mouth, wrapped",
+   "label": "The collar, close up",
    "w": 2400,
    "h": 2400
   },
@@ -92,6 +92,40 @@
    "src": "hires/agent-orange-4.webp",
    "label": "Marble detail",
    "w": 1600,
+   "h": 2400
+  }
+ ],
+ "JBD-30A28BA0570D": [
+  {
+   "src": "hires/alien-1.webp",
+   "label": "The full photo",
+   "w": 624,
+   "h": 1754
+  }
+ ],
+ "JBD-F09F6641058C": [
+  {
+   "src": "hires/clearboy-1.webp",
+   "label": "With its box",
+   "w": 1080,
+   "h": 1080
+  },
+  {
+   "src": "hires/clearboy-2.webp",
+   "label": "Front, with the logo",
+   "w": 1800,
+   "h": 2400
+  },
+  {
+   "src": "hires/clearboy-3.webp",
+   "label": "End on",
+   "w": 1800,
+   "h": 2400
+  },
+  {
+   "src": "hires/clearboy-4.webp",
+   "label": "With a ruler, for size",
+   "w": 1800,
    "h": 2400
   }
  ]
