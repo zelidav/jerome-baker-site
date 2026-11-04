@@ -224,7 +224,9 @@
   // zoom (from the bench): the full-resolution cutout first, then the original photos
   const photosOf = (p) => [
     { src: `../assets/glass/${p.id}_z.webp`, w: p.zw, h: p.zh, alt: `${p.name}, close up` },
-    ...(p.photos || (p.shop ? [] : [`${HOST}/piece/${p.id}/image.jpg`])).map((src, i) => ({ src, alt: `${p.name}, photo ${i + 2}` })),
+    ...(p.photos || (p.shop ? [] : [`${HOST}/piece/${p.id}/image.jpg`])).map((ph, i) => typeof ph === 'string'
+      ? { src: ph, alt: `${p.name}, photo ${i + 2}` }
+      : { src: `../assets/glass/${ph.src}`, w: ph.w, h: ph.h, alt: `${p.name}: ${ph.label}`, label: ph.label }),
   ];
   const zoom = (p, at) => window.JBZoom && JBZoom.open({ photos: photosOf(p), at });
 
