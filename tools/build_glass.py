@@ -90,6 +90,16 @@ def shopify_pieces():
 # nominal height in inches, for the size line in the piece view
 HEIGHT = {'GBG': 44, 'LEB': 15, 'OSB': 15, 'SPC': 15, 'CUJ': 7, 'BKR': 12, 'STR': 12, 'JRL': 5, 'JRS': 3}
 
+def size_in(p):
+    """Height in inches: the description's own "58 × 20 in" when it has one (the giants all differ), else the shape's
+    nominal height."""
+    m = re.search(r'(\d{2,3}(?:\.\d)?)\s*[×xX]\s*\d{1,3}(?:\.\d)?\s*in\b', p.get('description') or '')
+    if m:
+        v = float(m.group(1))
+        return int(v) if v.is_integer() else v
+    return HEIGHT.get(p.get('shape_code') or '')
+
+
 
 def get(url):
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (jb-site build)'})
@@ -155,7 +165,7 @@ def main():
             'id': pid, 'name': p['name'], 'shelf': shelf, 'series': p.get('series') or '', 'shape': p.get('shape') or '',
             'price': p.get('price') or 0, 'status': status, 'online': bool(p.get('online_sale')),
             'edition': p.get('edition') or '', 'standard': (p.get('category') or '').startswith(STANDARD_CATS),
-            'inches': HEIGHT.get(p.get('shape_code') or ''),
+            'inches': size_in(p),
             'desc': (p.get('description') or '').strip(),
             'buy': f'{HOST}/buy/{pid}', 'verify': f'{HOST}/c/piece/{pid}?prov=1', **img})
         if pid in EXTRA_PHOTOS:
