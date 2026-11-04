@@ -41,8 +41,20 @@
   window.JBHalftone = filterFor; // the header tear uses it too
 
   const INK = /rgb\(10, 10, 10\) (-?\d+(?:\.\d+)?)px (-?\d+(?:\.\d+)?)px 0px(?: 0px)?$/;
+  // Pinned things (fixed or sticky) and anything sitting on a live canvas keep a plain solid shadow: phone browsers
+  // (iOS Safari above all) redraw an SVG filter on every scroll or canvas frame, and the button flashes.
+  const touch = matchMedia('(pointer: coarse)').matches || /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg/.test(navigator.userAgent);
+  const pinned = (el) => {
+    if (!touch) return false;
+    if (el.closest('.holo-sec,.holo-fs,.holo-stage,.crew-layer,.dock,.promo')) return true;
+    for (let e = el; e && e !== document.body; e = e.parentElement) {
+      const p = getComputedStyle(e).position;
+      if (p === 'fixed' || p === 'sticky') return true;
+    }
+    return false;
+  };
   const halftone = (el) => {
-    if (el.dataset.ht) return;
+    if (el.dataset.ht || pinned(el)) return;
     const cs = getComputedStyle(el);
     if (cs.boxShadow === 'none' || (cs.boxShadow.match(/rgb/g) || []).length > 1 || cs.boxShadow.includes('inset')) return;
     const m = cs.boxShadow.match(INK);

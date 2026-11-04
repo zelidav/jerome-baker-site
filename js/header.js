@@ -41,14 +41,14 @@
     const rnd = () => { seed = Math.imul(seed ^ (seed >>> 15), 2246822507); seed = Math.imul(seed ^ (seed >>> 13), 3266489909); return ((seed ^= seed >>> 16) >>> 0) / 4294967296; };
     // midpoint displacement: long rolling swells, smaller jags riding on them
     const fractal = (amp, rough) => {
-      const ys = new Array(N + 1);
-      ys[0] = (rnd() - .5) * amp; ys[N] = (rnd() - .5) * amp;
-      for (let step = N, a = amp; step > 1; step = Math.floor(step / 2), a *= rough) {
-        const h = Math.floor(step / 2);
-        for (let i = h; i < N; i += step) if (ys[i] === undefined) ys[i] = (ys[i - h] + ys[Math.min(N, i + h)]) / 2 + (rnd() - .5) * a;
+      // built on a power-of-two grid (so every midpoint has both neighbors), then sampled at the N steps
+      const M = 1024, g = new Array(M + 1);
+      g[0] = (rnd() - .5) * amp; g[M] = (rnd() - .5) * amp;
+      for (let step = M, a = amp; step > 1; step /= 2, a *= rough) {
+        const h = step / 2;
+        for (let i = h; i < M; i += step) g[i] = (g[i - h] + g[i + h]) / 2 + (rnd() - .5) * a;
       }
-      for (let i = 0; i <= N; i++) if (ys[i] === undefined) ys[i] = ys[i - 1];
-      return ys;
+      return Array.from({ length: N + 1 }, (_, i) => { const x = i * M / N, k = Math.floor(x), f = x - k; return g[k] + ((g[Math.min(M, k + 1)] - g[k]) * f); });
     };
     const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
     const waves = [[520, 900, 8], [180, 320, 4.5], [60, 120, 2.2]].map(([a, b, amp]) => [a + rnd() * (b - a), rnd() * 6.28, amp * (.7 + rnd() * .6)]);
@@ -84,6 +84,25 @@
   // a bar of links right under the menu (the shop's yellow categories) is the next layer down, torn its own way
   const under = head.nextElementSibling;
   if (under && under.matches('.subnav')) { under.classList.add('hdr-under'); tear(under, 'under'); }
+
+  // ---------- links to a spot on the page land below whatever sticks to the top ----------
+  // (the menu, the shop's yellow bar and its tear, the glass filter bar), so the section and its items show
+  const stick = () => {
+    let h = 0;
+    for (const el of document.querySelectorAll('header.top, header.topbar, .subnav, .sbar')) {
+      const cs = getComputedStyle(el);
+      if ((cs.position !== 'sticky' && cs.position !== 'fixed') || cs.display === 'none') continue;
+      const rip = el.querySelector(':scope > .hdr-tear');
+      h = Math.max(h, (parseFloat(cs.top) || 0) + el.offsetHeight + (rip ? rip.offsetHeight * .7 : 0));
+    }
+    document.documentElement.style.setProperty('--stick', Math.round(h + 14) + 'px');
+  };
+  const stickCss = document.createElement('style');
+  stickCss.textContent = '[id]{scroll-margin-top:var(--stick,110px)}';
+  document.head.append(stickCss);
+  stick();
+  addEventListener('resize', stick);
+  addEventListener('load', stick);
 
   // ---------- the logo ----------
   const logo = head.querySelector('a.logo, :scope > a:first-child');

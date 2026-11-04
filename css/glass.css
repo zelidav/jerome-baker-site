@@ -95,8 +95,11 @@ body{background:var(--blue)}
 .t-price{margin:6px 2px 0;font-weight:800;font-size:17px}
 .t-price s{color:#8A8FA0;text-decoration-thickness:2px}
 /* the giant bongs: the first one gets a 2x2 feature frame */
-.tile.feature{grid-column:span 2;grid-row:span 2}
-.tile.feature .frame{aspect-ratio:auto;flex:1;min-height:520px}
+/* a wide frame across two columns, the same height as its row, so the whole piece is on screen next to its neighbors
+   (it used to be 2x2 and ran taller than the window) */
+.tile.feature{grid-column:span 2}
+.tile.feature .frame{aspect-ratio:auto;flex:1;min-height:0}
+.tile.feature .frame img.cut{height:88%;bottom:6%}
 .tile.feature .t-name{font-size:22px}
 .empty{text-align:center;font-weight:700;font-size:16px;padding:40px 16px}
 .linkbtn{background:none;border:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:8px}
@@ -219,6 +222,7 @@ body.in-shop .crew-layer{opacity:0;pointer-events:none;transition:opacity .4s}
 @media (max-width:760px){
   .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tile.feature .frame{min-height:420px}
+  .tile.feature .frame img.cut{height:84%;bottom:8.5%}
   .sbar{position:relative}
   .t-name{font-size:15px}
 }
