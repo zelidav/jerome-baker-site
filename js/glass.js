@@ -205,7 +205,7 @@
       ph = document.createElement('img');
       ph.className = 'photo'; ph.alt = ''; ph.decoding = 'async';
       const pp = byId[el.dataset.id];
-      ph.src = pp.shop ? (pp.photos[0] || '').replace(/width=\d+/, 'width=800') : `${HOST}/piece/${el.dataset.id}/image.jpg`;
+      ph.src = pp.flip ? `../assets/glass/${pp.flip}` : pp.shop ? (pp.photos[0] || '').replace(/width=\d+/, 'width=800') : `${HOST}/piece/${el.dataset.id}/image.jpg`;
       el.querySelector('.frame').appendChild(ph);
     }
     el._flip = setTimeout(() => { if (el.classList.contains('lit')) { page.off(el); el.classList.add('flip'); } }, 1600);
