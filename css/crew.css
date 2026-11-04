@@ -13,6 +13,28 @@
 .bubble a{pointer-events:none;display:block;margin-top:4px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--red)}
 .crew-toggle{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:75;min-height:44px;padding:0 14px;border:3px solid var(--ink);background:var(--yellow);color:var(--ink);font-family:var(--display);font-weight:800;font-size:13px;box-shadow:4px 4px 0 var(--ink);cursor:pointer}
 body.no-crew .crew-layer{display:none}
+/* the crew drops by: peek in from the edge, look around, float, duck out (js/crew.js) */
+.floater{transition:opacity .35s ease}
+.floater.peeking img{animation:crew-lean .7s cubic-bezier(.2,1.6,.4,1) both}
+.floater.look img{animation:crew-look 1.6s ease-in-out}
+.floater.leaving{opacity:0;transition:opacity .9s ease}
+.floater.leaving img{transform:scale(.9) rotate(-8deg)}
+.floater.pinned img{filter:drop-shadow(5px 7px 0 rgba(10,10,10,.55)) drop-shadow(0 0 0 #FFF100)}
+.floater.pinned::after{content:"";position:absolute;left:50%;bottom:-6px;translate:-50% 0;width:62%;height:9px;border-radius:50%;background:radial-gradient(closest-side,rgba(10,10,10,.28),transparent);pointer-events:none}
+@keyframes crew-lean{0%{transform:scale(.85)}100%{transform:none}}
+@keyframes crew-look{0%,100%{transform:none}22%{transform:rotate(-9deg) translateX(-4px)}48%{transform:rotate(7deg) translateX(3px)}70%{transform:rotate(-3deg)}}
+/* "Want me to stick around?" */
+.bubble.asking{pointer-events:auto;max-width:240px}
+.bubble .ask{display:flex;gap:8px;margin-top:8px}
+.bubble .ask button{min-height:40px;padding:0 12px;border:3px solid var(--ink);background:var(--yellow);color:var(--ink);font-family:var(--display);font-weight:900;font-size:14px;cursor:pointer;box-shadow:3px 3px 0 var(--ink)}
+.bubble .ask button.no{background:var(--white)}
+.bubble .ask button:hover,.bubble .ask button:focus-visible{translate:-1px -1px;box-shadow:4px 4px 0 var(--ink)}
+.bubble.asking a{pointer-events:auto}
+/* bottom-left corner: Hide the crew + Lite mode (js/litemode.js) */
+.jb-corner{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:75;display:flex;gap:8px;align-items:flex-end}
+.jb-corner .crew-toggle{position:static}
+@media (prefers-reduced-motion:reduce){.floater.peeking img,.floater.look img{animation:none}}
+
 
 /* Home: the crew wall on the booth's barn wood */
 section.crew{position:relative;padding-top:96px;padding-bottom:110px;background:#3a2f26 url(../assets/img/booth-wall.webp) 0 50%/auto 100% repeat-x;color:var(--white);overflow:hidden;isolation:isolate}

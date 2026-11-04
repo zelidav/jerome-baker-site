@@ -14,7 +14,9 @@
   // and iOS reports a low core count for privacy, so it must not count as a weak device
   const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
   const weak = (navigator.connection && navigator.connection.saveData) || (navigator.deviceMemory && navigator.deviceMemory < 3) || (!ios && navigator.hardwareConcurrency && navigator.hardwareConcurrency < 4);
-  if (off || weak || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // Lite mode (js/litemode.js) turns the dance off with everything else that's heavy
+  const saver = (() => { try { return localStorage.getItem('jb-lite') === '1'; } catch (e) { return false; } })();
+  if (off || weak || saver || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const dir = (document.documentElement.dataset.base || '../') + 'assets/dance/';
   // the WebM's alpha channel is dropped by some browsers and GPUs (she waltzes in a black box), so everyone gets the

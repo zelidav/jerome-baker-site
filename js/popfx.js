@@ -45,7 +45,7 @@
   // which costs a lot and makes pinned buttons flash. They get the same dots as a plain painted layer instead: a
   // ::before behind the element, offset like the shadow, tiled with the dot image and cut out where the element
   // sits, so it never repaints on its own. Elements that already use ::before keep a solid shadow.
-  const touch = matchMedia('(pointer: coarse)').matches || /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg/.test(navigator.userAgent);
+  const touch = matchMedia('(pointer: coarse)').matches || /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg/.test(navigator.userAgent) || (() => { try { return localStorage.getItem('jb-lite') === '1'; } catch (e) { return false; } })();
   const dotsLayer = (el, cs, dx, dy) => {
     if (getComputedStyle(el, '::before').content !== 'none') return false;
     if (cs.position === 'static') {

@@ -8,3 +8,6 @@
   clip-path:polygon(50% 0,61% 22%,85% 8%,78% 34%,100% 42%,80% 58%,94% 82%,66% 74%,58% 100%,45% 78%,22% 96%,26% 70%,0 66%,18% 48%,2% 24%,30% 28%);animation:antpop .2s ease-out}
 @keyframes antpop{from{scale:.3;opacity:0}to{scale:1;opacity:1}}
 .ant-puff{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(185,185,195,.95),rgba(150,150,160,.55) 55%,transparent 72%);filter:blur(3px);pointer-events:none}
+
+/* heavy lifting (giants): sweat drops */
+.ant-sweat{position:absolute;width:9px;height:13px;background:#7fd3ff;border:2px solid #0A0A0A;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;rotate:180deg;pointer-events:none}

@@ -102,7 +102,8 @@
     sec.querySelector('.fx-btns').addEventListener('click', (e) => { const b = e.target.closest('[data-d]'); if (b) { go(+b.dataset.d); hold(6000); } });
     track.addEventListener('scroll', () => requestAnimationFrame(mark), { passive: true });
     mark();
-    if (reduce || n < 2) return;
+    // Lite mode (js/litemode.js): the strip holds still, swipe and arrows still work
+    if (reduce || n < 2 || (() => { try { return localStorage.getItem('jb-lite') === '1'; } catch (e) { return false; } })()) return;
     let pauseUntil = 0, held = false, seen = false;
     const hold = (ms) => { pauseUntil = performance.now() + ms; };
     track.addEventListener('pointerenter', () => (held = true));

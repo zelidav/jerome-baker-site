@@ -210,3 +210,26 @@ jbIdle(() => {
   s.defer = true;
   document.head.appendChild(s);
 })();
+
+// Lite mode (js/litemode.js): one switch for the heavy effects, and an offer when the page runs slow. Every page.
+(() => {
+  if (document.querySelector('script[src$="js/litemode.js"]')) return;
+  const s = document.createElement('script');
+  s.src = (document.documentElement.dataset.base || '') + 'js/litemode.js';
+  s.defer = true;
+  document.head.appendChild(s);
+})();
+
+// the drop-down menus on the desktop top bar (js/megamenu.js, css/megamenu.css)
+(() => {
+  if (document.querySelector('script[src$="js/megamenu.js"]') || !document.querySelector('header.top, header.topbar')) return;
+  const base = document.documentElement.dataset.base || '';
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = base + 'css/megamenu.css';
+  document.head.appendChild(css);
+  const s = document.createElement('script');
+  s.src = base + 'js/megamenu.js';
+  s.defer = true;
+  document.head.appendChild(s);
+})();
