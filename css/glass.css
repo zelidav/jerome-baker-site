@@ -169,12 +169,17 @@ body.in-shop .crew-layer{opacity:0;pointer-events:none;transition:opacity .4s}
   background:radial-gradient(60% 50% at 50% 75%,#fff 0 22%,#FFF100 38%,#FDB514 60%,rgba(218,35,66,.85) 80%,transparent 100%);opacity:0;transform-origin:50% 100%;filter:drop-shadow(0 0 6px #FDB514)}
 .lighter.lit .flame{opacity:1;animation:flick .12s ease-in-out infinite alternate}
 @keyframes flick{from{scale:1 1;rotate:-4deg}to{scale:.88 1.12;rotate:5deg}}
-/* the animated crew member and the milk crates they climb */
+/* the animated crew member and the stepladder they climb */
 .act-layer{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
 .actor{position:absolute;left:0;top:0;transform-origin:50% 100%;filter:drop-shadow(4px 8px 6px rgba(10,10,10,.35));user-select:none}
-.crates{position:absolute;z-index:1;display:flex;flex-direction:column-reverse}
-.crates i{flex:1;border:3px solid var(--ink);margin-top:-3px;background:
-  repeating-linear-gradient(90deg,transparent 0 14%,rgba(10,10,10,.55) 14% 20%),linear-gradient(#E3343F,#B71C2B);box-shadow:inset 0 6px 0 rgba(255,255,255,.2)}
+.ladder{position:absolute;z-index:1;overflow:visible;transform-origin:50% 100%;pointer-events:none}
+.ladder svg{display:block;overflow:visible}
+/* halftone dot shadow on the floor under the ladder */
+.ladder::after{content:"";position:absolute;left:-14%;right:-14%;bottom:-10px;height:18px;border-radius:50%;
+  background:radial-gradient(circle,rgba(10,10,10,.55) 1.6px,transparent 2.2px) 0 0/7px 7px;
+  -webkit-mask:radial-gradient(closest-side,#000 55%,transparent);mask:radial-gradient(closest-side,#000 55%,transparent)}
+.ladder.creak{animation:creak .32s ease-in-out 2}
+@keyframes creak{30%{rotate:-2.2deg}70%{rotate:1.6deg}}
 .say{position:absolute;z-index:5;margin:0;max-width:200px;background:var(--white);color:var(--ink);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:8px 12px;font:800 16px/1.2 var(--display);opacity:0;scale:.6;transition:opacity .2s,scale .2s;pointer-events:none}
 .say.on{opacity:1;scale:1}
 .snd{position:absolute;left:14px;top:12px;z-index:6;min-height:44px;padding:0 14px;border:3px solid var(--ink);background:var(--white);color:var(--ink);font:800 14px var(--body);cursor:pointer;box-shadow:4px 4px 0 var(--ink)}
@@ -217,6 +222,15 @@ body.in-shop .crew-layer{opacity:0;pointer-events:none;transition:opacity .4s}
   .bench-stage .lightbox{bottom:70px}
   .bench-info{border-left:0;border-top:4px solid var(--ink);padding-top:32px}
   .bench-nav{top:auto;bottom:24px;translate:none;width:46px;height:46px}
+  /* phones: sound and zoom become two square icon buttons in one top row, clear of the close button and the piece */
+  .bench-stage{padding-top:76px}
+  .snd,.bzoom{top:12px;width:48px;height:48px;min-height:48px;padding:0;justify-content:center;font-size:0;gap:0}
+  .snd{display:inline-flex;align-items:center}
+  .snd::before{content:"";width:26px;height:26px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9h4l5-4v14l-5-4H3z' fill='%230A0A0A'/%3E%3Cpath d='M15.5 8.5a5 5 0 0 1 0 7M18 6a8.5 8.5 0 0 1 0 12' fill='none' stroke='%230A0A0A' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
+  .snd[aria-pressed=false]{text-decoration:none}
+  .snd[aria-pressed=false]::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 9h4l5-4v14l-5-4H3z' fill='%230A0A0A'/%3E%3Cpath d='M16 9l6 6M22 9l-6 6' stroke='%23DA2342' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E")}
+  .bzoom{left:72px}
+  .bzoom svg{width:24px;height:24px}
 }
 @media (max-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:760px){
