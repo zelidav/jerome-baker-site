@@ -25,15 +25,20 @@ THUMB_W = 480
 
 # The live /shop/ sidebar. Kaleidoscope Collab is greyed out there and its items are not in the grid.
 TREE = [
-    ('Accessories', ['Bags & Backpacks', 'Hats']),
+    ('Accessories', ['Bags & Backpacks', 'Hats', 'Stickers']),
     ('Footwear', ['Flip Flops', 'Men’s Sneakers', 'Women’s Sneakers']),
     ('Tops', ['Hoodies & Sweatshirts', 'Polos', 'T-Shirts']),
+    ('Loungewear', ['Pajamas, Dresses & Slacks']),
     ('Art & Home', ['Prints & Paintings', 'Home & Kitchen', 'Gift Cards']),
     ('Collections', ['JB Signature', 'NY Drop 1', 'Studio Store']),
 ]
 # jeromebaker.com Shopify product type / title -> the categories above (first match wins)
 SHOPIFY_CATS = [
     (r'gift card', 'Gift Cards'),
+    (r'sticker|decal', 'Stickers'),
+    (r'pajama|dress|slacks', 'Pajamas, Dresses & Slacks'),
+    (r'towel|pillow|banner|pint|mug', 'Home & Kitchen'),
+    (r'wallet|backpack', 'Bags & Backpacks'),
     (r'painting|poster|still life|further|adrenochrome', 'Prints & Paintings'),
     (r'rug|bento|lunchbox|decor', 'Home & Kitchen'),
     (r'hat|cap', 'Hats'),
@@ -127,8 +132,13 @@ def shopify_items(jobs):
     """Merch for sale on the jeromebaker.com Shopify store. These check out on jeromebaker.com through a Shopify
     cart link; the WooCommerce items keep checking out on jeromebakerny.com."""
     out = []
-    for x in shopify.pull():
-        if not shopify.is_merch(x):
+    main = shopify.pull()
+    seen = {x['handle'] for x in main} | {shopify.short_name(x['title']).lower() for x in main}
+    # jeromebaker.shop is all merch; anything it shares with jeromebaker.com is listed once, from .com
+    extra = [x for x in shopify.pull(shopify.STORE2)
+             if x['handle'] not in seen and shopify.short_name(x['title']).lower() not in seen]
+    for store, x in [(shopify.STORE, x) for x in main] + [(shopify.STORE2, x) for x in extra]:
+        if store == shopify.STORE and not shopify.is_merch(x):
             continue
         key = (x['product_type'] + ' ' + x['title'] + ' ' + ' '.join(x['tags'][:3])).lower()
         cat = next((c for rx, c in SHOPIFY_CATS if re.search(rx, key)), 'Studio Store')
@@ -149,10 +159,10 @@ def shopify_items(jobs):
             if len(vals) > 1 or len(opts) > 1:
                 attrs.append(dict(name='Amount' if o['name'] == 'Title' else o['name'], src=o['name'], key='', terms=[[v, v.lower()] for v in vals]))
         out.append(dict(
-            id=x['id'], name=shopify.short_name(x['title']), slug='shp-' + x['handle'], url=shopify.page_url(x),
+            id=x['id'], name=shopify.short_name(x['title']), slug='shp-' + x['handle'], url=shopify.page_url(x, store),
             price=min(v[2] for v in vs), cats=[cat, 'Studio Store'], imgs=imgs, inStock=True, type='variable' if attrs else 'simple',
             desc=shopify.clean(x['body_html'])[:1200], attrs=attrs,
-            variations=[[v[0], {a['name']: v[3].get(a['src']) for a in attrs}] for v in vs], shop='shopify',
+            variations=[[v[0], {a['name']: v[3].get(a['src']) for a in attrs}] for v in vs], shop='shopify', store=store,
         ))
     return out
 
