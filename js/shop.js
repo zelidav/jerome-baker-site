@@ -139,7 +139,7 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
   const cartUrl = (p, sel, qty) => {
     if (p.shop === 'shopify') {  // jeromebaker.com: a Shopify cart link goes straight to its checkout
       const v = p.attrs.length ? findVar(p, sel) : p.variations[0];
-      return v ? `https://jeromebaker.com/cart/${v[0]}:${qty}` : '';
+      return v ? `${p.store || 'https://jeromebaker.com'}/cart/${v[0]}:${qty}` : '';
     }
     let u = D.store + '/cart/?add-to-cart=' + p.id + '&quantity=' + qty;
     if (p.attrs.length) {
@@ -202,7 +202,7 @@ ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="gri
       if (url) { buy.href = url; buy.removeAttribute('aria-disabled'); } else { buy.removeAttribute('href'); buy.setAttribute('aria-disabled', 'true'); }
       buy.textContent = p.inStock ? 'Add to cart' : 'Gone forever';
       note.innerHTML = !p.inStock ? 'This one sold out. Told you.' : missing.length ? `Pick a ${esc(missing.join(' and a '))} first.` :
-        `Adds it to your cart on <a href="${esc(p.url)}" target="_blank" rel="noopener">${p.shop === 'shopify' ? 'jeromebaker.com' : 'jeromebakerny.com'}</a>, where checkout and shipping happen.`;
+        `Adds it to your cart on <a href="${esc(p.url)}" target="_blank" rel="noopener">${p.shop === 'shopify' ? (p.store || 'https://jeromebaker.com').replace(/^https:\/\/(www\.)?/, '') : 'jeromebakerny.com'}</a>, where checkout and shipping happen.`;
       $('pdQty').textContent = qty;
     };
     pd.onclick = (e) => {

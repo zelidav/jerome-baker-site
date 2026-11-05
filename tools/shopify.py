@@ -8,10 +8,12 @@ Only items with at least one variant for sale and at least one photo are pulled.
 import html, json, re, time, urllib.error, urllib.request
 
 STORE = 'https://jeromebaker.com'
+# the second Shopify store (merch). Items already on jeromebaker.com are skipped there, so nothing lists twice.
+STORE2 = 'https://www.jeromebaker.shop'
 UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
 # not ours to sell on the brand site
 SKIP_TITLES = ('rise energy shot', 'proof of ownership', 'case of skeeter', 'tb05')
-MERCH_TYPES = {'hats', 't-shirt', 'hoodie', 'tank top', 'long-sleeve', 'bags', 'shoes', 'poster', 'home decor', 'gift card', 'accessories'}
+MERCH_TYPES = {'paper products', 'mug', 'all over prints', 'hats', 't-shirt', 'hoodie', 'tank top', 'long-sleeve', 'bags', 'shoes', 'poster', 'home decor', 'gift card', 'accessories'}
 MERCH_VENDORS = {'printify', 'the kind group'}
 
 
@@ -59,10 +61,10 @@ def img_url(src, w):
     return src + ('&' if '?' in src else '?') + f'width={w}'
 
 
-def pull():
+def pull(store=STORE):
     out, page = [], 1
     while True:
-        batch = json.loads(get(f'{STORE}/products.json?limit=250&page={page}'))['products']
+        batch = json.loads(get(f'{store}/products.json?limit=250&page={page}'))['products']
         if not batch:
             break
         out += batch
@@ -97,9 +99,9 @@ def variants(p):
     return out
 
 
-def cart(variant_id, qty=1):
-    return f'{STORE}/cart/{variant_id}:{qty}'
+def cart(variant_id, qty=1, store=STORE):
+    return f'{store}/cart/{variant_id}:{qty}'
 
 
-def page_url(p):
-    return f"{STORE}/products/{p['handle']}"
+def page_url(p, store=STORE):
+    return f"{store}/products/{p['handle']}"
