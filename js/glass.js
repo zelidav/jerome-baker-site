@@ -254,6 +254,7 @@
   const bImg = $('#bImg'), bFill = $('#bFill'), bPiece = $('#bPiece'), hit = $('#bHit');
   const bSmoke = new Smoke($('#bSmoke'), { scrolls: false, cap: 900 });
   let cur = null;
+  const MODELS = { 'JBD-595E91DF67DE': 'baker', 'JBD-CCB51FA365DB': 'northern-lights', 'JBD-98EE782454AB': 'jaws' };
 
   const benchMouth = () => {
     const c = $('#bSmoke').getBoundingClientRect(), r = bImg.getBoundingClientRect();
@@ -298,6 +299,7 @@
       ? (p.shop ? 'Available. Checkout and shipping happen on jeromebaker.com.' : p.online ? 'Available. Ships from the studio with its provenance record.' : 'Available through our team. Ask and we will hold it for you.')
       : p.status === 'sold' ? 'Sold. Somebody already took this one home.' : 'In a collection. It is registered to its owner.';
     ctas(p);
+    $('#b3d').hidden = !MODELS[p.id];
     $('#bDesc').textContent = p.desc;
     $('#bFacts').innerHTML = [
       p.edition && ['Edition', p.edition],
@@ -328,6 +330,13 @@
   });
   $('#bClose').onclick = close;
   $('#bZoom').onclick = () => cur && zoom(cur);
+  // pieces with a finished 3D model: a full-screen spin view, loaded only when asked for (the models are 0.5-4 MB)
+  const spin = $('#spin3d'), spinF = $('#spin3dF');
+  const closeSpin = () => { spin.hidden = true; spinF.removeAttribute('src'); };
+  $('#b3d').onclick = () => { if (!cur || !MODELS[cur.id]) return; release(true); spinF.src = '../assets/3d/' + MODELS[cur.id] + '.html'; spin.hidden = false; $('#spin3dX').focus(); };
+  $('#spin3dX').onclick = closeSpin;
+  bench.addEventListener('cancel', (e) => { if (!spin.hidden) { e.preventDefault(); closeSpin(); } });
+  bench.addEventListener('close', closeSpin);
   // straight to the detail: double-click the piece, or put two fingers on it, and the zoom opens on that spot
   const zspot = (cx, cy) => { const r = bImg.getBoundingClientRect(); return [Math.min(1, Math.max(0, (cx - r.left) / r.width)), Math.min(1, Math.max(0, (cy - r.top) / r.height))]; };
   bPiece.addEventListener('dblclick', (e) => { if (cur) { release(true); zoom(cur, zspot(e.clientX, e.clientY)); } });
