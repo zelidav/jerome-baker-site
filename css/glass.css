@@ -124,6 +124,8 @@ body.in-shop .crew-layer{opacity:0;pointer-events:none;transition:opacity .4s}
 .promise li{background:var(--white);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--blue);padding:14px 18px;font-size:16px;line-height:1.5}
 .promise li:nth-child(2){rotate:.6deg}
 .promise li b{display:block;font-family:var(--display);font-weight:900;font-size:20px}
+.promise-go{display:inline-block;margin-top:8px;font-weight:800;color:var(--blue);text-decoration:none;border-bottom:3px solid var(--red)}
+.promise-go:hover{color:var(--red)}
 
 /* page smoke: one canvas over everything, never catches the pointer */
 .smoke-layer{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:35}
@@ -197,8 +199,25 @@ body.in-shop .crew-layer{opacity:0;pointer-events:none;transition:opacity .4s}
 .hit.on{background:var(--yellow);color:var(--ink)}
 .hit.on .hit-ring{border-color:var(--ink)}
 .hit.on .hit-ring span{background:var(--red)}
-.bench-nav{position:absolute;top:50%;translate:0 -50%;z-index:5;width:52px;height:52px;border:3px solid var(--ink);background:var(--white);color:var(--ink);font-size:34px;line-height:1;font-weight:900;cursor:pointer;box-shadow:4px 4px 0 var(--ink)}
-.bench-nav.prev{left:14px}.bench-nav.next{right:14px}
+/* piece to piece: labelled buttons in the bottom corners, out of the way of the photo (feedback: the side arrows
+   read as "more photos of this one" and jumped to the next b0ng) */
+.bench-nav{position:absolute;bottom:24px;z-index:5;display:flex;align-items:center;gap:10px;min-height:56px;max-width:min(240px,30%);padding:6px 14px;border:3px solid var(--ink);background:var(--white);color:var(--ink);cursor:pointer;box-shadow:4px 4px 0 var(--ink);text-align:left;font-family:var(--display)}
+.bench-nav b{font-size:30px;line-height:1;font-weight:900}
+.bench-nav span{display:flex;flex-direction:column;min-width:0}
+.bench-nav small{font:800 10px/1.2 var(--mono,monospace);letter-spacing:.12em;text-transform:uppercase;color:#555}
+.bench-nav i{font-style:normal;font-weight:800;font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bench-nav i:empty{display:none}
+.bench-nav:hover{background:var(--yellow)}
+.bench-nav.prev{left:14px}.bench-nav.next{right:14px;text-align:right}
+/* every photo of the piece, in the panel */
+.b-angles{margin-top:26px}
+.b-angles-k{margin:0 0 10px;font:800 12px/1 var(--mono,monospace);letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+.b-angles-k span{color:#777;margin-left:6px}
+.b-angle-row{display:flex;flex-wrap:wrap;gap:10px}
+.b-angle-row button{position:relative;width:92px;height:118px;padding:0;border:3px solid var(--ink);background:#fff;cursor:zoom-in;box-shadow:3px 3px 0 var(--ink);overflow:hidden;transition:translate .15s}
+.b-angle-row button:hover,.b-angle-row button:focus-visible{translate:0 -3px}
+.b-angle-row img{width:100%;height:100%;object-fit:cover}
+.b-angle-row span{position:absolute;left:0;right:0;bottom:0;padding:3px 4px;background:rgba(10,10,10,.82);color:#fff;font:700 10px/1.15 var(--body);text-align:left}
 .bench-info{overflow:auto;padding:72px clamp(20px,4vw,56px) 48px;background:var(--white);color:var(--ink);border-left:4px solid var(--ink)}
 .b-series{margin:0;font-weight:800;font-size:14px;color:var(--blue)}
 .b-name{margin:10px 0 0;font-family:var(--display);font-weight:900;font-size:clamp(40px,4.6vw,72px);line-height:.92;letter-spacing:-.02em}
@@ -227,7 +246,8 @@ body.in-shop .crew-layer{opacity:0;pointer-events:none;transition:opacity .4s}
   .bench-piece{height:min(40dvh,440px)}
   .bench-stage .lightbox{bottom:70px}
   .bench-info{border-left:0;border-top:4px solid var(--ink);padding-top:32px}
-  .bench-nav{top:auto;bottom:24px;translate:none;width:46px;height:46px}
+  .bench-nav{bottom:24px;min-height:46px;padding:4px 10px;max-width:none}
+  .bench-nav span{display:none}
   /* phones: sound and zoom become two square icon buttons in one top row, clear of the close button and the piece */
   .bench-stage{padding-top:76px}
   .snd,.bzoom{top:12px;width:48px;height:48px;min-height:48px;padding:0;justify-content:center;font-size:0;gap:0}

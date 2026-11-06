@@ -226,9 +226,9 @@
     { src: `../assets/glass/${p.id}_z.webp`, w: p.zw, h: p.zh, alt: `${p.name}, close up` },
     ...(p.photos || (p.shop ? [] : [`${HOST}/piece/${p.id}/image.jpg`])).map((ph, i) => typeof ph === 'string'
       ? { src: ph, alt: `${p.name}, photo ${i + 2}` }
-      : { src: `../assets/glass/${ph.src}`, w: ph.w, h: ph.h, alt: `${p.name}: ${ph.label}`, label: ph.label }),
+      : { src: `../assets/glass/${ph.src}`, thumb: `../assets/glass/${ph.src.replace(/\.webp$/, '_t.webp')}`, w: ph.w, h: ph.h, alt: `${p.name}: ${ph.label}`, label: ph.label }),
   ];
-  const zoom = (p, at) => window.JBZoom && JBZoom.open({ photos: photosOf(p), at });
+  const zoom = (p, at, index = 0) => window.JBZoom && JBZoom.open({ photos: photosOf(p), at, index });
 
   const visible = () => [...aisles.querySelectorAll('.tile:not([hidden])')].map((el) => el.dataset.id);
   new IntersectionObserver(([e]) => document.body.classList.toggle('in-shop', e.isIntersecting), { rootMargin: '-50% 0px -50% 0px' }).observe(aisles);
@@ -300,6 +300,15 @@
       : p.status === 'sold' ? 'Sold. Somebody already took this one home.' : 'In a collection. It is registered to its owner.';
     ctas(p);
     $('#b3d').hidden = !MODELS[p.id];
+    // every photo of the piece, right there in the panel (they used to hide behind "Zoom in on the detail")
+    const ph = photosOf(p).slice(1), ang = $('#bAngles');
+    ang.hidden = !ph.length;
+    $('#bAngleRow').innerHTML = ph.map((x, i) => `<button type="button" data-i="${i + 1}" aria-label="${esc(x.label || x.alt || 'Photo ' + (i + 2))}"><img src="${x.thumb || x.src}" alt="" loading="lazy" decoding="async">${x.label ? `<span>${esc(x.label)}</span>` : ''}</button>`).join('');
+    $('#bAngleN').textContent = ph.length === 1 ? '1 photo' : `${ph.length} photos`;
+    const ids = visible(), at = ids.indexOf(p.id);
+    const nb = (d) => byId[ids[(at + d + ids.length) % ids.length]];
+    $('#bPrevName').textContent = ids.length > 1 && nb(-1) ? nb(-1).name : '';
+    $('#bNextName').textContent = ids.length > 1 && nb(1) ? nb(1).name : '';
     $('#bDesc').textContent = p.desc;
     $('#bFacts').innerHTML = [
       p.edition && ['Edition', p.edition],
@@ -330,6 +339,7 @@
   });
   $('#bClose').onclick = close;
   $('#bZoom').onclick = () => cur && zoom(cur);
+  $('#bAngleRow').addEventListener('click', (e) => { const b = e.target.closest('[data-i]'); if (b && cur) { release(true); zoom(cur, null, +b.dataset.i); } });
   // pieces with a finished 3D model: a full-screen spin view, loaded only when asked for (the models are 0.5-4 MB)
   const spin = $('#spin3d'), spinF = $('#spin3dF');
   const closeSpin = () => { spin.hidden = true; spinF.removeAttribute('src'); };
