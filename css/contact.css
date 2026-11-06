@@ -87,3 +87,6 @@ body.dock-open .jb-top{visibility:hidden}
   header.top nav ul,header.topbar nav{flex-wrap:nowrap}
   header.top nav a,header.topbar nav a{white-space:nowrap}
 }
+/* phones: the dock, the Feedback / Hide the crew / Lite mode row and back-to-top all float over the bottom of the
+   page, so the footer ends with enough room that its last lines scroll clear of them */
+body.has-dock footer.site-foot,body.has-dock footer.sfoot{padding-bottom:calc(220px + env(safe-area-inset-bottom))}
