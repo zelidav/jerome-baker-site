@@ -168,3 +168,15 @@ RENAMED = {
     "two-can": "big-bill", "gray": "beamer", "public-enemy": "big-stitch", "jack": "gourdo", "dillo": "gutterball",
     "shellby": "speedbump", "cy": "dr-squint", "the-spinners": "the-zone-outs", "peeper": "lookie-lou", "the-grin": "mouthy",
 }
+
+# Where each box-art crew member sits on the whole box, assets/img/box.webp, as [left, top, width, height] in %.
+# Only for the ones whose src is "Jerome Baker box art" (their src image is the cut-out sprite itself).
+# Found by template matching: python tools/build_share.py --locate
+BOX_SPOTS = {
+    "beamer": [85.9, 69.5, 7.5, 13.2],
+    "mama-cobra": [86.5, 28.8, 10.0, 13.1],
+    "lil-lucky": [78.7, 4.0, 10.7, 11.3],
+    "big-stitch": [24.0, 63.1, 14.0, 14.4],
+    "gourdo": [76.5, 76.1, 9.6, 9.2],
+    "speedbump": [15.7, 64.0, 7.1, 8.6],
+}
