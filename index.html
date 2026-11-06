@@ -38,11 +38,24 @@ nav a.hot{color:var(--yellow)}
 .hero{padding-top:clamp(32px,5vw,72px);padding-bottom:110px;display:flex;flex-wrap:wrap;gap:32px;align-items:center;background:var(--blue)}
 .hero .wash{position:absolute;inset:0;background:var(--blue);mix-blend-mode:multiply;opacity:.78;z-index:0}
 .hero .dots{position:absolute;inset:0;z-index:0}
-.hero-copy{flex:1 1 520px;min-width:0;position:relative;z-index:2}
-.ransom{margin:0;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;font-family:var(--display);font-weight:900;font-size:clamp(48px,7.4vw,118px);line-height:.92;letter-spacing:-.02em}
+.hero-copy{flex:1 1 600px;min-width:0;position:relative;z-index:2}
+.ransom{margin:0;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;font-family:var(--display);font-weight:900;font-size:clamp(40px,min(6.4vw,9.6vh),100px);line-height:.92;letter-spacing:-.02em}
 .ransom span{padding:4px 16px}
-.lede{margin:36px 0 0;max-width:46ch;color:var(--white);font-size:18px;line-height:1.5}
-.ctas{display:flex;flex-wrap:wrap;gap:16px;margin-top:28px}
+.ransom span:first-child{white-space:nowrap}
+.lede{margin:36px 0 0;max-width:46ch;color:var(--white);font-size:19px;line-height:1.5;font-weight:600}
+.ctas{display:flex;flex-wrap:wrap;gap:20px;margin-top:28px}
+/* each first-fold button has its own contrasting shadow and its own hover move (lead #34) */
+.ctas .cta-a{box-shadow:6px 6px 0 var(--yellow)}
+.ctas .cta-b{box-shadow:6px 6px 0 var(--red)}
+.ctas .cta-c{box-shadow:6px 6px 0 var(--teal)}
+.ctas .btn:hover{transform:none}
+.ctas .cta-a:hover{animation:cta-wobble .5s ease-in-out}
+.ctas .cta-b:hover{animation:cta-hop .45s cubic-bezier(.3,1.6,.5,1)}
+.ctas .cta-c:hover{animation:cta-jelly .6s cubic-bezier(.3,1.6,.5,1)}
+@keyframes cta-wobble{0%,100%{rotate:0deg}25%{rotate:-4deg}50%{rotate:3deg}75%{rotate:-2deg}}
+@keyframes cta-hop{0%,100%{translate:0 0}40%{translate:0 -9px;box-shadow:6px 14px 0 var(--red)}}
+@keyframes cta-jelly{0%,100%{scale:1 1}30%{scale:1.12 .88}55%{scale:.94 1.08}80%{scale:1.03 .97}}
+@media (prefers-reduced-motion:reduce){.ctas .btn:hover{animation:none}}
 .collage{flex:1 1 520px;min-width:0;height:720px;position:relative;z-index:2}
 .collage .gl{position:absolute;filter:drop-shadow(10px 14px 0 rgba(10,10,10,.6))}
 .redband{background:var(--red);transform:rotate(-2deg);margin:-40px -20px 0;position:relative;z-index:5;overflow:hidden;border-top:4px solid var(--ink);border-bottom:4px solid var(--ink)}
@@ -135,7 +148,7 @@ section.made{background:var(--ink);color:var(--white);padding-top:112px;padding-
 <span style="background:#DA2342;color:#FFFFFF;rotate:2deg">lit.</span>
 </h1>
 <p class="lede">Glass pulled by hand since 1991. Raided by the feds in 2003, back on the torch ever since. Every piece is one of one and comes with its provenance on file. The streetwear is real too, and it ships now.</p>
-<div class="ctas"><a class="btn btn-red" href="#glass">Shop the glass</a><a class="btn btn-yellow" href="#wear">Shop the merch</a><a class="btn btn-ink" href="travel/">Open the trip guide</a></div>
+<div class="ctas"><a class="btn btn-red cta-a" href="#glass">Shop the glass</a><a class="btn btn-yellow cta-b" href="#wear">Shop the merch</a><a class="btn btn-ink cta-c" href="travel/">Open the trip guide</a></div>
 </div>
 <div class="collage" aria-hidden="true">
 <img class="mark bob2" src="assets/img/jb-mark.webp" alt="" style="left:-4%;top:26%;width:108%;rotate:-8deg;z-index:2;filter:drop-shadow(12px 14px 0 #0A0A0A)" width="520" height="401">

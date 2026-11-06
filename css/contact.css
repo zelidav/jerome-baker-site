@@ -12,8 +12,16 @@
 .hdr-social a{display:inline-flex;width:36px;height:36px;align-items:center;justify-content:center;color:var(--white,#fff);border-radius:50%;transition:color .15s,background .15s}
 .hdr-social a:hover,.hdr-social a:focus-visible{color:var(--ink,#0A0A0A);background:var(--yellow,#FFF100)}
 .hdr-social svg{width:22px;height:22px}
-@media (min-width:1180px){.hdr-social{display:inline-flex}}
+@media (min-width:1440px){.hdr-social{display:inline-flex}}
 header.top > nav, header.topbar > nav{margin-left:auto}
+/* at least 50px more air between the logo and the menu, at every width (lead #33) */
+@media (min-width:1440px){
+  header.top,header.topbar{flex-wrap:nowrap;column-gap:14px}
+  header.top > a:first-child,header.topbar > a:first-child{margin-right:52px}  /* 66px+ between logo and menu */
+  header.top nav ul{column-gap:18px}
+  .hdr-social{gap:2px;margin-left:0}
+  .hdr-social a{width:32px;height:32px}
+}
 
 /* ---------- the menu bar tucks away scrolling down, comes back scrolling up (desktop) ---------- */
 @media (min-width:901px){
@@ -72,3 +80,10 @@ body.dock-open .jb-top{visibility:hidden}
 .reach-thanks{margin:6px 0 4px;font-family:var(--display,sans-serif);font-weight:900;font-size:24px;color:var(--yellow,#FFF100)}
 .reach-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
 .reach [hidden]{display:none!important}
+
+/* wide desktop: the menu stays on one row next to the logo (no item breaking onto a second line). Narrower
+   screens keep the old wrap, which is better than links running off the edge. */
+@media (min-width:1440px){
+  header.top nav ul,header.topbar nav{flex-wrap:nowrap}
+  header.top nav a,header.topbar nav a{white-space:nowrap}
+}
