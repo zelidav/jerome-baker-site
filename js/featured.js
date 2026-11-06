@@ -21,6 +21,9 @@
 .fx-btns button{width:48px;height:48px;border:3px solid #0A0A0A;background:#fff;color:#0A0A0A;font:900 22px/1 Montserrat,Helvetica,Arial,sans-serif;cursor:pointer;box-shadow:4px 4px 0 #0A0A0A}
 .fx-track{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;padding:8px 16px 22px;margin:0 -16px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
 .fx-track::-webkit-scrollbar{display:none}
+@media (hover:hover) and (pointer:fine){.fx-track{cursor:grab}}
+.fx-track.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+.fx-track.dragging .fx-card{pointer-events:none}
 .fx-card{flex:0 0 clamp(200px,24vw,280px);scroll-snap-align:start;display:flex;flex-direction:column;background:#fff;border:3px solid #0A0A0A;color:#0A0A0A;text-decoration:none;box-shadow:6px 6px 0 #0A0A0A;rotate:var(--t,0deg);transition:rotate .25s,translate .25s}
 .fx-card:hover,.fx-card:focus-visible{rotate:0deg;translate:0 -4px}
 .fx-pic{position:relative;aspect-ratio:4/5;display:flex;align-items:flex-end;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#fff 0,#eef0f6 60%,#dfe2ec 100%);border-bottom:3px solid #0A0A0A;overflow:hidden}
@@ -106,6 +109,39 @@
     if (reduce || n < 2 || (() => { try { return localStorage.getItem('jb-lite') === '1'; } catch (e) { return false; } })()) return;
     let pauseUntil = 0, held = false, seen = false;
     const hold = (ms) => { pauseUntil = performance.now() + ms; };
+    // grab and drag it with a mouse (touch already swipes natively). A real drag swallows the click so the
+    // card under the pointer doesn't open; snapping is off while dragging and comes back on release.
+    let drag = null;
+    track.addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0) return;
+      drag = { x: e.clientX, left: track.scrollLeft, moved: false, id: e.pointerId };
+    });
+    addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x;
+      if (!drag.moved && Math.abs(dx) < 6) return;
+      if (!drag.moved) { drag.moved = true; track.classList.add('dragging'); try { track.setPointerCapture(drag.id); } catch (_) {} }
+      track.scrollLeft = drag.left - dx;
+      e.preventDefault();
+    });
+    const drop = () => {
+      if (!drag) return;
+      const was = drag.moved;
+      drag = null;
+      if (!was) return;
+      track.classList.remove('dragging');
+      // let the snap settle on the nearest card
+      const s = step(), to = Math.round(track.scrollLeft / s) * s;
+      track.scrollTo({ left: to, behavior: reduce ? 'auto' : 'smooth' });
+      // the click that ends a drag (if the browser sends one) doesn't open a card; a later real click still does
+      const eat = (ev) => { ev.preventDefault(); ev.stopPropagation(); };
+      track.addEventListener('click', eat, { capture: true, once: true });
+      setTimeout(() => track.removeEventListener('click', eat, { capture: true }), 60);
+      hold(4000);
+    };
+    addEventListener('pointerup', drop);
+    addEventListener('pointercancel', drop);
+    track.addEventListener('dragstart', (e) => e.preventDefault()); // no ghost-image drag of the card links/images
     track.addEventListener('pointerenter', () => (held = true));
     track.addEventListener('pointerleave', () => { held = false; hold(2500); });
     track.addEventListener('touchstart', () => { held = true; }, { passive: true });
