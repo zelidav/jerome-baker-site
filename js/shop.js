@@ -112,6 +112,9 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
     render();
     // land on the results, not the heading, so the items are on screen (the heading pushes them off a phone)
     if (scroll) ($('count') || $('collection')).scrollIntoView({ behavior: 'smooth' });
+    // a sidebar pick re-renders the grid in place; when the list gets shorter the page used to collapse under the
+    // reader and drop them at the footer. Hold "The merch collection" at the top instead.
+    else if ($('collection').getBoundingClientRect().top < 0) $('collection').scrollIntoView({ behavior: 'auto' });
   };
   $('cats').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setCat(b.dataset.cat); });
   $('sort').onchange = (e) => { st.sort = e.target.value; render(); };

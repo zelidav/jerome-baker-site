@@ -25,8 +25,11 @@ header.hdr nav a.genie{display:inline-block;transform-origin:50% 100%;will-chang
 @media (prefers-reduced-motion:reduce){.hdr-logo,.hdr-logo::after{animation:none}}
 
 /* the shop's yellow category bar: the next layer of paper. It starts below the menu's tear and tears over the page itself */
-.subnav.hdr-under{padding-top:42px;border-bottom:0!important}
-@media (max-width:760px){.subnav.hdr-under{padding-top:30px}}
+.subnav.hdr-under{padding-top:34px;border-bottom:0!important}
+@media (max-width:760px){.subnav.hdr-under{padding-top:26px}}
+/* the yellow bar: tighter, and its links in the brand blue like the rest of the menus (feedback lead #13) */
+.subnav.hdr-under a{color:var(--blue);padding:8px 12px}
+.subnav.hdr-under a:hover,.subnav.hdr-under a.on{background:var(--blue);color:var(--yellow)}
 @media (min-width:901px){body:has(.subnav.hdr-under) .filters{top:calc(var(--hdr,92px) + 144px);max-height:calc(100vh - var(--hdr,92px) - 160px)}}
 
 /* the squiggly red line under every menu link (it used to be only under the shop's "Ritual Merch"); hover and it squiggles */
@@ -45,3 +48,8 @@ header.hdr nav a:not(.btn):not(.cartbtn):hover::after,header.hdr nav a:not(.btn)
 .hdr-logo.alt > img:not(.hdr-alt){opacity:0;transform:rotateY(-90deg) scale(.7)}
 .hdr-logo.alt .hdr-alt{opacity:1;transform:none;transition-delay:.12s}
 .hdr-logo.alt::after{opacity:0}
+
+/* yellow in the menu means "you are here". Travel Guide used to be yellow on every page, so it looked selected
+   while you were reading the story (lead #24). It keeps a small yellow star instead, and turns yellow only on its own page. */
+header.hdr nav a.hot:not([aria-current]),header.hdr nav a[href$="travel/"]:not([aria-current]){color:var(--white)!important}
+header.hdr nav a[href$="travel/"]:not([aria-current])::before{content:"✱ ";color:var(--yellow)}
