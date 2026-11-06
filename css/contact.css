@@ -72,3 +72,7 @@ body.dock-open .jb-top{visibility:hidden}
 .reach-thanks{margin:6px 0 4px;font-family:var(--display,sans-serif);font-weight:900;font-size:24px;color:var(--yellow,#FFF100)}
 .reach-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
 .reach [hidden]{display:none!important}
+
+/* phones: the dock, the Feedback / Hide the crew / Lite mode row and back-to-top all float over the bottom of the
+   page, so the footer ends with enough room that its last lines scroll clear of them */
+body.has-dock footer.site-foot,body.has-dock footer.sfoot{padding-bottom:calc(220px + env(safe-area-inset-bottom))}
