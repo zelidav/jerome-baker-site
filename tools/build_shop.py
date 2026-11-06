@@ -5,6 +5,10 @@ categories (the same set the live /shop/ page lists), downloads up to 4 images p
 assets/shop/, and writes js/shop-data.js. Checkout still happens on jeromebakerny.com: the page
 builds an add-to-cart link with the chosen variation.
 
+Product copy: merch whose store description is blank or a flat store template gets the site's own Jerome Baker
+copy from tools/shop_copy.py, applied after the pull so a rebuild keeps it. The stores are never written to.
+Re-apply that copy to the js/shop-data.js on disk without pulling anything:  python tools/build_shop.py --copy-only
+
 Every product gets a crew member. If a crew member already wears that exact product (crew_data.py
 `wear`), they get it; otherwise it goes to the crew member who fits that kind of thing.
 """
@@ -15,6 +19,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'tools'))
 import crew_data  # noqa: E402
 import shopify  # noqa: E402
+import shop_copy  # noqa: E402
 
 API = 'https://jeromebakerny.com/wp-json/wc/store/v1/products?per_page=100&page={}'
 UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36'
@@ -198,6 +203,7 @@ def main():
     items += shopify_items(jobs)
     for it in items:
         it['crew'] = crew_for(it, worn)
+    copied = shop_copy.apply(items)
     names = {it['name']: it['id'] for it in items}
     featured = [f if isinstance(f, int) else names.get(f) for f in FEATURED]
     featured = [f for f in featured if any(it['id'] == f for it in items)]
@@ -208,15 +214,31 @@ def main():
         for f in cf.as_completed([ex.submit(save_img, s, d) for s, d in jobs]):
             f.result()
 
-    data = dict(store='https://jeromebakerny.com', tree=TREE, featured=featured, crew=crew, items=items)
-    with open(os.path.join(ROOT, 'js', 'shop-data.js'), 'w', encoding='utf-8') as f:
+    write(dict(store='https://jeromebakerny.com', tree=TREE, featured=featured, crew=crew, items=items))
+    print(f'{len(items)} products, {len(jobs)} images, featured {len(featured)}, site copy on {copied}')
+
+
+DATA = os.path.join(ROOT, 'js', 'shop-data.js')
+
+
+def write(data):
+    with open(DATA, 'w', encoding='utf-8') as f:
         f.write('/* Built by tools/build_shop.py from the live jeromebakerny.com catalog. Do not edit by hand. */\n')
         f.write('window.JBShop = ' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';\n')
-    print(f'{len(items)} products, {len(jobs)} images, featured {len(featured)}')
+
+
+def copy_only():
+    """Re-apply tools/shop_copy.py to the shop data already on disk, without pulling anything."""
+    src = open(DATA, encoding='utf-8').read()
+    head = 'window.JBShop = '
+    data = json.loads(src[src.index(head) + len(head):src.rindex(';')])
+    n = shop_copy.apply(data['items'])
+    write(data)
+    print(f"site copy on {n} of {len(data['items'])} products")
 
 
 if __name__ == '__main__':
-    main()
+    copy_only() if '--copy-only' in sys.argv else main()
 
 # site rule: flaggable words get number/symbol swaps (b0ng, p!pe, sm0ke...). See tools/scrub.py.
 import scrub as _scrub  # noqa: E402
