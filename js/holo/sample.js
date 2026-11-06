@@ -93,8 +93,22 @@
     // long-pressing a canvas can't save it, so the right sticker gets its own save button
     const save = document.createElement('a');
     save.className = 'holo-save';
-    save.href = crewImg.currentSrc || crewImg.src;
-    save.download = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-sticker.webp';
+    // PNG, not WebP: iPhone opens and posts PNG. tools/build_share.py pre-renders it; the share kit section names it.
+    const stem = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    save.download = gif.dataset.stickerName || stem + '-sticker.png';
+    if (gif.dataset.sticker) save.href = gif.dataset.sticker;
+    else {
+      // no pre-rendered PNG: draw the cutout to a canvas and save that as PNG
+      save.href = '#';
+      save.addEventListener('click', (ev) => {
+        if (save.href.startsWith('blob:')) return;
+        ev.preventDefault();
+        const c = document.createElement('canvas');
+        c.width = crewImg.naturalWidth; c.height = crewImg.naturalHeight;
+        c.getContext('2d').drawImage(crewImg, 0, 0);
+        c.toBlob((b) => { if (!b) return; save.href = URL.createObjectURL(b); save.click(); }, 'image/png');
+      });
+    }
     save.textContent = 'Save the sticker';
     sec.querySelector('p').after(save);
     gif.after(sec);

@@ -8,9 +8,11 @@ crew/<old-slug>/index.html for every renamed crew member (crew_data.RENAMED), an
 """
 import html, json, os, re, sys
 
+from PIL import Image
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
-from crew_data import CREW, MERCH, SHOP, RENAMED  # noqa: E402
+from crew_data import CREW, MERCH, SHOP, RENAMED, BOX_SPOTS  # noqa: E402
 from crew_personas import PERSONAS, AXES, brief  # noqa: E402
 
 e = html.escape
@@ -173,35 +175,82 @@ def match_cta(up, name=None):
             f'<a class="btn btn-yellow" href="{up}crew/match/">Find your crew</a></div></section>\n')
 
 
-def before(c, up):
-    """The crop from the original art, a button that opens the full source with the character outlined."""
-    s = c["src"]
-    mark = ""
-    if s.get("box") and s["box"][2] < 80:
-        x, y, w, h = s["box"]
-        mark = f'<span class="src-mark" style="left:{x}%;top:{y}%;width:{w}%;height:{h}%"></span>'
-    when = f', {s["y"]}' if s.get("y") else ""
-    return (f'<figure class="before"><button type="button" class="before-btn" id="beforeBtn" aria-haspopup="dialog">'
-            f'<img src="{up}assets/{c["ref"]}" alt="{e(c["name"])} before the merch, on the original Jerome Baker art" loading="lazy">'
-            f'<span class="before-hint">Where {e(c["name"])} came from</span></button><p>BEFORE THE MERCH</p></figure>'
-            f'<dialog class="srcbox" id="srcBox" aria-labelledby="srcT"><button type="button" class="srcbox-x" data-close aria-label="Close">✕</button>'
-            f'<div class="src-art"><img src="{up}assets/{s["img"]}" alt="{e(s["t"])}" loading="lazy">{mark}</div>'
-            f'<p class="src-t" id="srcT">{e(s["t"])}{e(when)}</p><p class="src-d">{e(s["d"])}</p></dialog>')
+def _size(rel):
+    """Natural size of an image under assets/, so small sources are never blown up past 2x."""
+    with Image.open(os.path.join(ROOT, "assets", rel)) as im:
+        return im.size
+
+
+def _mark(box):
+    x, y, w, h = box
+    return f'<span class="src-mark" style="left:{x}%;top:{y}%;width:{w}%;height:{h}%"></span>'
+
+
+def origin_block(c, up):
+    """Where they came from: three slides. The character, the character on the original art, the whole piece of art."""
+    s, n = c["src"], e(c["name"])
+    whole, box = s["img"], s.get("box")
+    title = s["t"]
+    if c["slug"] in BOX_SPOTS:              # a sprite off the box: zoom out to the whole box
+        whole, box = "img/box.webp", BOX_SPOTS[c["slug"]]
+    if box and box[2] >= 80:                 # the source is already the detail; nothing to outline
+        box = None
+    when = f", {s['y']}" if s.get("y") and s["y"] not in title else ""
+    # zoom out from the outlined spot to the whole piece when the slide comes up
+    origin = f"{box[0] + box[2] / 2:.1f}% {box[1] + box[3] / 2:.1f}%" if box else "50% 50%"
+    zoom = f"{min(4, 60 / max(box[2], box[3])):.2f}" if box else "1"
+
+    def fig(k, rel, alt, cap, extra="", cls=""):
+        w, h = _size(rel)
+        return (f'<figure class="og-slide{cls}" role="group" aria-roledescription="slide" aria-label="{k} of 3">'
+                f'<div class="og-art"><div class="og-pic" style="max-width:{w * 2}px{extra}">'
+                f'<img src="{up}assets/{rel}" alt="{alt}" width="{w}" height="{h}" loading="lazy" decoding="async">'
+                + (_mark(box) if k == 3 and box else "") + f'</div></div><figcaption>{cap}</figcaption></figure>')
+
+    slides = (fig(1, f'crew/{c["img"]}.webp', f'{n} today', f'<b>1. {n} today.</b> {e(c["title"])}.')
+              + fig(2, c["ref"], f'{n} on the original Jerome Baker art',
+                    f'<b>2. Before the merch.</b> {n} on the original Jerome Baker art. {e(s["d"])}')
+              + fig(3, whole, e(title),
+                    (f'<b>3. The whole piece.</b> ' if box else f'<b>3. The source.</b> ') + f'{e(title)}{e(when)}.'
+                    + (f' {n} is in the yellow box.' if box else ''),
+                    f';--zo:{origin};--z:{zoom}', " og-zoom" if box else ""))
+    return (f'<section class="origin" aria-labelledby="ogT" aria-roledescription="carousel">'
+            f'<h2 id="ogT">Where {n} came from</h2>'
+            f'<p class="og-sub">Every crew member started out on the original Jerome Baker box and booth art.</p>'
+            f'<div class="og-track" id="ogTrack" tabindex="0" aria-label="Slides. Use the arrow keys or swipe.">{slides}</div>'
+            f'<div class="og-nav"><button type="button" class="og-btn" id="ogPrev" aria-label="Previous slide">←</button>'
+            f'<span class="og-dots">' + "".join(f'<button type="button" class="og-dot" aria-label="Slide {k}"></button>' for k in (1, 2, 3)) + '</span>'
+            f'<button type="button" class="og-btn" id="ogNext" aria-label="Next slide">→</button></div>'
+            f'<p class="og-live" id="ogLive" aria-live="polite"></p></section>')
 
 
 def gif_block(c, up):
-    """Their GIF loop, lazy, with download and share."""
-    g = f"assets/gifs/{c['slug']}.gif"
-    if not os.path.exists(os.path.join(ROOT, g)):
-        return ""
-    name = f"{c['slug']}-jerome-baker.gif"
-    return (f'<section class="gif pad"><div class="wrap gif-in">'
-            f'<img src="{up}{g}" alt="{e(c["name"])}, animated" width="480" height="480" loading="lazy" decoding="async">'
-            f'<div><h2 class="display">Take {e(c["name"])} with you.</h2>'
-            f'<p>A loop of {e(c["name"])} doing what {e(c["name"])} does. Put it in the group chat. Nobody will ask questions they want answered.</p>'
-            f'<div class="gif-acts"><a class="btn btn-yellow" href="{up}{g}" download="{name}">Download the GIF</a>'
-            f'<button type="button" class="btn btn-ink" id="gifShare" data-gif="{up}{g}" data-name="{name}">Share the GIF</button></div>'
-            f'<p class="gif-note" id="gifNote" aria-live="polite"></p></div></div></section>\n')
+    """Take them with you: the share kit. Video for Instagram/TikTok, plus GIF, MP4, avatar and sticker downloads.
+    The MP4, avatar and sticker are pre-rendered by tools/build_share.py."""
+    slug, n = c["slug"], e(c["name"])
+    files = dict(gif=f"assets/gifs/{slug}.gif", mp4=f"assets/gifs/{slug}.mp4",
+                 avatar=f"assets/crew/avatar/{slug}-320.png", sticker=f"assets/crew/sticker/{slug}.png")
+    missing = [f for f in files.values() if not os.path.exists(os.path.join(ROOT, f))]
+    if missing:
+        sys.exit(f"{slug}: share kit files missing ({', '.join(missing)}). Run python tools/build_share.py")
+    names = dict(gif=f"{slug}-jerome-baker.gif", mp4=f"{slug}-jerome-baker.mp4", avatar=f"{slug}-avatar.png", sticker=f"{slug}-sticker.png")
+    thumb = {"avatar": f'<img src="{up}{files["avatar"]}" alt="" width="110" height="110" loading="lazy" decoding="async">',
+             "sticker": f'<img class="kit-stk" src="{up}assets/crew/{c["img"]}_s.webp" alt="" width="110" height="110" loading="lazy" decoding="async">'}
+    dl = lambda k, label, kind: (f'<a class="kit-dl kit-{k}" href="{up}{files[k]}" download="{names[k]}" type="{kind}">'
+                                 f'{thumb.get(k, "")}<b>{label}</b><small>{e(names[k])}</small></a>')
+    return (f'<section class="gif kit pad" id="kit" data-sticker="{up}{files["sticker"]}" data-sticker-name="{names["sticker"]}">'
+            f'<div class="wrap gif-in">'
+            f'<img src="{up}{files["gif"]}" alt="{n}, animated" width="480" height="480" loading="lazy" decoding="async">'
+            f'<div><h2 class="display">Take {n} with you.</h2>'
+            f'<p>A loop of {n} doing what {n} does. Post it, put it in the group chat, make it your icon.</p>'
+            f'<div class="gif-acts"><button type="button" class="btn btn-yellow kit-share" id="kitShare" '
+            f'data-mp4="{up}{files["mp4"]}" data-name="{names["mp4"]}">Share to Instagram / TikTok</button></div>'
+            f'<p class="gif-note" id="gifNote" role="status" aria-live="polite"></p>'
+            f'<p class="kit-h">Download</p><div class="kit-row">'
+            + dl("gif", "GIF", "image/gif") + dl("mp4", "Video (MP4)", "video/mp4")
+            + dl("avatar", "Avatar PNG", "image/png") + dl("sticker", "Sticker PNG", "image/png")
+            + f'</div><p class="kit-how">On iPhone: Share, then <b>Save Video</b> puts it in Photos. Instagram and TikTok take the video, not the GIF.</p>'
+            f'</div></div></section>\n')
 
 
 def crew_page(c, i):
@@ -235,7 +284,7 @@ def crew_page(c, i):
 <dt>Weakness</dt><dd>{e(c['weakness'])}</dd>
 <dt>Wearing</dt><dd>{e(', '.join(MERCH[m][0] for m in c['wear']))}</dd>
 </dl></div>
-{before(c, up)}
+{origin_block(c, up)}
 </div>
 </section>
 <section class="wearing pad"><div class="wrap">
@@ -257,27 +306,13 @@ def crew_page(c, i):
 </main>
 {site_footer(up)}
 </div>
-{scripts(up, weird=True)}<script>
+{scripts(up, weird=True)}<script src="{up}js/crew-kit.js" defer></script>
+<script>
 (() => {{
   const me = window.JB_CREW.find((x) => x.slug === {json.dumps(c['slug'])});
   const line = document.getElementById('line');
   let k = 0;
   document.getElementById('more').addEventListener('click', () => {{ k = (k + 1) % me.lines.length; line.textContent = me.lines[k]; }});
-  // where they came from: the lightbox with the original art
-  const box = document.getElementById('srcBox');
-  document.getElementById('beforeBtn').addEventListener('click', () => box.showModal());
-  box.addEventListener('click', (ev) => {{ if (ev.target === box || ev.target.closest('[data-close]')) box.close(); }});
-  // the GIF: share the file itself where the phone allows it, otherwise copy the link
-  const gif = document.getElementById('gifShare');
-  if (gif) gif.addEventListener('click', async () => {{
-    const url = new URL(gif.dataset.gif, location.href).href, note = document.getElementById('gifNote');
-    try {{
-      const file = new File([await (await fetch(url)).blob()], gif.dataset.name, {{ type: 'image/gif' }});
-      if (navigator.canShare && navigator.canShare({{ files: [file] }})) {{ await navigator.share({{ files: [file], title: me.name + ', The JB Crew' }}); return; }}
-    }} catch (e) {{ if (e && e.name === 'AbortError') return; }}
-    try {{ await navigator.clipboard.writeText(url); note.textContent = 'Link to the GIF copied. Paste it anywhere.'; }}
-    catch (e) {{ note.textContent = 'Copy this link: ' + url; }}
-  }});
   const log = document.getElementById('log'), msg = document.getElementById('msg');
   const add = (t, who) => {{ const p = document.createElement('p'); p.textContent = t; if (who) p.className = 'them'; log.appendChild(p); }};
   document.getElementById('talk').addEventListener('submit', async (ev) => {{
