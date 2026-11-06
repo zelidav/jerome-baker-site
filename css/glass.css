@@ -126,6 +126,9 @@ body.in-shop .crew-layer{opacity:0;pointer-events:none;transition:opacity .4s}
 .promise li b{display:block;font-family:var(--display);font-weight:900;font-size:20px}
 .promise-go{display:inline-block;margin-top:8px;font-weight:800;color:var(--blue);text-decoration:none;border-bottom:3px solid var(--red)}
 .promise-go:hover{color:var(--red)}
+.coa{margin:34px 0 0;rotate:-2deg;max-width:560px}
+.coa img{display:block;width:100%;height:auto;border:4px solid var(--ink);box-shadow:10px 10px 0 var(--blue);background:#fff}
+.coa figcaption{margin-top:14px;font:800 12px/1.3 var(--mono,monospace);letter-spacing:.12em;text-transform:uppercase}
 
 /* page smoke: one canvas over everything, never catches the pointer */
 .smoke-layer{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:35}
