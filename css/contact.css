@@ -1,0 +1,74 @@
+/* js/contact.js: Contact + socials in the menu, the menu bar that tucks away on scroll, back to top, "Reach us" */
+
+/* ---------- wide screens: the logo, headlines and everything else line up with the content column ----------
+   .pad used to cap at 48px, so on a 2048px screen the JB logo and the first-fold headline sat hard against the left
+   edge while the sections below centred at 1344px. Past 1440px the side padding now grows to keep everything in
+   one centred column; backgrounds still run edge to edge. */
+.pad{padding-left:max(clamp(16px,4vw,48px),calc((100% - 1344px) / 2));padding-right:max(clamp(16px,4vw,48px),calc((100% - 1344px) / 2))}
+.sbar{padding-left:max(clamp(16px,4vw,48px),calc((100% - 1344px) / 2));padding-right:max(clamp(16px,4vw,48px),calc((100% - 1344px) / 2))}
+
+/* ---------- the menu: Contact + social icons ---------- */
+.hdr-social{display:none;align-items:center;gap:6px;margin-left:4px}
+.hdr-social a{display:inline-flex;width:36px;height:36px;align-items:center;justify-content:center;color:var(--white,#fff);border-radius:50%;transition:color .15s,background .15s}
+.hdr-social a:hover,.hdr-social a:focus-visible{color:var(--ink,#0A0A0A);background:var(--yellow,#FFF100)}
+.hdr-social svg{width:22px;height:22px}
+@media (min-width:1180px){.hdr-social{display:inline-flex}}
+header.top > nav, header.topbar > nav{margin-left:auto}
+
+/* ---------- the menu bar tucks away scrolling down, comes back scrolling up (desktop) ---------- */
+@media (min-width:901px){
+  html header.topbar{position:sticky;top:0;z-index:60}
+  html header.top,html header.topbar{transition:transform .32s cubic-bezier(.3,.7,.3,1)}
+  html header.hdr-away{transform:translateY(calc(-100% - 48px));pointer-events:none}
+  .subnav{transition:top .32s cubic-bezier(.3,.7,.3,1)}
+  html.hdr-hidden .subnav{top:0}
+  .sbar{top:var(--hdrv,0px);transition:top .32s cubic-bezier(.3,.7,.3,1)}
+  html.hdr-hidden body:has(.subnav.hdr-under) .filters{top:150px}
+}
+@media (prefers-reduced-motion:reduce){html header.top,html header.topbar,.subnav,.sbar{transition:none}}
+
+/* ---------- back to top: bottom right, above the feedback button ---------- */
+.jb-top{position:fixed;right:max(12px,env(safe-area-inset-right));bottom:calc(68px + env(safe-area-inset-bottom));z-index:76;
+  width:48px;height:48px;display:flex;align-items:center;justify-content:center;border:3px solid var(--ink,#0A0A0A);border-radius:50%;
+  background:var(--yellow,#FFF100);color:var(--ink,#0A0A0A);box-shadow:4px 4px 0 var(--ink,#0A0A0A);cursor:pointer;
+  opacity:0;translate:0 16px;pointer-events:none;transition:opacity .2s,translate .2s}
+.jb-top.on{opacity:1;translate:0 0;pointer-events:auto}
+.jb-top:hover{background:var(--white,#fff)}
+.jb-top svg{width:24px;height:24px}
+body.has-dock .jb-top{bottom:calc(148px + env(safe-area-inset-bottom))}
+body.dock-open .jb-top{visibility:hidden}
+
+/* ---------- "Reach us" at the top of the footer ---------- */
+.reach{margin:-8px 0 44px;padding-bottom:44px;border-bottom:1px solid #333}
+.reach-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:36px 56px;align-items:start}
+@media (max-width:860px){.reach-in{grid-template-columns:1fr}}
+.reach .reach-k{display:block;color:var(--yellow,#FFF100);font-family:var(--mono,monospace);font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin:0 0 12px}
+.reach a{display:inline-flex;align-items:center;gap:12px;color:var(--white,#fff);text-decoration:none}
+.reach a:hover{color:var(--yellow,#FFF100)}
+.reach svg{flex:0 0 auto}
+.reach-phone{font-family:var(--display,sans-serif);font-weight:900;font-size:clamp(34px,4.6vw,60px);line-height:1;letter-spacing:-.02em;padding:4px 0}
+.reach-phone svg{width:.8em;height:.8em;color:var(--red,#DA2342)}
+.reach-mail{margin-top:14px;font-weight:700;font-size:clamp(17px,1.6vw,22px);word-break:break-all}
+.reach-mail svg{width:24px;height:24px;color:var(--yellow,#FFF100)}
+.reach-social{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.reach-social a{gap:8px;padding:9px 14px 9px 10px;border:2px solid #555;border-radius:999px;font-weight:700;font-size:14px}
+.reach-social a:hover{border-color:var(--yellow,#FFF100)}
+.reach-social svg{width:22px;height:22px}
+
+.reach-form{background:#161616;border:2px solid #333;padding:22px 22px 18px;color:#d8d8d8}
+.reach-lede{margin:-4px 0 14px;font-size:14px;line-height:1.5;color:#bdbdbd}
+.reach-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.reach-row{grid-template-columns:1fr}}
+.reach-form label{display:block;margin:0 0 12px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#bdbdbd}
+.reach-form label i{font-style:normal;text-transform:none;letter-spacing:0;font-weight:500;color:#8a8a8a}
+.reach-form input,.reach-form select,.reach-form textarea{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:11px 12px;
+  font:500 16px/1.35 var(--body,sans-serif);color:var(--ink,#0A0A0A);background:var(--white,#fff);border:2px solid var(--white,#fff);border-radius:0}
+.reach-form textarea{resize:vertical;min-height:110px}
+.reach-form input:focus,.reach-form select:focus,.reach-form textarea:focus{outline:3px solid var(--yellow,#FFF100);outline-offset:0}
+.reach-go{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin-top:4px}
+.reach-go .btn{box-shadow:5px 5px 0 #000}
+.reach-err{margin:0;color:#FF8FA3;font-weight:700;font-size:14px}
+.reach-err:empty{display:none}
+.reach-thanks{margin:6px 0 4px;font-family:var(--display,sans-serif);font-weight:900;font-size:24px;color:var(--yellow,#FFF100)}
+.reach-hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;opacity:0}
+.reach [hidden]{display:none!important}

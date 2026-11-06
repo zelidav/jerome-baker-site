@@ -98,3 +98,24 @@
     document.querySelectorAll('.ticker, .hero, .redband, .wall, .strip, .wear, .made, .trip-teaser, .glass').forEach((el) => io.observe(el));
   }
 })();
+
+// The JB Crew on the home page is a preview: only the first row of pins shows (however many fit at this width),
+// and "Meet the whole crew" / "Find Your Crew" underneath take you to the rest.
+(() => {
+  const board = document.querySelector('#crew .pinboard');
+  if (!board) return;
+  const pins = [...board.querySelectorAll('.pin')];
+  const total = pins.length;
+  const meet = document.querySelector('#crew a[href="crew/"]');
+  const fit = () => {
+    pins.forEach((p) => (p.hidden = false));
+    const top = pins[0] ? pins[0].offsetTop : 0;
+    let shown = 0;
+    pins.forEach((p) => { if (p.offsetTop > top + 8) p.hidden = true; else shown++; });
+    if (meet) meet.textContent = shown < total ? `Meet all ${total}` : 'Meet the whole crew';
+  };
+  fit();
+  let t;
+  addEventListener('resize', () => { clearTimeout(t); t = setTimeout(fit, 120); });
+  addEventListener('load', fit);
+})();

@@ -233,3 +233,13 @@ jbIdle(() => {
   s.defer = true;
   document.head.appendChild(s);
 })();
+
+// Reach us (js/contact.js, css/contact.css): Contact + socials in the menu, the menu bar that tucks away while you
+// scroll down, back to top, and the phone / inbox / customer-service form at the top of every footer. Every page.
+(() => {
+  if (document.querySelector('script[src$="js/contact.js"]')) return;
+  const s = document.createElement('script');
+  s.src = (document.documentElement.dataset.base || '') + 'js/contact.js';
+  s.defer = true;
+  document.head.appendChild(s);
+})();
