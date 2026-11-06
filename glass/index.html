@@ -79,7 +79,7 @@
 <div><h2 class="display">Real glass.<br>Real paper trail.</h2></div>
 <ul>
 <li><b>One of one.</b> Each piece is registered in the Jerome Baker system with its own ID before it leaves the studio.</li>
-<li><b>Check it yourself.</b> Every piece links to its provenance record. The ID on the record matches the one on your box.</li>
+<li><b>Check it yourself.</b> Every piece links to its provenance record. The ID on the record matches the one on your box. <a class="promise-go" href="https://jbcustomer.cannacrypted.com/c/verify" target="_blank" rel="noopener">Look up any piece in the registry →</a></li>
 <li><b>Yours on the record.</b> When you buy, the piece is logged to you. Sell it one day and the history goes with it.</li>
 </ul>
 </div>
@@ -107,8 +107,8 @@
 <div class="fill" id="bFill" aria-hidden="true"><div class="fill-smoke"></div><div class="bubbles" id="bBubbles"></div></div>
 </div>
 <button type="button" class="hit" id="bHit"><span class="hit-ring" aria-hidden="true"><span id="bHitLvl"></span></span><span id="bHitLabel">Hold to take a hit</span></button>
-<button type="button" class="bench-nav prev" id="bPrev" aria-label="Previous piece">‹</button>
-<button type="button" class="bench-nav next" id="bNext" aria-label="Next piece">›</button>
+<button type="button" class="bench-nav prev" id="bPrev"><b aria-hidden="true">‹</b><span><small>Previous piece</small><i id="bPrevName"></i></span></button>
+<button type="button" class="bench-nav next" id="bNext"><span><small>Next piece</small><i id="bNextName"></i></span><b aria-hidden="true">›</b></button>
 </div>
 <div class="bench-info">
 <p class="b-series" id="bSeries"></p>
@@ -116,6 +116,7 @@
 <p class="b-price" id="bPrice"></p>
 <p class="b-status" id="bStatus" aria-live="polite"></p>
 <div class="b-ctas" id="bCtas"></div>
+<div class="b-angles" id="bAngles" hidden><p class="b-angles-k">More angles <span id="bAngleN"></span></p><div class="b-angle-row" id="bAngleRow"></div></div>
 <p class="b-desc" id="bDesc"></p>
 <dl class="b-facts" id="bFacts"></dl>
 </div>
