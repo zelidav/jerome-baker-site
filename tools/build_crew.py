@@ -239,7 +239,7 @@ def origin_block(c, up):
             f'<figure class="og-view">'
             f'<div class="og-frame" id="ogFrame" data-spot="{x},{y},{sw},{sh}" style="--ar:{w}/{h};--fa:{min(2, max(4 / 3, w / h)):.3f};--fa-m:{min(1.6, max(1, w / h)):.3f}">'
             f'<div class="og-stage" id="ogStage">'
-            f'<img src="{up}assets/{S["img"]}" alt="{e(S["alt"])}. {n} is marked: {e(words)}" width="{w}" height="{h}" decoding="async">'
+            f'<img src="{up}assets/{S["img"]}" alt="{e(S["alt"])}. {n} is marked: {e(words)}" width="{w}" height="{h}" loading="lazy" decoding="async">'
             f'<span class="og-mark" style="left:{x}%;top:{y}%;width:{sw}%;height:{sh}%"><span class="og-tag">{n}</span></span>'
             f'</div></div>'
             f'<figcaption class="og-bar"><button type="button" class="og-tog" id="ogTog" aria-pressed="false" '

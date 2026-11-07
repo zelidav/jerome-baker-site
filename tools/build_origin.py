@@ -3,7 +3,8 @@
 The crew pages open with "Where <name> comes from": the WHOLE box, booth wall or collage, then a zoom into the
 spot the character came from (tools/crew_data.py ORIGIN). This script makes those whole images web-sized and
 covers everything that is not safe for work with a pixelated patch and a CENSORED tape strip, in the same style
-as the tape already printed on the box. Every cover is listed in COVERS below, so it is easy to audit.
+as the tape already printed on the box, and blurs third-party characters and brand marks (McDonald's, Disney, MAD,
+the Simpsons, the Grateful Dead...). Every cover is listed in COVERS and every blur in BLURS, so it is easy to audit.
 
 Inputs live outside the repo (they are huge): the 4000px renders in ~/code/jbsite-work/sources/ (made from
 ~/Downloads/BAKER_BACK.pdf, Jerome-Baker-Trade-Show-Booth-Side-Panel-2-114x81.pdf and panel.pdf) plus
@@ -21,17 +22,57 @@ SRC = os.path.expanduser("~/code/jbsite-work/sources")
 OUT = os.path.join(ROOT, "assets", "origin")
 FONT = "C:/Windows/Fonts/impact.ttf" if os.path.exists("C:/Windows/Fonts/impact.ttf") else None
 
-# name: (source file, output width, webp quality)
+# name: (source file, width the COVERS/BLURS coordinates are written in, output width, webp quality)
+# Output widths keep each file around 300-400KB; the page never zooms past ~1.6x the file's own pixels.
 IMAGES = {
-    "box": (os.path.join(ROOT, "assets", "img", "box.webp"), 1500, 82),   # the box, front (already partly taped)
-    "box-back": (os.path.join(SRC, "boxback.png"), 2400, 70),            # the back of the box
-    "box-cut": (os.path.join(SRC, "shot1.png"), 1796, 80),               # a closer cut of the box collage
-    "booth": (os.path.join(SRC, "booth.png"), 2400, 70),                 # booth side panel, 114x81 in
-    "wall": (os.path.join(SRC, "wall.png"), 3600, 68),                   # the wide booth panel
-    "c2018": (os.path.join(SRC, "shot2.png"), 2390, 84),                 # 2018 JB Cannabis Collection collage
+    "box": (os.path.join(ROOT, "assets", "img", "box.webp"), 1500, 1500, 72),   # the box, front (already partly taped)
+    "box-back": (os.path.join(SRC, "boxback.png"), 2400, 1600, 60),            # the back of the box
+    "box-cut": (os.path.join(SRC, "shot1.png"), 1796, 1500, 66),               # a closer cut of the box collage
+    "booth": (os.path.join(SRC, "booth.png"), 2400, 1700, 56),                 # booth side panel, 114x81 in
+    "wall": (os.path.join(SRC, "wall.png"), 3600, 2700, 56),                   # the wide booth panel
+    "c2018": (os.path.join(SRC, "shot2.png"), 2390, 2390, 74),                 # 2018 JB Cannabis Collection collage
 }
 
-# Covers, in OUTPUT pixels: (x0, y0, x1, y1, tape label, what is under it). Reviewed by eye, region by region.
+# Third-party characters, mascots and brand marks: blurred (no tape; the tape means NSFW). Same coordinate space
+# as COVERS. (x0, y0, x1, y1, what is under it)
+BLURS = {
+    "box": [
+        (1150, 0, 1305, 140, "Obey Giant-style propaganda face (Shepard Fairey)"),
+    ],
+    "box-back": [
+        (0, 1450, 445, 1840, "McDonald's characters: Hamburglar, Grimace, Ronald, Mayor McCheese, Birdie"),
+        (590, 1560, 860, 1840, "Mickey Mouse (Disney), Sorcerer's Apprentice"),
+        (1395, 1235, 1636, 1425, "Alfred E. Neuman (MAD Magazine)"),
+        (470, 1440, 615, 1665, "Uncle Duke (Doonesbury)"),
+        (500, 1250, 775, 1445, "Freak Brothers-style comic characters (Gilbert Shelton)"),
+        (1700, 60, 1925, 350, "Rupert Bear (Rupert Finds Gipsy Granny comic)"),
+        (2002, 1330, 2115, 1462, "R. Crumb comic character carrying records (head, kept clear of Lunar Larry)"),
+        (1900, 1462, 2115, 1840, "R. Crumb comic character carrying records (body)"),
+        (1900, 815, 1995, 965, "Nike swoosh parody (Just Dab It)"),
+    ],
+    "box-cut": [
+        (1440, 1365, 1796, 1722, "The Simpsons-style gnome"),
+        (640, 370, 905, 710, "Grateful Dead skull and roses"),
+    ],
+    "booth": [],
+    "wall": [
+        (1350, 140, 1600, 375, "Grateful Dead skeleton and roses art on the Trails poster"),
+        (2005, 125, 2265, 425, "Grateful Dead Steal Your Face skull on the Stonerdays poster"),
+    ],
+    "c2018": [
+        (5, 330, 272, 525, "Disney-style comic characters (Air Pirates-style mice, pigs, bears, cats)"),
+        (840, 238, 1005, 470, "King Kong (title lettering and the gorilla)"),
+        (1650, 360, 1800, 600, "Donald Duck and other cartoon characters"),
+        (1705, 28, 1802, 162, "Campbell's soup can parody"),
+        (2108, 228, 2302, 572, "Felix the Cat and other cartoon cats"),
+        (1080, 0, 1142, 52, "Rupert Bear comic panel"),
+        (1092, 266, 1202, 332, "Freak Brothers-style comic characters"),
+        (0, 12, 36, 72, "Nike swoosh parody (Just Dab It)"),
+        (1262, 238, 1302, 292, "Nike swoosh parody (Just Dab It)"),
+    ],
+}
+
+# NSFW covers, in the coordinate width above: (x0, y0, x1, y1, tape label, what is under it). Reviewed by eye, region by region.
 COVERS = {
     "box": [
         (50, 135, 195, 268, "CENSORED", "pink pin-up, top left: topless"),
@@ -111,15 +152,41 @@ def cover(im, k, x0, y0, x1, y1, label):
     im.paste(strip, (x0 + w // 2 - cx, y0 + h // 2 - cy), strip)
 
 
+def blur(im, x0, y0, x1, y1):
+    """A heavy blur with soft edges, so the character is unreadable but the collage still reads as one piece."""
+    w, h = x1 - x0, y1 - y0
+    r = max(10, min(w, h) // 5)
+    patch = im.crop((x0, y0, x1, y1)).resize((max(1, w // 6), max(1, h // 6)), Image.BILINEAR)
+    patch = patch.filter(ImageFilter.GaussianBlur(max(2, r / 6))).resize((w, h), Image.BICUBIC).filter(ImageFilter.GaussianBlur(r / 3))
+    mask = Image.new("L", (w, h), 0)
+    f = max(3, min(w, h) // 10)
+    # soft edges inside the image, hard where the box touches the image's own edge
+    l, t = (0 if x0 <= 0 else f // 3), (0 if y0 <= 0 else f // 3)
+    rr, b = (w if x1 >= im.width else w - f // 3), (h if y1 >= im.height else h - f // 3)
+    ImageDraw.Draw(mask).rounded_rectangle((l, t, rr, b), radius=f, fill=255)
+    mask = mask.filter(ImageFilter.GaussianBlur(f / 4))
+    if l == 0 or t == 0 or rr == w or b == h:  # re-fill the edge rows the blur softened
+        d = ImageDraw.Draw(mask)
+        if l == 0: d.rectangle((0, t + f, f // 3, b - f), fill=255)
+        if t == 0: d.rectangle((l + f, 0, rr - f, f // 3), fill=255)
+        if rr == w: d.rectangle((w - f // 3, t + f, w, b - f), fill=255)
+        if b == h: d.rectangle((l + f, h - f // 3, rr - f, h), fill=255)
+    im.paste(patch, (x0, y0), mask)
+
+
 def build(name):
-    path, width, q = IMAGES[name]
+    path, cw, width, q = IMAGES[name]
     if not os.path.exists(path):
         sys.exit(f"{name}: source missing at {path}")
     im = Image.open(path).convert("RGB")
-    if im.width != width:
-        im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
+    if im.width != cw:
+        im = im.resize((cw, round(im.height * cw / im.width)), Image.LANCZOS)
+    for x0, y0, x1, y1, _why in BLURS[name]:
+        blur(im, x0, y0, x1, y1)
     for k, (x0, y0, x1, y1, label, _why) in enumerate(COVERS[name]):
         cover(im, k, x0, y0, x1, y1, label)
+    if width != cw:
+        im = im.resize((width, round(im.height * width / cw)), Image.LANCZOS)
     os.makedirs(OUT, exist_ok=True)
     im.save(os.path.join(OUT, f"{name}.webp"), "WEBP", quality=q, method=6)
     return im.size
@@ -137,7 +204,8 @@ def mr_x_steps():
 def main():
     for name in IMAGES:
         size = build(name)
-        print(f"assets/origin/{name}.webp {size[0]}x{size[1]}, {len(COVERS[name])} covers")
+        kb = os.path.getsize(os.path.join(OUT, f"{name}.webp")) // 1024
+        print(f"assets/origin/{name}.webp {size[0]}x{size[1]} {kb}KB, {len(COVERS[name])} NSFW covers, {len(BLURS[name])} blurs")
     mr_x_steps()
     print("assets/origin/mrx-sketch.webp, mrx-poster.webp")
 
