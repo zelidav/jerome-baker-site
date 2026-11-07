@@ -45,38 +45,56 @@
 <section class="lbody pad" id="anywhere">
 <div class="wrap">
 <div class="track">
+<figure class="svis"><img src="../assets/wholesale/glass-lineup.webp" srcset="../assets/wholesale/glass-lineup_t.webp 480w, ../assets/wholesale/glass-lineup.webp 1300w" sizes="(max-width:700px) 100vw, 1100px" width="1300" height="617" alt="Seven Baker Classics in a row, crowns of marbles and fumed bulbs" loading="lazy" decoding="async"><figcaption>Hand-blown, signed and registered, every one.</figcaption></figure>
 <span class="tag">TRACK 1 · ANY STATE</span>
 <h2>Wholesale glass and merch.</h2>
 <p>For sm0ke shops, head shops, galleries and boutiques. Every piece comes with its provenance on file, so your customer can scan it and see exactly what they bought. Wholesale pricing on request.</p>
-<table class="lineup">
-<thead><tr><th>THE LINEUP</th><th>WHAT IT IS</th><th>RETAIL</th></tr></thead>
+<!-- B2B hook: each row carries data-item. When signed-in store accounts land, a script can add a WHOLESALE column keyed on data-item
+     (and fill .ws cells) for logged-in B2B users only. Wholesale numbers stay out of this public page until then. -->
+<table class="lineup" data-b2b="pending">
+<thead><tr><th class="lt"><span class="sr">Photo</span></th><th>THE LINEUP</th><th>RETAIL</th></tr></thead>
 <tbody>
-<tr><td><b>LE Series Baker Classic</b></td><td>15 in, 45mm tube, a crown of dichroic marbles. One of one.</td><td>$750</td></tr>
-<tr><td><b>Original Series Baker Classic</b></td><td>The same Baker silhouette, 35mm tube, the everyday flagship. One of one.</td><td>$550</td></tr>
-<tr><td><b>Keikis</b></td><td>Small hand-sculpted pieces: cactus, fish, lizard, starfish and more. Each one different.</td><td>$250</td></tr>
-<tr><td><b>Skeeter lunch boxes</b></td><td>A small piece packed in a collectible metal lunch box.</td><td>$150</td></tr>
-<tr><td><b>Everyday Steeze</b></td><td>Beaker and straight tube, built to be used every day.</td><td>$100</td></tr>
-<tr><td><b>Hand-blown jars</b></td><td>Large and small collectible storage jars.</td><td>$60 / $40</td></tr>
-<tr><td><b>Classic Clearboy</b></td><td>The corncob hand p!pe Jerome has made since the early days.</td><td>$25</td></tr>
-<tr><td><b>Hats, papers and merch</b></td><td>Embroidered hats, r0lling papers with matches, the Ritual merch line.</td><td>$7 to $50</td></tr>
-<tr><td><b>Giant b0ngs and studio pieces</b></td><td>Four feet of glass and up, plus one-offs from the studio. Ask about allocation.</td><td>On request</td></tr>
+<tr data-item="le-baker-classic"><td class="lt"><a href="../glass/#p=JBD-A89E658649ED" class="lthumb"><img src="../assets/glass/JBD-A89E658649ED_t.webp" alt="Jester Bloom, an LE Series Baker Classic" loading="lazy" decoding="async"></a></td><td><b>LE Series Baker Classic</b><span class="what">15 in, 45mm tube, a crown of dichroic marbles. One of one.</span><span class="deep">Wig-wag, millies, knuckles and marbles, worked at the bench. On the shelf now: Jester Bloom, an aqua-to-gold base under purple-amber wig-wag and a hand-set jester millie. <a class="more" href="../glass/#p=JBD-A89E658649ED">See the LE shelf</a></span></td><td class="rp">$750</td></tr>
+<tr data-item="og-baker-classic"><td class="lt"><a href="../glass/#p=JBD-3B07BA3340B4" class="lthumb"><img src="../assets/glass/JBD-3B07BA3340B4_t.webp" alt="Coney Island, an Original Series Baker Classic" loading="lazy" decoding="async"></a></td><td><b>Original Series Baker Classic</b><span class="what">The same Baker silhouette, 35mm tube, the everyday flagship. One of one.</span><span class="deep">Fumed bulb, straight tube, built to hit and built to last. On the shelf now: Coney Island, raked blue-and-white wig-wag over an ocean-blue-and-gold fumed bulb. <a class="more" href="../glass/#p=JBD-3B07BA3340B4">See the Originals</a></span></td><td class="rp">$550</td></tr>
+<tr data-item="keiki"><td class="lt"><span class="lthumb lthumb-none" aria-hidden="true">1 OF 1</span></td><td><b>Keikis</b><span class="what">Small hand-sculpted pieces: cactus, fish, lizard, starfish and more. Each one different.</span><span class="deep">Seven styles in the run: cactus, faces, fish, lizard, marbles, mushroom and starfish. Hand blown, so no two match. Ask us what is in the current batch. <a class="more" href="#talk">Ask about Keikis</a></span></td><td class="rp">$250</td></tr>
+<tr data-item="skeeter"><td class="lt"><a href="../glass/#p=JBD-BFFCE45A8CA0" class="lthumb"><img src="../assets/glass/JBD-BFFCE45A8CA0_t.webp" alt="Skeeter Classic Logo Suitcase lunch box" loading="lazy" decoding="async"></a></td><td><b>Skeeter lunch boxes</b><span class="what">A small piece packed in a collectible metal lunch box.</span><span class="deep">Every box is finished by hand with archival sticker prints, so each Skeeter is slightly different. Styles include the Classic Logo Suitcase and The JB Office Lunch. <a class="more" href="../glass/#p=JBD-BFFCE45A8CA0">See the Skeeters</a></span></td><td class="rp">$150</td></tr>
+<tr data-item="everyday-steeze"><td class="lt"><a href="../glass/#p=SHP-8325350916333" class="lthumb"><img src="../assets/glass/SHP-8325350916333_t.webp" alt="Everyday Steeze tube" loading="lazy" decoding="async"></a></td><td><b>Everyday Steeze</b><span class="what">Beaker and straight tube, built to be used every day.</span><span class="deep">The Everyday Steeze line runs from 25mm to 50mm tubes, alongside the red and blue EVO beakers and straights. <a class="more" href="../glass/#p=SHP-8325350916333">See Everyday Steeze</a></span></td><td class="rp">$100</td></tr>
+<tr data-item="jars"><td class="lt"><a href="../glass/#p=JBD-A3905EE11EAC" class="lthumb"><img src="../assets/glass/JBD-A3905EE11EAC_t.webp" alt="Large hand-blown JB jar" loading="lazy" decoding="async"></a></td><td><b>Hand-blown jars</b><span class="what">Large and small collectible storage jars.</span><span class="deep">Fumed glass with a cork seal. The large is 75mm wide and holds 3oz; the small is 38mm and 1oz, sized to live by the register. <a class="more" href="../glass/#p=JBD-A3905EE11EAC">See the jars</a></span></td><td class="rp">$60 / $40</td></tr>
+<tr data-item="clearboy"><td class="lt"><a href="../glass/#p=JBD-8E7AE6D13D43" class="lthumb"><img src="../assets/glass/JBD-8E7AE6D13D43_t.webp" alt="Classic Clearboy hand p!pe" loading="lazy" decoding="async"></a></td><td><b>Classic Clearboy</b><span class="what">The corncob hand p!pe Jerome has made since the early days.</span><span class="deep">Clear glass body with the OG C@nnabis Collective logo etched where the thumb sits, packed in a little cloth pouch. <a class="more" href="../glass/#p=JBD-8E7AE6D13D43">See the Clearboy</a></span></td><td class="rp">$25</td></tr>
+<tr data-item="hats-merch"><td class="lt"><a href="../shop/#p=hat-indica" class="lthumb"><img src="../assets/shop/6754_0_t.webp" alt="Indica drop hat" loading="lazy" decoding="async"></a></td><td><b>Hats, papers and merch</b><span class="what">Embroidered hats, r0lling papers with matches, the Ritual merch line.</span><span class="deep">The drop hats are hand-numbered hemp 6-panels, pattern-matched to the Indica, Sativa and Hybrid drops. One of 250 per pattern. <a class="more" href="../shop/#p=hat-indica">See the merch</a></span></td><td class="rp">$7 to $50</td></tr>
+<tr data-item="giant-studio"><td class="lt"><a href="../glass/#p=JBD-30A28BA0570D" class="lthumb"><img src="../assets/glass/JBD-30A28BA0570D_t.webp" alt="The Alien, a 50-inch uranium glass b0ng" loading="lazy" decoding="async"></a></td><td><b>Giant b0ngs and studio pieces</b><span class="what">Four feet of glass and up, plus one-offs from the studio. Ask about allocation.</span><span class="deep">The Alien is 50 inches of uranium glass that glows green under UV light, pulled in Brooklyn by a team of around fifteen. One of one. <a class="more" href="../glass/#p=JBD-30A28BA0570D">See the giants</a></span></td><td class="rp">On request</td></tr>
 </tbody>
 </table>
 <div class="cols">
-<div class="card-l"><h3>Co-branded merch</h3><p>Hats, tees and papers with your store and the JB mark together. Small runs.</p></div>
-<div class="card-l"><h3>Displays</h3><p>Glass cubes, a full dome case and hand-blown jars, built to put the glass at eye level.</p></div>
-<div class="card-l"><h3>Provenance on every piece</h3><p>Each one-of-one is registered. A scan of the sticker shows where it came from and who made it.</p></div>
+<div class="card-l"><img class="cimg" src="../assets/wholesale/boxset-hats_t.webp" width="480" height="290" alt="JB box set, drop hats, papers and matches" loading="lazy" decoding="async" style="object-position:50% 50%"><h3>Co-branded merch</h3><p>Hats, tees and papers with your store and the JB mark together. Small runs.</p></div>
+<div class="card-l"><img class="cimg" src="../assets/wholesale/tier1-display_t.webp" width="480" height="1651" alt="Shelves of a JB display case: b0ngs, box sets, hats and jars behind glass" loading="lazy" decoding="async" style="object-position:50% 38%"><h3>Displays</h3><p>Glass cubes, a full dome case and hand-blown jars, built to put the glass at eye level.</p></div>
+<div class="card-l"><img class="cimg" src="../assets/wholesale/provenance-sticker_t.webp" width="480" height="319" alt="Holographic Genuine Jerome Baker Designs sticker on a b0ng" loading="lazy" decoding="async" style="object-position:40% 50%"><h3>Provenance on every piece</h3><p>Each one-of-one is registered. A scan of the sticker shows where it came from and who made it.</p></div>
 </div>
 </div>
 
 <div class="track" id="ny">
+<figure class="svis tilt-r"><img src="../assets/wholesale/live-glassblowing.webp" srcset="../assets/wholesale/live-glassblowing_t.webp 480w, ../assets/wholesale/live-glassblowing.webp 900w" sizes="(max-width:700px) 100vw, 1100px" width="900" height="1199" alt="Jason Harris blowing glass live at a launch event, with JB box sets and hats on the table" loading="lazy" decoding="async" style="object-position:50% 4%"><figcaption>Launch day: live glass-blowing by founder Jason Harris.</figcaption></figure>
 <span class="tag">TRACK 2 · NEW YORK, LICENSED STORES</span>
 <h2>The New York program.</h2>
 <p>For licensed New York adult-use d!spensaries. One program that puts Jerome Baker in your store: the glass, the training and the brand.</p>
+<div class="tier1">
+<figure class="t1-display"><img src="../assets/wholesale/tier1-display.webp" srcset="../assets/wholesale/tier1-display_t.webp 480w, ../assets/wholesale/tier1-display.webp 620w" sizes="(max-width:700px) 60vw, 300px" width="620" height="2133" alt="The full Jerome Baker Tier 1 display: a lit glass case with a JB sign and drop hats on top, glass, box sets and jars on the shelves, and #ForgedInRitual signage below" loading="lazy" decoding="async"><figcaption>The full Tier 1 display.</figcaption></figure>
+<div class="t1-copy">
+<span class="tag">TIER 1 · THE FULL PROGRAM</span>
+<h3>Everything that goes in your store.</h3>
+<p>A JB cube for your counter, or we merchandise your existing shelving: backboard signage, globes and decals, acrylic, hat and joint stands. Installed by our team, then stocked with the glass, box sets and hats, with the budtender program behind it.</p>
+<div class="installs">
+<figure><img src="../assets/wholesale/install-cube-1.webp" srcset="../assets/wholesale/install-cube-1_t.webp 480w, ../assets/wholesale/install-cube-1.webp 900w" sizes="(max-width:700px) 33vw, 260px" width="900" height="1200" alt="A JB glass case installed in a New York d!spensary" loading="lazy" decoding="async"></figure>
+<figure><img src="../assets/wholesale/install-cube-2.webp" srcset="../assets/wholesale/install-cube-2_t.webp 480w, ../assets/wholesale/install-cube-2.webp 900w" sizes="(max-width:700px) 33vw, 260px" width="900" height="1200" alt="A JB glass case with hats and glass in a New York store" loading="lazy" decoding="async"></figure>
+<figure><img src="../assets/wholesale/install-store-3.webp" srcset="../assets/wholesale/install-store-3_t.webp 480w, ../assets/wholesale/install-store-3.webp 900w" sizes="(max-width:700px) 33vw, 260px" width="900" height="1200" alt="A JB uranium b0ng under black light beside an alien figure in a New York store" loading="lazy" decoding="async"></figure>
+</div>
+<p class="cap">Live New York installs.</p>
+</div>
+</div>
 <div class="cols">
-<div class="card-l blue"><h3>Signature glass in store</h3><ul><li>One-of-one LE and Original Series Bakers on consignment, with the display to show them</li><li>Jars, beakers, tubes, Clearboys, Skeeters and hats at wholesale</li><li>Each piece registered, with provenance your customers can scan</li><li>A store QR code that sends shoppers to your own JB shop page</li></ul></div>
-<div class="card-l blue"><h3>Budtender training</h3><ul><li>Eight short training pages, a quiz on each</li><li>Rewards are earned: finish the training or log a sale to unlock them</li><li>Points for every sale logged, toward merch and a monthly drawing for a JB piece</li><li>Passwordless login by text or email code</li></ul></div>
-<div class="card-l blue"><h3>The JB brand line</h3><ul><li>Jerome Baker branded products are made and sold by licensed New York processor partners</li><li>Jerome Baker never touches the plant</li><li>Orders and invoicing run through the licensed partners</li></ul></div>
+<div class="card-l blue"><img class="cimg" src="../assets/wholesale/glass-lineup_t.webp" width="480" height="228" alt="A row of one-of-one Baker Classics" loading="lazy" decoding="async" style="object-position:50% 50%"><h3>Signature glass in store</h3><ul><li>One-of-one LE and Original Series Bakers on consignment, with the display to show them</li><li>Jars, beakers, tubes, Clearboys, Skeeters and hats at wholesale</li><li>Each piece registered, with provenance your customers can scan</li><li>A store QR code that sends shoppers to your own JB shop page</li></ul></div>
+<div class="card-l blue"><img class="cimg cimg-art" src="../assets/crew/bot_m.webp" width="200" height="200" alt="" loading="lazy" decoding="async"><h3>Budtender training</h3><ul><li>Eight short training pages, a quiz on each</li><li>Rewards are earned: finish the training or log a sale to unlock them</li><li>Points for every sale logged, toward merch and a monthly drawing for a JB piece</li><li>Passwordless login by text or email code</li></ul></div>
+<div class="card-l blue"><img class="cimg" src="../assets/wholesale/brand-line-jars_t.webp" width="480" height="160" alt="Jerome Baker flower jars in Hybrid, Indica and Sativa labels" loading="lazy" decoding="async" style="object-position:50% 50%"><h3>The JB brand line</h3><ul><li>Jerome Baker branded products are made and sold by licensed New York processor partners</li><li>Jerome Baker never touches the plant</li><li>Orders and invoicing run through the licensed partners</li></ul></div>
 </div>
 <p class="fine">Licensed stores can apply directly at <a href="https://signup.cannacrypted.com">signup.cannacrypted.com</a>. Every program store is a licensed New York retailer. Adults 21+.</p>
 </div>
@@ -85,8 +103,10 @@
 
 <section class="lbody yellow pad" id="talk">
 <div class="wrap">
+<figure class="svis tilt-l"><img src="../assets/wholesale/bonggarden-glass.webp" srcset="../assets/wholesale/bonggarden-glass_t.webp 480w, ../assets/wholesale/bonggarden-glass.webp 1600w" sizes="(max-width:700px) 100vw, 1100px" width="1600" height="725" alt="Jerome Baker b0ngs in yellow, clear and orange in front of the Jerome Baker New York backdrop" loading="lazy" decoding="async"><figcaption>The B0ng Garden, our booth at Hall of Flowers.</figcaption></figure>
 <h2>Talk to us.</h2>
 <p>Tell us about your store. We get back to you within two business days.</p>
+<div class="talkgrid">
 <div class="lwrap">
 <form class="lform" data-lead="b2b" data-subject="JB wholesale lead" novalidate>
 <div class="row">
@@ -116,6 +136,12 @@
 <p class="small">Or email <a href="mailto:sales@jeromebakerny.com">sales@jeromebakerny.com</a>.</p>
 </form>
 <div class="thanks" role="status"><h3>Got it.</h3><p>Someone from the JB team will reach out within two business days.</p></div>
+</div>
+<aside class="support" aria-label="How we support stores">
+<figure><img src="../assets/wholesale/bonggarden-booth.webp" srcset="../assets/wholesale/bonggarden-booth_t.webp 480w, ../assets/wholesale/bonggarden-booth.webp 1100w" sizes="(max-width:1000px) 100vw, 480px" width="1100" height="1031" alt="The Jerome Baker booth at Hall of Flowers: b0ngs among giant yellow paper flowers, with JB merch on the shelves" loading="lazy" decoding="async"><figcaption>The B0ng Garden at Hall of Flowers.</figcaption></figure>
+<h3>We set it up with you.</h3>
+<p>We don't drop off a box and leave. Our team builds and installs the display, trains your budtenders on site, and backs launch day with an RSVP push and live glass-blowing when the calendar allows. Standard glass ships on 30-day terms with a 90-day guarantee, and featured Keikis, LEs and Originals can go in on consignment.</p>
+</aside>
 </div>
 </div>
 </section>

@@ -59,4 +59,50 @@ body{background:var(--ink)}
 .sent .lform{display:none}
 .sent .thanks{display:block}
 
+/* wholesale visuals: section-top photos, Tier 1 display, lineup thumbs, B0ng Garden aside */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.svis{margin:0 0 44px;max-width:1100px;position:relative;rotate:-1deg}
+.svis.tilt-r{rotate:1deg}.svis.tilt-l{rotate:-1.2deg}
+.svis img{width:100%;height:auto;aspect-ratio:2.1/1;object-fit:cover;border:4px solid var(--ink);box-shadow:10px 10px 0 var(--ink);background:var(--ink)}
+.svis figcaption{position:absolute;left:18px;bottom:-14px;background:var(--yellow);border:3px solid var(--ink);font:700 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:6px 10px;rotate:-1.5deg;max-width:calc(100% - 36px)}
+.lbody.yellow .svis figcaption{background:var(--white)}
+.card-l .cimg{display:block;width:calc(100% + 44px);max-width:none;margin:-22px -22px 18px;height:190px;object-fit:cover;border-bottom:4px solid var(--ink);background:var(--ink)}
+.card-l .cimg-art{object-fit:contain;background:var(--yellow);padding:10px 0}
+.lineup .lt{width:96px;padding:8px 10px}
+.lthumb{display:grid;place-items:center;width:76px;height:96px;background:var(--gray);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);rotate:-2deg;overflow:hidden;text-decoration:none}
+.lineup tr:nth-child(even) .lthumb{rotate:2deg}
+.lthumb img{width:100%;height:100%;object-fit:contain;padding:4px;transition:scale .2s}
+a.lthumb:hover img,a.lthumb:focus-visible img{scale:1.08}
+.lthumb-none{background:var(--yellow);font:700 12px var(--mono);letter-spacing:.08em;text-align:center}
+.lineup .what{display:block}
+.lineup .deep{display:block;margin-top:6px;font-size:14px;line-height:1.5;opacity:.85}
+.lineup .more{font-weight:800;white-space:nowrap;color:var(--blue)}
+.lineup .more::after{content:" \2192"}
+.tier1{display:grid;grid-template-columns:minmax(150px,240px) 1fr;gap:clamp(22px,4vw,48px);align-items:start;margin:30px 0 8px}
+.t1-display{margin:0;rotate:-2deg}
+.t1-display img{width:100%;height:auto;border:4px solid var(--ink);box-shadow:10px 10px 0 var(--red);background:var(--ink)}
+.t1-display figcaption,.tier1 .cap{font:700 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;margin-top:14px}
+.t1-copy h3{margin:0 0 10px;font-family:var(--display);font-weight:900;font-size:clamp(26px,3.4vw,40px);line-height:1}
+.installs{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,2vw,22px);margin-top:22px}
+.installs figure{margin:0}
+.installs img{width:100%;height:auto;aspect-ratio:3/4;object-fit:cover;border:4px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:var(--ink)}
+.installs figure:nth-child(1){rotate:-2deg}.installs figure:nth-child(2){rotate:1.5deg;translate:0 10px}.installs figure:nth-child(3){rotate:-1deg}
+.talkgrid{display:grid;grid-template-columns:minmax(0,760px) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+.support{margin-top:28px}
+.support figure{margin:0;rotate:2deg}
+.support img{width:100%;height:auto;border:4px solid var(--ink);box-shadow:10px 10px 0 var(--red);background:var(--ink)}
+.support figcaption{font:700 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;margin-top:12px}
+.support h3{margin:22px 0 8px;font-family:var(--display);font-weight:900;font-size:clamp(26px,3vw,36px);line-height:1}
+.support p{margin:0;font-weight:600}
+@media (max-width:1000px){.talkgrid{grid-template-columns:1fr}.support{max-width:640px}}
+@media (max-width:700px){
+.tier1{grid-template-columns:1fr}.t1-display{max-width:220px;margin:0 auto}
+.lineup thead{display:none}
+.lineup,.lineup tbody{display:block}
+.lineup tr{display:grid;grid-template-columns:76px 1fr;gap:4px 12px;padding:12px;border-bottom:2px solid var(--ink)}
+.lineup td{display:block;padding:0;border:0}
+.lineup .lt{grid-row:span 2;width:auto;padding:0}
+.lineup .rp{grid-column:2}
+.svis{rotate:0deg}.svis img{aspect-ratio:16/10}
+}
 @media (max-width:700px){.lhero .cast{display:none}.lineup td:last-child{white-space:normal}}
