@@ -64,43 +64,58 @@
     });
   }
 
-  // the slides
-  const track = document.getElementById('ogTrack');
-  if (track) {
-    const slides = [...track.querySelectorAll('.og-slide')];
-    const dots = [...document.querySelectorAll('.og-dot')];
-    const prev = document.getElementById('ogPrev'), next = document.getElementById('ogNext');
-    const live = document.getElementById('ogLive');
-    let cur = 0;
-    const mark = (i) => {
-      if (i === cur && slides[i].classList.contains('on')) return;
-      cur = i;
-      slides.forEach((s, k) => { s.classList.toggle('on', k === i); s.setAttribute('aria-hidden', k === i ? 'false' : 'true'); });
-      dots.forEach((d, k) => d.setAttribute('aria-current', k === i ? 'true' : 'false'));
-      prev.disabled = i === 0; next.disabled = i === slides.length - 1;
-      if (live) live.textContent = 'Slide ' + (i + 1) + ' of ' + slides.length;
+  // where they come from: show the whole piece, then zoom into the spot (tools/build_crew.py origin_block)
+  const frame = document.getElementById('ogFrame');
+  if (frame) {
+    const stage = document.getElementById('ogStage');
+    const tog = document.getElementById('ogTog');
+    const img = stage.querySelector('img');
+    const [sx, sy, sw, sh] = frame.dataset.spot.split(',').map(Number);
+    const still = matchMedia('(prefers-reduced-motion: reduce)');
+    let zoomed = false, started = false;
+    // whole piece: centred, contained. zoomed: the spot fills about two thirds of the frame, never past the art's edges
+    const place = () => {
+      const F = frame.getBoundingClientRect(), fw = frame.clientWidth, fh = frame.clientHeight;
+      const W = stage.offsetWidth, H = stage.offsetHeight;
+      if (!W || !H || !F.width) return;
+      let s = 1, tx = (fw - W) / 2, ty = (fh - H) / 2;
+      if (zoomed) {
+        const pw = W * sw / 100, ph = H * sh / 100;
+        // never blow the art up much past its own pixels, or it goes to mush
+        const sharp = Math.max(2.5, 1.6 * (img.naturalWidth || W) / W);
+        s = Math.max(1, Math.min(9, sharp, 0.66 * fw / pw, 0.66 * fh / ph));
+        const cx = W * (sx + sw / 2) / 100, cy = H * (sy + sh / 2) / 100;
+        tx = fw / 2 - cx * s; ty = fh / 2 - cy * s;
+        tx = W * s <= fw ? (fw - W * s) / 2 : Math.min(0, Math.max(fw - W * s, tx));
+        ty = H * s <= fh ? (fh - H * s) / 2 : Math.min(0, Math.max(fh - H * s, ty));
+      }
+      stage.style.setProperty('--s', s.toFixed(3));
+      stage.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${s.toFixed(4)})`;
+      frame.classList.toggle('zoomed', zoomed);
+      tog.setAttribute('aria-pressed', zoomed ? 'true' : 'false');
+      tog.textContent = zoomed ? tog.dataset.out : tog.dataset.in;
     };
-    const go = (i) => {
-      i = Math.max(0, Math.min(slides.length - 1, i));
-      track.scrollTo({ left: slides[i].offsetLeft - track.offsetLeft, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-      mark(i);
+    const set = (z) => { zoomed = z; place(); };
+    tog.addEventListener('click', () => { started = true; set(!zoomed); });
+    frame.addEventListener('click', () => { started = true; set(!zoomed); });
+    addEventListener('resize', place, { passive: true });
+    if (window.ResizeObserver) new ResizeObserver(place).observe(frame);
+    // start on the whole thing; once it is on screen and loaded, hold a beat, then zoom in
+    const go = () => {
+      if (started) return;
+      started = true;
+      if (still.matches) { set(true); return; }
+      setTimeout(() => set(true), 1100);
     };
-    prev.addEventListener('click', () => go(cur - 1));
-    next.addEventListener('click', () => go(cur + 1));
-    dots.forEach((d, k) => d.addEventListener('click', () => go(k)));
-    track.addEventListener('keydown', (ev) => {
-      if (ev.key === 'ArrowRight') { ev.preventDefault(); go(cur + 1); }
-      else if (ev.key === 'ArrowLeft') { ev.preventDefault(); go(cur - 1); }
-      else if (ev.key === 'Home') { ev.preventDefault(); go(0); }
-      else if (ev.key === 'End') { ev.preventDefault(); go(slides.length - 1); }
-    });
-    // swiping: follow the scroll position
-    let t = 0;
-    track.addEventListener('scroll', () => {
-      clearTimeout(t);
-      t = setTimeout(() => mark(Math.round(track.scrollLeft / Math.max(1, track.clientWidth))), 80);
-    }, { passive: true });
-    mark(0);
+    const ready = () => img.complete ? Promise.resolve() : new Promise((r) => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); });
+    place();
+    requestAnimationFrame(() => requestAnimationFrame(() => frame.classList.add('ready')));
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => {
+        if (es.some((x) => x.isIntersecting)) { io.disconnect(); ready().then(go); }
+      }, { threshold: 0.45 });
+      io.observe(frame);
+    } else ready().then(go);
   }
 
 })();
