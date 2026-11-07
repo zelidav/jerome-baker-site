@@ -176,7 +176,93 @@ BOX_SPOTS = {
     "beamer": [85.9, 69.5, 7.5, 13.2],
     "mama-cobra": [86.5, 28.8, 10.0, 13.1],
     "lil-lucky": [78.7, 4.0, 10.7, 11.3],
-    "big-stitch": [24.0, 63.1, 14.0, 14.4],
+    "big-stitch": [24.1, 63.1, 12.0, 14.4],
     "gourdo": [76.5, 76.1, 9.6, 9.2],
     "speedbump": [15.7, 64.0, 7.1, 8.6],
 }
+
+
+# Where each crew member comes from, shown right under the hero on their page: the WHOLE piece of source art
+# (assets/origin/<source>.webp, built by tools/build_origin.py with the NSFW parts taped over), then a zoom into
+# the spot. slug: (source key in ORIGIN_SOURCES, [left, top, width, height] in % of the whole image, the spot in words)
+ORIGIN = {
+    "torch": ("booth", [39.4, 10.6, 21.5, 34.1], "The lion in the little window, dead center of the wall, torch lit."),
+    "ocho": ("booth", [74.9, 1.6, 8.9, 13.9], "The Enlighten All Humans sticker, top right. The orange guy with the green tentacles."),
+    "dj-rivets": ("booth", [75.9, 30.1, 21.5, 42.4], "The Baker Bots poster on the right. Robots built out of glass, posing in front of their boxes."),
+    "the-zone-outs": ("booth", [73.6, 78.4, 24.9, 20.8], "Bottom right corner: Junior, Granny and Father, all three obeying, eyes spinning."),
+    "lookie-lou": ("booth", [50.6, 58.0, 10.4, 12.8], "The top brass porthole, middle of the wall. Something in there is looking back."),
+    "sticky-ricky": ("wall", [74.6, 6.6, 8.0, 28.6], "The Honey Pot poster in the gold frame, up top on the right."),
+    "crude": ("wall", [55.7, 47.2, 7.2, 28.8], "The Oil Crisis poster, framed in the middle. Robots Need Oil."),
+    "mr-x": ("wall", [68.8, 39.9, 9.7, 30.3], "The graph-paper sheet taped up on the right: five takes on one X."),
+    "lunar-larry": ("box-back", [68.3, 57.6, 15.0, 21.7], "Bottom right, the chimp in the space helmet."),
+    "chomps": ("box-back", [45.0, 44.0, 14.2, 16.3], "Dead center: the big grin with the JBD tag on top."),
+    "beamer": ("box", None, "Bottom right, the gray alien, half hidden behind a JB tag."),
+    "mama-cobra": ("box", None, "Right side, the rainbow cobra over the CANNABIS poster."),
+    "lil-lucky": ("box", None, "Top right, the yellow-faced devil, just above the CENSORED tape."),
+    "big-stitch": ("box", None, "Lower left, the PUBLIC ENEMY NO. 1 poster peeking out from behind a JB tag."),
+    "gourdo": ("box", None, "Bottom right, the carved pumpkin sitting in a pair of hands."),
+    "speedbump": ("box", None, "Lower left, the green glass turtle on the joint of a piece."),
+    "big-bill": ("box-cut", [76.5, 43.0, 18.5, 16.0], "Right side, the toucan and the parrot in a flower lei."),
+    "dr-squint": ("c2018", [26.8, 38.0, 4.6, 16.0], "Left of center, the red-haired girl. Two eyes back then. The rest of her stays taped up."),
+    "gutterball": ("c2018", [60.8, 61.9, 6.6, 22.0], "Right of center, the armadillo at the foot of the pyramid."),
+    "mouthy": ("c2018", [58.4, 2.4, 6.7, 19.6], "Top, the big grin under the JBD tag. Same grin as the back of the box."),
+}
+for _s in ORIGIN:
+    if ORIGIN[_s][1] is None:
+        ORIGIN[_s] = (ORIGIN[_s][0], BOX_SPOTS[_s], ORIGIN[_s][2])
+
+# The pieces of source art. title, alt, and the copy that says what the piece is. {name} becomes the crew member.
+ORIGIN_SOURCES = {
+    "box": dict(
+        img="origin/box.webp", kind="box",
+        title="The Jerome Baker box",
+        alt="The whole Jerome Baker box art, a collage of old comics, pulp ads and JB tags, with the not-safe-for-work parts taped over",
+        copy=["This is the Jerome Baker box. Our top pieces ship in it.",
+              "Jason Harris designed it over a long, long time, with some psychedelic enhancement, and there's a whole universe in there.",
+              "Some of it is not safe for work, so online we tape it up. If you know, you know.",
+              "Own a JB box? Open it up. {name}'s in there."]),
+    "box-back": dict(
+        img="origin/box-back.webp", kind="box",
+        title="The back of the Jerome Baker box",
+        alt="The whole back of the Jerome Baker box, a dense psychedelic collage, with the not-safe-for-work parts taped over",
+        copy=["This is the back of the Jerome Baker box, the one our top pieces ship in.",
+              "Jason Harris built it up over a long, long time, with some psychedelic enhancement. It's a whole universe back there.",
+              "A lot of it is not safe for work, so online it gets the tape. If you know, you know.",
+              "Got a JB box? Flip it over and go find {name}."]),
+    "box-cut": dict(
+        img="origin/box-cut.webp", kind="box",
+        title="The Jerome Baker box collage, up close",
+        alt="A big cut of the Jerome Baker box collage: comics, roses, Peace Maker, a toucan and a parrot",
+        copy=["This is a big cut of the collage on the Jerome Baker box, the box our top pieces ship in.",
+              "Jason Harris designed it over a long, long time, with some psychedelic enhancement, and there's a whole universe in there.",
+              "If you know, you know. Own a JB box? Go looking for {name}."]),
+    "booth": dict(
+        img="origin/booth.webp", kind="booth",
+        title="A Jerome Baker booth wall",
+        alt="A whole Jerome Baker trade-show booth wall: barn wood, the lion in the window, a wanted poster, Baker Bots, brass portholes and three hypnotized heads",
+        copy=["This is one of our booth walls. We've been hauling walls like this to shows for years.",
+              "Hand sketches, murals, posters and stickers, all ours, all on barn wood.",
+              "{name} started out right here. JB fam, if you see us out and about, come find {name} on the wall."]),
+    "wall": dict(
+        img="origin/wall.webp", kind="booth", taped=False,
+        title="The long Jerome Baker booth wall",
+        alt="The whole long Jerome Baker booth wall: posters, framed art, a page of X sketches and a giant JBD tag on barn wood",
+        copy=["This is the long booth wall, the big one that goes up behind us at shows.",
+              "Years of hand sketches, posters and murals, all ours, pinned to barn wood.",
+              "{name} started out right here. JB fam, if you see us out and about, come find {name} on the wall."]),
+    "c2018": dict(
+        img="origin/c2018.webp", kind="collage",
+        title="The 2018 JB Cannabis Collection collage",
+        alt="The whole 2018 JB Cannabis Collection collage, comics, posters and JB tags, with the not-safe-for-work parts taped over",
+        copy=["This is the JB Cannabis Collection collage from 2018. Same cut-and-paste universe as the box: old comics, pulp ads and our own tags.",
+              "Parts of it are not safe for work, so online it gets the tape. If you know, you know.",
+              "{name} was hiding in plain sight the whole time."]),
+}
+
+# Mr. X gets his evolution shown too: sketch -> the mark -> the character. (img under assets/, caption)
+MR_X_STEPS = [
+    ("origin/mrx-sketch.webp", "The sketches. Five takes on two bongs crossed into an X, on graph paper."),
+    ("origin/mrx-poster.webp", "The mark. The crossed bongs under the Jerome Baker name."),
+    ("img/jb-crossed.svg", "The logo today. Same crossed bongs, in color."),
+    ("crew/mrx.webp", "Mr. X. The mark grew a face and found a mushroom."),
+]
