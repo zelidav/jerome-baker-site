@@ -260,6 +260,14 @@
     'JBD-C256C7355BC3': 'captain-ahab', 'JBD-3B07BA3340B4': 'coney-island', 'JBD-C03E08E3D935': 'flecko-the-gecko',
     'JBD-41B34E1C6BD9': 'jeremiahs-cousin', 'JBD-D292E97DB854': 'knuckle-sandwich', 'JBD-F43C642DA53F': 'lbd-logo-millie',
     'JBD-A3185688FDEB': 'ol-blue-eyes',
+    'JBD-36BBE0335F82': 'liberace', 'JBD-C97DB8320C0A': 'mavericks', 'JBD-2C9B95C3C2C8': 'merry-prankster',
+    'JBD-A04F8D029F47': 'miss-cleo', 'JBD-6C081ECE930D': 'miss-havisham', 'JBD-5BE3DA25CD0F': 'nazarre',
+    'JBD-BDDF76BC90DD': 'norma-desmond', 'JBD-C46FC4F07E9B': 'orange-sunshine', 'JBD-E96E6DA62E2D': 'patient-zero',
+    'JBD-FC94DF65C0AA': 'pollock', 'JBD-555F20F0E0E8': 'rasta-dancer', 'JBD-4EBFD8FE11B0': 'rasta-time',
+    'JBD-568A5A9B4A53': 'saint-joan', 'JBD-BC84B21654A2': 'sir-puffsalot', 'JBD-02DD40FC029D': 'son-of-ra',
+    'JBD-75701CAB2CAE': 'the-chong-b0ng', 'JBD-0C690496751A': 'the-force', 'JBD-10FF513A7CF3': 'the-pale-horseman',
+    'JBD-BD2802EC5198': 'the-sun-xix', 'JBD-9631C4591519': 'trenchtown-rock', 'JBD-C08779E1C78F': 'valentino',
+    'JBD-C706091E9C43': 'viva-las-vegas', 'JBD-BBEF8E9E848B': 'woodstock',
   };
 
   const benchMouth = () => {
