@@ -254,7 +254,13 @@
   const bImg = $('#bImg'), bFill = $('#bFill'), bPiece = $('#bPiece'), hit = $('#bHit');
   const bSmoke = new Smoke($('#bSmoke'), { scrolls: false, cap: 900 });
   let cur = null;
-  const MODELS = { 'JBD-595E91DF67DE': 'baker', 'JBD-CCB51FA365DB': 'northern-lights', 'JBD-98EE782454AB': 'jaws' };
+  const MODELS = {
+    'JBD-595E91DF67DE': 'baker', 'JBD-CCB51FA365DB': 'northern-lights', 'JBD-98EE782454AB': 'jaws',
+    'JBD-9E40404C237F': 'barfly', 'JBD-C2455D3C39C4': 'bubble-hash', 'JBD-6B2164673608': 'candyman',
+    'JBD-C256C7355BC3': 'captain-ahab', 'JBD-3B07BA3340B4': 'coney-island', 'JBD-C03E08E3D935': 'flecko-the-gecko',
+    'JBD-41B34E1C6BD9': 'jeremiahs-cousin', 'JBD-D292E97DB854': 'knuckle-sandwich', 'JBD-F43C642DA53F': 'lbd-logo-millie',
+    'JBD-A3185688FDEB': 'ol-blue-eyes',
+  };
 
   const benchMouth = () => {
     const c = $('#bSmoke').getBoundingClientRect(), r = bImg.getBoundingClientRect();
