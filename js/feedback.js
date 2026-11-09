@@ -93,6 +93,10 @@
     "#jbfb-row button{border:0;border-radius:8px;padding:9px 14px;font-size:14px;font-weight:700;cursor:pointer}" +
     "#jbfb-cancel{background:#eee;color:#111}#jbfb-send{background:#2A3B8E;color:#fff}" +
     "#jbfb-send:disabled{opacity:.6;cursor:default}" +
+    "#jbfb-mic{background:#fff;color:#111;border:2px solid #111 !important;padding:7px 12px !important;display:flex;align-items:center;gap:6px}" +
+    "#jbfb-mic.on{background:#DA2342;color:#fff;border-color:#DA2342 !important;animation:jbfbpulse 1.2s ease-in-out infinite}" +
+    "@keyframes jbfbpulse{50%{box-shadow:0 0 0 6px rgba(218,35,66,.25)}}" +
+    "@media (prefers-reduced-motion:reduce){#jbfb-mic.on{animation:none}}" +
     "#jbfb-msg{font-size:13px;margin-right:auto;color:#555}#jbfb-msg.err{color:#B3122C}#jbfb-msg.ok{color:#1a7f37}" +
     "@media print{#jbfb-root{display:none}}";
 
@@ -113,6 +117,7 @@
       "<textarea id='jbfb-text' placeholder='What should change here?' maxlength='5000'></textarea>" +
       "<input id='jbfb-name' type='text' placeholder='Your name (optional)' maxlength='120'>" +
       "<div id='jbfb-row'><span id='jbfb-msg'></span>" +
+      "<button id='jbfb-mic' type='button' aria-pressed='false' aria-label='Talk instead of typing' hidden>🎤 Talk</button>" +
       "<button id='jbfb-cancel' type='button'>Cancel</button>" +
       "<button id='jbfb-send' type='button'>Send</button></div>");
     root.appendChild(panel); root.appendChild(btn);
@@ -130,7 +135,46 @@
       panel.classList.add("open");
       $("jbfb-text").focus();
     }
-    function close() { panel.classList.remove("open"); }
+    function close() { stopMic(); panel.classList.remove("open"); }
+
+    // Talk instead of typing: the browser's own speech-to-text (Chrome, Edge, Safari, Android, iPhone).
+    // Words land in the box as you speak; tap again to stop. Hidden where the browser can't do it (Firefox).
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, listening = false, baseText = "";
+    var mic = $("jbfb-mic");
+    function stopMic() { if (rec && listening) { try { rec.stop(); } catch (e) {} } }
+    function setMic(on) {
+      listening = on; mic.classList.toggle("on", on); mic.setAttribute("aria-pressed", on ? "true" : "false");
+      mic.textContent = on ? "■ Stop" : "🎤 Talk";
+    }
+    if (SR) {
+      mic.hidden = false;
+      mic.addEventListener("click", function () {
+        if (listening) { stopMic(); return; }
+        rec = new SR();
+        rec.lang = document.documentElement.lang || navigator.language || "en-US";
+        // Android Chrome repeats words in continuous mode, so there it takes one sentence per tap
+        rec.continuous = !/Android/i.test(navigator.userAgent); rec.interimResults = true;
+        var ta = $("jbfb-text");
+        baseText = ta.value.replace(/\s+$/, ""); if (baseText) baseText += " ";
+        rec.onresult = function (e) {
+          var fin = "", live = "";
+          for (var i = 0; i < e.results.length; i++) {
+            var t = e.results[i][0].transcript;
+            if (e.results[i].isFinal) fin += t; else live += t;
+          }
+          ta.value = baseText + (fin + live).replace(/^\s+/, "");
+          ta.scrollTop = ta.scrollHeight;
+        };
+        rec.onerror = function (e) {
+          var m = $("jbfb-msg");
+          if (e.error === "not-allowed" || e.error === "service-not-allowed") { m.textContent = "Mic is blocked. Allow it in the browser, or type."; m.className = "err"; }
+          else if (e.error === "no-speech") { m.textContent = "Didn't hear anything."; m.className = "err"; }
+        };
+        rec.onend = function () { setMic(false); var m = $("jbfb-msg"); if (m.textContent === "Listening…") m.textContent = ""; };
+        try { rec.start(); setMic(true); $("jbfb-msg").textContent = "Listening…"; $("jbfb-msg").className = ""; }
+        catch (err) { setMic(false); }
+      });
+    }
 
     btn.addEventListener("click", function () { panel.classList.contains("open") ? close() : open(); });
     // Keep the text selection if they highlighted something before clicking.
@@ -139,9 +183,10 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
 
     $("jbfb-send").addEventListener("click", function () {
+      stopMic();
       var msg = $("jbfb-text").value.trim(), name = $("jbfb-name").value.trim();
       var m = $("jbfb-msg");
-      if (!msg) { m.textContent = "Type something first."; m.className = "err"; return; }
+      if (!msg) { m.textContent = "Type or talk first."; m.className = "err"; return; }
       try { localStorage.setItem("jbfb.name", name); } catch (e) {}
       // where it was left goes into the message too, so the email says exactly which spot
       var spot = [];
