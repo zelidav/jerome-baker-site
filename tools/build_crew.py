@@ -12,7 +12,7 @@ from PIL import Image
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
-from crew_data import CREW, MERCH, SHOP, RENAMED, BOX_SPOTS  # noqa: E402
+from crew_data import CREW, MERCH, SHOP, RENAMED, ORIGIN, ORIGIN_SOURCES, MR_X_STEPS  # noqa: E402
 from crew_personas import PERSONAS, AXES, brief  # noqa: E402
 
 e = html.escape
@@ -181,47 +181,71 @@ def _size(rel):
         return im.size
 
 
-def _mark(box):
-    x, y, w, h = box
-    return f'<span class="src-mark" style="left:{x}%;top:{y}%;width:{w}%;height:{h}%"></span>'
+KICK = {"box": "Straight off the box", "booth": "Off the booth wall", "collage": "Off the 2018 collage"}
+
+
+def _check_origin():
+    errs = []
+    for c in CREW:
+        o = ORIGIN.get(c["slug"])
+        if not o:
+            errs.append(f"{c['slug']}: no ORIGIN entry in crew_data.py")
+            continue
+        src, spot, words = o
+        if src not in ORIGIN_SOURCES:
+            errs.append(f"{c['slug']}: unknown origin source {src!r}")
+        elif not os.path.exists(os.path.join(ROOT, "assets", ORIGIN_SOURCES[src]["img"])):
+            errs.append(f"{c['slug']}: {ORIGIN_SOURCES[src]['img']} missing. Run python tools/build_origin.py")
+        if len(spot) != 4 or spot[0] + spot[2] > 100.5 or spot[1] + spot[3] > 100.5 or not words:
+            errs.append(f"{c['slug']}: bad origin spot {spot}")
+    for rel, _ in MR_X_STEPS:
+        if not os.path.exists(os.path.join(ROOT, "assets", rel)):
+            errs.append(f"Mr. X step {rel} missing")
+    if errs:
+        sys.exit("crew origins are broken:\n  " + "\n  ".join(errs))
 
 
 def origin_block(c, up):
-    """Where they came from: three slides. The character, the character on the original art, the whole piece of art."""
-    s, n = c["src"], e(c["name"])
-    whole, box = s["img"], s.get("box")
-    title = s["t"]
-    if c["slug"] in BOX_SPOTS:              # a sprite off the box: zoom out to the whole box
-        whole, box = "img/box.webp", BOX_SPOTS[c["slug"]]
-    if box and box[2] >= 80:                 # the source is already the detail; nothing to outline
-        box = None
-    when = f", {s['y']}" if s.get("y") and s["y"] not in title else ""
-    # zoom out from the outlined spot to the whole piece when the slide comes up
-    origin = f"{box[0] + box[2] / 2:.1f}% {box[1] + box[3] / 2:.1f}%" if box else "50% 50%"
-    zoom = f"{min(4, 60 / max(box[2], box[3])):.2f}" if box else "1"
-
-    def fig(k, rel, alt, cap, extra="", cls=""):
-        w, h = _size(rel)
-        return (f'<figure class="og-slide{cls}" role="group" aria-roledescription="slide" aria-label="{k} of 3">'
-                f'<div class="og-art"><div class="og-pic" style="max-width:{w * 2}px{extra}">'
-                f'<img src="{up}assets/{rel}" alt="{alt}" width="{w}" height="{h}" loading="lazy" decoding="async">'
-                + (_mark(box) if k == 3 and box else "") + f'</div></div><figcaption>{cap}</figcaption></figure>')
-
-    slides = (fig(1, f'crew/{c["img"]}.webp', f'{n} today', f'<b>1. {n} today.</b> {e(c["title"])}.')
-              + fig(2, c["ref"], f'{n} on the original Jerome Baker art',
-                    f'<b>2. Before the merch.</b> {n} on the original Jerome Baker art. {e(s["d"])}')
-              + fig(3, whole, e(title),
-                    (f'<b>3. The whole piece.</b> ' if box else f'<b>3. The source.</b> ') + f'{e(title)}{e(when)}.'
-                    + (f' {n} is in the yellow box.' if box else ''),
-                    f';--zo:{origin};--z:{zoom}', " og-zoom" if box else ""))
-    return (f'<section class="origin" aria-labelledby="ogT" aria-roledescription="carousel">'
-            f'<h2 id="ogT">Where {n} came from</h2>'
-            f'<p class="og-sub">Every crew member started out on the original Jerome Baker box and booth art.</p>'
-            f'<div class="og-track" id="ogTrack" tabindex="0" aria-label="Slides. Use the arrow keys or swipe.">{slides}</div>'
-            f'<div class="og-nav"><button type="button" class="og-btn" id="ogPrev" aria-label="Previous slide">←</button>'
-            f'<span class="og-dots">' + "".join(f'<button type="button" class="og-dot" aria-label="Slide {k}"></button>' for k in (1, 2, 3)) + '</span>'
-            f'<button type="button" class="og-btn" id="ogNext" aria-label="Next slide">→</button></div>'
-            f'<p class="og-live" id="ogLive" aria-live="polite"></p></section>')
+    """Where they come from, right under the hero: the WHOLE piece of source art (box, booth wall, collage),
+    then a smooth zoom into the character's spot (js/crew-kit.js), with a see-the-whole-thing toggle.
+    Mr. X also gets his sketch -> mark -> character evolution."""
+    src, spot, words = ORIGIN[c["slug"]]
+    S, n = ORIGIN_SOURCES[src], e(c["name"])
+    w, h = _size(S["img"])
+    x, y, sw, sh = spot
+    copy = " ".join(e(t.format(name=c["name"])) for t in S["copy"])
+    steps = ""
+    if c["slug"] == "mr-x":
+        def step(k, rel, cap):
+            if rel.endswith(".svg"):
+                dim = 'width="300" height="285"'
+            else:
+                iw, ih = _size(rel)
+                dim = f'width="{iw}" height="{ih}"'
+            arrow = '<span class="og-arrow" aria-hidden="true">→</span>' if k else ""
+            return (f'{arrow}<figure class="og-step"><span class="og-step-pic"><img src="{up}assets/{rel}" alt="" {dim} loading="lazy" decoding="async"></span>'
+                    f'<figcaption><b>{k + 1}.</b> {e(cap)}</figcaption></figure>')
+        steps = (f'<div class="og-evo"><h3>From a sketch to the mark to Mr. X</h3>'
+                 f'<p>Mr. X started as a page of sketches: two bongs crossed into an X, drawn five different ways. '
+                 f'If you know JB, you know that X. It became our crossed-bongs mark, and then the mark grew a face.</p>'
+                 f'<div class="og-steps">' + "".join(step(k, rel, cap) for k, (rel, cap) in enumerate(MR_X_STEPS)) + '</div></div>')
+    return (f'<section class="og pad" id="origin" aria-labelledby="ogT" data-kind="{S["kind"]}">'
+            f'<div class="wrap og-in">'
+            f'<div class="og-copy"><p class="og-kick">{KICK[S["kind"]]}</p>'
+            f'<h2 id="ogT" class="display">Where {n} comes from</h2>'
+            f'<p class="og-what">{e(S["title"])}</p>'
+            f'<p class="og-txt">{copy}</p>'
+            f'<p class="og-spot"><b>Find {n}:</b> {e(words)}</p></div>'
+            f'<figure class="og-view">'
+            f'<div class="og-frame" id="ogFrame" data-spot="{x},{y},{sw},{sh}" style="--ar:{w}/{h};--fa:{min(2, max(4 / 3, w / h)):.3f};--fa-m:{min(1.6, max(1, w / h)):.3f}">'
+            f'<div class="og-stage" id="ogStage">'
+            f'<img src="{up}assets/{S["img"]}" alt="{e(S["alt"])}. {n} is marked: {e(words)}" width="{w}" height="{h}" loading="lazy" decoding="async">'
+            f'<span class="og-mark" style="left:{x}%;top:{y}%;width:{sw}%;height:{sh}%"><span class="og-tag">{n}</span></span>'
+            f'</div></div>'
+            f'<figcaption class="og-bar"><button type="button" class="og-tog" id="ogTog" aria-pressed="false" '
+            f'data-in="Zoom in on {n}" data-out="See the whole thing">Zoom in on {n}</button>'
+            f'<span class="og-cap">{e(S["title"])}.' + (' The not-safe-for-work bits are taped over.' if S.get("taped", True) else ' Tap the art to zoom.') + '</span></figcaption>'
+            f'</figure>{steps}</div></section>\n')
 
 
 def gif_block(c, up):
@@ -272,10 +296,11 @@ def crew_page(c, i):
 <h1 class="cp-name">{name}</h1>
 <p class="cp-title" style="background:#FFF100;color:#0A0A0A">{e(c['title'])}</p>
 <p class="cp-bio">{e(c['bio'])}</p>
+<p class="cp-from"><a href="#origin">{e(KICK[ORIGIN_SOURCES[ORIGIN[c['slug']][0]]['kind']])}. See where {e(c['name'])} comes from ↓</a></p>
 <div class="say"><span class="line" id="line">{e(c['lines'][0])}</span><button type="button" class="btn btn-ink" id="more">Say more</button></div>
 </div>
 </section>
-{who_block(c, up)}<section class="sheet pad">
+{origin_block(c, up)}{who_block(c, up)}<section class="sheet pad">
 <div class="wrap grid">
 <div class="rap"><h2>Rap sheet</h2><dl>
 <dt>Name</dt><dd>{e(c['name'])}</dd>
@@ -284,7 +309,6 @@ def crew_page(c, i):
 <dt>Weakness</dt><dd>{e(c['weakness'])}</dd>
 <dt>Wearing</dt><dd>{e(', '.join(MERCH[m][0] for m in c['wear']))}</dd>
 </dl></div>
-{origin_block(c, up)}
 </div>
 </section>
 <section class="wearing pad"><div class="wrap">
@@ -422,6 +446,7 @@ def fill_footer(s, up, note):
 
 def main():
     check_personas()
+    _check_origin()
     data = []
     for c in CREW:
         d = {k: c[k] for k in ("slug", "img", "name", "title", "doing", "lines", "color")}
