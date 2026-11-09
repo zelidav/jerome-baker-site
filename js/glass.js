@@ -124,16 +124,18 @@
   /* ---------------------------------------------------------------- the store */
   const HOST = 'https://jbcustomer.cannacrypted.com';
   // one smooth gradient per series, from the brand colors
+  // Sasha's band colors (red, blue, green, yellow, orange), each a gradient within its own hue, under his JB pattern
   const BANDS = {
-    giant: 'linear-gradient(125deg,#2A3B8E 0%,#4B2C8C 45%,#DA2342 100%)',
-    le: 'linear-gradient(125deg,#0E1A5C 0%,#2A3B8E 50%,#05B48F 100%)',
-    og: 'linear-gradient(125deg,#05B48F 0%,#2A8F9E 45%,#2A3B8E 100%)',
-    second: 'linear-gradient(125deg,#DA2342 0%,#F06A2A 50%,#FDB514 100%)',
-    daily: 'linear-gradient(125deg,#1A1A2E 0%,#2A3B8E 60%,#5266C4 100%)',
-    studio: 'linear-gradient(125deg,#4B2C8C 0%,#B0328F 50%,#FDB514 100%)',
-    creatures: 'linear-gradient(125deg,#05607E 0%,#05B48F 55%,#9FE3D5 100%)',
-    kit: 'linear-gradient(125deg,#2A2A2A 0%,#5A4A3A 55%,#C08A3A 100%)',
+    giant: 'linear-gradient(125deg,#8E1028 0%,#DA2342 55%,#FF5A6E 100%)',
+    le: 'linear-gradient(125deg,#141F5E 0%,#2A3B8E 55%,#4F67D6 100%)',
+    og: 'linear-gradient(125deg,#036650 0%,#05B48F 55%,#3FE0B8 100%)',
+    second: 'linear-gradient(125deg,#F2C200 0%,#FFF100 55%,#FFF86A 100%)',
+    daily: 'linear-gradient(125deg,#B23A06 0%,#F06A2A 55%,#FF9A52 100%)',
+    studio: 'linear-gradient(125deg,#8E1028 0%,#DA2342 55%,#FF5A6E 100%)',
+    creatures: 'linear-gradient(125deg,#036650 0%,#05B48F 55%,#3FE0B8 100%)',
+    kit: 'linear-gradient(125deg,#141F5E 0%,#2A3B8E 55%,#4F67D6 100%)',
   };
+  const LIGHT_BANDS = new Set(['second']); // dark type on the yellow band
   const sold = (p) => p.status !== 'available';
   const tagOf = (p) => (p.status === 'sold' ? 'Sold' : p.status === 'collected' ? 'In a collection' : '');
   const aisles = $('#aisles');
@@ -148,7 +150,7 @@
   aisles.innerHTML = D.shelves.map((s) => {
     const ps = D.pieces.filter((p) => p.shelf === s.key);
     return `<section class="aisle" id="s-${s.key}" data-k="${s.key}" aria-labelledby="h-${s.key}">`
-      + `<div class="band" style="--g:${BANDS[s.key]}"><div class="band-in"><h2 id="h-${s.key}">${esc(s.title)}</h2><p>${esc(s.line)}<span class="ct">${ps.length} pieces</span></p></div></div>`
+      + `<div class="band${LIGHT_BANDS.has(s.key) ? ' light' : ''}" style="--g:${BANDS[s.key]}"><div class="band-in"><h2 id="h-${s.key}">${esc(s.title)}</h2><p>${esc(s.line)}<span class="ct">${ps.length} pieces</span></p></div></div>`
       + `<div class="grid">${ps.map((p, i) => tile(p, s.key === 'giant' && i === 0)).join('')}</div></section>`;
   }).join('');
 
@@ -740,4 +742,22 @@ ${treads}<rect x="${lx0 - 6}" y="0" width="${rx0 - lx0 + 12}" height="${capH}" r
   };
   addEventListener('hashchange', route);
   route();
+})();
+
+// the JB pattern on each band drifts a little slower than the page (a light parallax). Only bands on screen update.
+(() => {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const live = new Set();
+  const io = new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? live.add(e.target) : live.delete(e.target))));
+  const watch = () => document.querySelectorAll('.band').forEach((b) => { if (!b.dataset.px) { b.dataset.px = '1'; io.observe(b); } });
+  watch(); new MutationObserver(watch).observe(document.body, { childList: true, subtree: true });
+  let q = false;
+  addEventListener('scroll', () => {
+    if (q) return; q = true;
+    requestAnimationFrame(() => {
+      q = false;
+      const vh = innerHeight;
+      live.forEach((b) => { const r = b.getBoundingClientRect(); b.style.setProperty('--py', ((r.top + r.height / 2 - vh / 2) * -0.15).toFixed(1) + 'px'); });
+    });
+  }, { passive: true });
 })();
