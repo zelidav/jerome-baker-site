@@ -90,3 +90,76 @@ body.dock-open .jb-top{visibility:hidden}
 /* phones: the dock, the Feedback / Hide the crew / Lite mode row and back-to-top all float over the bottom of the
    page, so the footer ends with enough room that its last lines scroll clear of them */
 body.has-dock footer.site-foot,body.has-dock footer.sfoot{padding-bottom:calc(220px + env(safe-area-inset-bottom))}
+
+/* the email line: envelope and address on one line, centred, with air between them (lead #41).
+   .site-foot a (display:inline-block) was beating .reach a, so the icon sat high with no gap. */
+.site-foot .reach a.reach-mail,.reach a.reach-mail{display:flex;align-items:center;gap:14px;width:max-content;max-width:100%}
+.reach a.reach-mail span{overflow-wrap:anywhere;word-break:normal}
+.reach a.reach-mail svg{width:26px;height:26px}
+.site-foot .reach a.reach-more,.reach a.reach-more{display:inline-block;margin-top:14px;font-family:var(--mono,monospace);font-size:13px;letter-spacing:.06em;color:var(--yellow,#FFF100);text-decoration:underline;text-underline-offset:4px}
+.site-foot .reach-social a{display:inline-flex}
+
+/* social icons take their own colours on hover: Instagram gradient, YouTube red, LinkedIn blue (lead #41) */
+.reach-social a,.hdr-social a,.cx-social a{transition:color .15s,background .15s,border-color .15s}
+.reach-social a.s-ig:hover,.hdr-social a.s-ig:hover,.cx-social a.s-ig:hover,
+.reach-social a.s-ig:focus-visible,.hdr-social a.s-ig:focus-visible,.cx-social a.s-ig:focus-visible{
+  color:#fff;border-color:transparent;background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285AEB 90%)}
+.reach-social a.s-yt:hover,.hdr-social a.s-yt:hover,.cx-social a.s-yt:hover,
+.reach-social a.s-yt:focus-visible,.hdr-social a.s-yt:focus-visible,.cx-social a.s-yt:focus-visible{color:#fff;border-color:#FF0000;background:#FF0000}
+.reach-social a.s-li:hover,.hdr-social a.s-li:hover,.cx-social a.s-li:hover,
+.reach-social a.s-li:focus-visible,.hdr-social a.s-li:focus-visible,.cx-social a.s-li:focus-visible{color:#fff;border-color:#0A66C2;background:#0A66C2}
+
+/* ---------- the contact page (contact/) ---------- */
+.cx-hero{background:var(--blue,#2A3B8E);color:#fff;padding-top:clamp(36px,5vw,72px);padding-bottom:clamp(40px,5vw,72px);position:relative;overflow:hidden}
+.cx-hero .wash{position:absolute;inset:0;background:var(--blue,#2A3B8E);mix-blend-mode:multiply;opacity:.8}
+.cx-hero .wrap{position:relative;display:flex;flex-wrap:wrap;gap:28px 48px;align-items:flex-end;justify-content:space-between}
+.cx-hero h1{margin:0;font-family:var(--display,sans-serif);font-weight:900;font-size:clamp(48px,8vw,112px);line-height:.9;letter-spacing:-.02em}
+.cx-hero h1 span{display:inline-block;background:#FFF100;color:#0A0A0A;padding:0 14px;rotate:-2deg}
+.cx-hero .lede{max-width:44ch;margin:18px 0 0;font-size:clamp(17px,1.5vw,20px);line-height:1.5}
+.cx-quick{display:flex;flex-direction:column;gap:10px}
+.cx-quick a{display:flex;align-items:center;gap:14px;color:#fff;text-decoration:none;font-weight:800}
+.cx-quick a:hover{color:#FFF100}
+.cx-quick .ph{font-family:var(--display,sans-serif);font-weight:900;font-size:clamp(32px,4vw,52px);line-height:1}
+.cx-quick svg{width:.9em;height:.9em;flex:0 0 auto}
+.cx-quick .ph svg{color:#DA2342}
+.cx-quick .em{font-size:clamp(17px,1.5vw,21px)}
+.cx-quick .em svg{width:24px;height:24px;color:#FFF100}
+
+.cx-depts{background:#FFF100;border-top:4px solid #0A0A0A;border-bottom:4px solid #0A0A0A;padding-top:48px;padding-bottom:56px}
+.cx-depts h2,.cx-form-sec h2,.cx-follow h2{margin:0 0 22px;font-family:var(--display,sans-serif);font-weight:900;font-size:clamp(34px,5vw,60px);line-height:.95;letter-spacing:-.02em;color:#0A0A0A}
+.cx-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+.cx-card{background:#fff;border:3px solid #0A0A0A;box-shadow:7px 7px 0 #0A0A0A;padding:22px 22px 20px;display:flex;flex-direction:column;gap:8px;rotate:var(--t,0deg)}
+.cx-card h3{margin:0;font-family:var(--display,sans-serif);font-weight:900;font-size:24px;line-height:1.05;color:#0A0A0A}
+.cx-card p{margin:0;font-size:15px;line-height:1.5;color:#2a2a2a;flex:1}
+.cx-card a{color:#2A3B8E;font-weight:800;text-decoration:none;overflow-wrap:anywhere}
+.cx-card a:hover{text-decoration:underline}
+.cx-card .go{margin-top:6px;align-self:flex-start;font-family:var(--mono,monospace);font-size:12px;letter-spacing:.1em;text-transform:uppercase;background:#0A0A0A;color:#FFF100;padding:8px 12px;cursor:pointer;border:0}
+.cx-card .go:hover{background:#DA2342;color:#fff;text-decoration:none}
+
+.cx-form-sec{background:#0A0A0A;color:#fff;padding-top:56px;padding-bottom:64px}
+.cx-form-sec h2{color:#fff}
+.cx-form-sec .wrap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px 56px;align-items:start}
+@media (max-width:900px){.cx-form-sec .wrap{grid-template-columns:1fr}}
+.cx-form-sec .reach-form{margin:0}
+.reach-dept{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;border:0;padding:0}
+.reach-dept legend{width:100%;margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#bdbdbd}
+.reach-dept label{margin:0!important;cursor:pointer}
+.reach-dept input{position:absolute;opacity:0;width:1px;height:1px}
+.reach-dept span{display:inline-block;padding:9px 14px;border:2px solid #555;border-radius:999px;font-size:14px;font-weight:700;letter-spacing:0;text-transform:none;color:#fff}
+.reach-dept input:checked + span{background:#FFF100;border-color:#FFF100;color:#0A0A0A}
+.reach-dept input:focus-visible + span{outline:3px solid #FFF100;outline-offset:2px}
+
+.cx-follow{background:#fff;padding-top:56px;padding-bottom:64px}
+.cx-social{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 30px}
+.cx-social a{display:inline-flex;align-items:center;gap:10px;padding:12px 18px 12px 14px;border:3px solid #0A0A0A;border-radius:999px;color:#0A0A0A;text-decoration:none;font-weight:800;font-size:16px;box-shadow:4px 4px 0 #0A0A0A}
+.cx-social svg{width:24px;height:24px}
+.cx-ig{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px 24px;align-items:center;border:3px solid #0A0A0A;box-shadow:8px 8px 0 #0A0A0A;padding:22px;max-width:860px;
+  background:linear-gradient(#fff,#fff) padding-box,radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%) border-box}
+.cx-ig img{width:84px;height:84px;border-radius:50%;object-fit:contain;background:#2A3B8E;padding:10px;border:3px solid #d6249f}
+.cx-ig b{display:block;font-family:var(--display,sans-serif);font-weight:900;font-size:24px;color:#0A0A0A}
+.cx-ig p{margin:4px 0 0;font-size:15px;line-height:1.5;color:#333}
+.cx-ig .follow{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;color:#fff;text-decoration:none;font-weight:900;font-size:17px;border-radius:999px;
+  background:radial-gradient(circle at 30% 107%,#fdf497 0%,#fd5949 45%,#d6249f 60%,#285AEB 90%);box-shadow:4px 4px 0 #0A0A0A}
+.cx-ig .follow:hover{filter:brightness(1.08)}
+.cx-ig .follow svg{width:22px;height:22px}
+@media (max-width:640px){.cx-ig{grid-template-columns:auto minmax(0,1fr)}.cx-ig .follow{grid-column:1 / -1;justify-content:center}}

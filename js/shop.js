@@ -52,6 +52,37 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
   let railHold = 0, railIn = false, railSeen = false;
   $('railPrev').onclick = () => { nudge(-1); railHold = performance.now() + 6000; };
   $('railNext').onclick = () => { nudge(1); railHold = performance.now() + 6000; };
+  // grab and drag it with a mouse (touch already swipes). A real drag swallows the click so the card under the
+  // pointer doesn't open; snapping is off while dragging and comes back on release.
+  let drag = null;
+  rail.addEventListener('pointerdown', (e) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    drag = { x: e.clientX, left: rail.scrollLeft, moved: false, id: e.pointerId };
+  });
+  addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x;
+    if (!drag.moved && Math.abs(dx) < 6) return;
+    if (!drag.moved) { drag.moved = true; rail.classList.add('dragging'); try { rail.setPointerCapture(drag.id); } catch (_) {} }
+    rail.scrollLeft = drag.left - dx;
+    e.preventDefault();
+  });
+  const drop = () => {
+    if (!drag) return;
+    const was = drag.moved;
+    drag = null;
+    if (!was) return;
+    rail.classList.remove('dragging');
+    const s = railStep();
+    rail.scrollTo({ left: Math.round(rail.scrollLeft / s) * s, behavior: reduceRail ? 'auto' : 'smooth' });
+    const eat = (ev) => { ev.preventDefault(); ev.stopPropagation(); };
+    rail.addEventListener('click', eat, { capture: true, once: true });
+    setTimeout(() => rail.removeEventListener('click', eat, { capture: true }), 60);
+    railHold = performance.now() + 4000;
+  };
+  addEventListener('pointerup', drop);
+  addEventListener('pointercancel', drop);
+  rail.addEventListener('dragstart', (e) => e.preventDefault());
   // it drifts one card every few seconds; touching, hovering or focusing it stops it
   if (!reduceRail) {
     ['pointerenter', 'focusin'].forEach((ev) => rail.addEventListener(ev, () => (railIn = true)));
@@ -243,14 +274,22 @@ ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="gri
     if (!pd.open) { lastFocus = document.activeElement; pd.showModal(); }
     pd.querySelector('.pd-x').focus();
     const h = '#p=' + p.slug;
+    if (push) cameIn = false; // browsed on from here: Back now walks this page's own history
     if (location.hash !== h) history[push ? 'pushState' : 'replaceState'](null, '', h);
     document.title = p.name + '. Ritual Merch. Jerome Baker';
   };
+  // Arrived from another page of the site straight into a product (#p=...)? Closing it goes back there,
+  // to the same scroll spot, instead of leaving you on this page.
+  let cameIn = (() => {
+    try { const r = new URL(document.referrer); return /^#p=/.test(location.hash) && r.origin === location.origin && r.pathname !== location.pathname; } catch (_) { return false; }
+  })();
+  const goBack = () => { if (!cameIn) return false; cameIn = false; if (history.length > 1) history.back(); else location.assign(document.referrer); return true; };
   const close = () => {
     if (!pd.open) return;
     pd.close();
     document.title = 'Ritual Merch. Jerome Baker';
     if (location.hash.startsWith('#p=')) history.replaceState(null, '', st.cat ? '#cat=' + slugify(st.cat) : location.pathname);
+    if (goBack()) return;
     if (lastFocus && document.contains(lastFocus)) lastFocus.focus();
   };
   pd.addEventListener('cancel', (e) => { e.preventDefault(); close(); });

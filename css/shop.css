@@ -45,6 +45,9 @@ header.top nav a.cartbtn{display:inline-flex;align-items:center;gap:8px;backgrou
 .rail-wrap{position:relative}
 .rail{display:flex;gap:28px;overflow-x:auto;scroll-snap-type:x mandatory;padding:20px 8px 34px;scrollbar-width:thin;scrollbar-color:var(--yellow) transparent}
 .rail .pcard{flex:0 0 clamp(240px,26vw,300px);scroll-snap-align:start}
+.rail{cursor:grab}
+.rail.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+.rail.dragging .pcard{pointer-events:none}
 .rail-btns{display:flex;gap:12px}
 .rail-btns button{width:52px;height:52px;border:3px solid var(--ink);background:var(--yellow);font-size:24px;font-weight:900;cursor:pointer;box-shadow:4px 4px 0 var(--ink)}
 .rail-btns button:hover{background:var(--white)}
