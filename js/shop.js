@@ -21,6 +21,14 @@
   // cards use the 480px thumbnail (built next to each photo); the product view loads the full 900px one
   const thumb = (src) => src.replace(/\.webp$/, '_t.webp');
 
+  // the preview line on a card: the first sentence or two of the product copy, about 110 characters (leads #36, #46)
+  const blurb = (d) => {
+    const t = String(d).replace(/\s+/g, ' ').trim();
+    let out = '';
+    for (const m of t.match(/[^.!?]+[.!?]+(\s|$)/g) || [t]) { if (out && (out + m).length > 120) break; out += m; if (out.length > 70) break; }
+    out = out.trim() || t;
+    return out.length > 130 ? out.slice(0, 127).replace(/\s+\S*$/, '') + '…' : out;
+  };
   const card = (p, i) => {
     const { title, sub } = split(p.name);
     const st = strainOf(p);
@@ -31,7 +39,7 @@
 ${c ? `<img class="worn" src="${base}assets/crew/${c.img}_s.webp" alt="" loading="lazy">` : ''}
 ${st ? `<span class="strain" style="--sc:${STRAIN[st][1]}">${st.toUpperCase()}</span>` : ''}
 ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
-<span class="meta"><h3>${esc(title)}</h3>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}<span class="row"><span class="pr">${money(p.price)}</span><span class="go">${p.attrs.length ? 'PICK SIZE →' : 'GET IT →'}</span></span></span>
+<span class="meta"><h3>${esc(title)}</h3>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}${p.desc ? `<span class="blurb">${esc(blurb(p.desc))}</span>` : ''}<span class="row"><span class="pr">${money(p.price)}</span><span class="go">${p.attrs.length ? 'PICK SIZE →' : 'GET IT →'}</span></span></span>
 </button>`;
   };
 

@@ -65,6 +65,7 @@ header.top nav a.cartbtn{display:inline-flex;align-items:center;gap:8px;backgrou
 .pcard .meta{background:var(--white);border:2px solid var(--ink);padding:10px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
 .pcard h3{margin:0;font-family:var(--display);font-weight:900;font-size:17px;line-height:1.15}
 .pcard .sub{font-size:13px;line-height:1.35;color:#3d3d3d}
+.pcard .blurb{font-size:13px;line-height:1.4;color:#2a2a2a;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .pcard .row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:4px}
 .pcard .pr{font-weight:900;font-size:20px;color:var(--blue)}
 .pcard .go{font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.14em}

@@ -82,6 +82,7 @@
 <div class="wrap">
 <h2 id="cx-f">Follow the torch.</h2>
 <div class="cx-social"><a class="s-ig" href="https://www.instagram.com/jerome_baker" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor"/></svg><span>@jerome_baker</span></a><a class="s-ig" href="https://www.instagram.com/jeromebakerny" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor"/></svg><span>@jeromebakerny</span></a><a class="s-yt" href="https://www.youtube.com/channel/UCht08a4Veo4ktA5x4kDvaFQ" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg><span>YouTube</span></a><a class="s-li" href="https://www.linkedin.com/company/jerome-baker-designs" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 10.2v6.3M7.5 7.4v.1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M11.2 16.5v-6.3m0 2.6c0-1.6 1.2-2.8 2.6-2.8s2.4 1 2.4 2.8v3.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>LinkedIn</span></a></div>
+<div class="cx-igfeed" id="igFeed" hidden aria-label="Latest posts on Instagram"></div>
 <div class="cx-ig">
 <img src="../assets/img/jb-mark.webp" alt="" width="84" height="84">
 <div><b>@jerome_baker</b><p>Glass coming off the torch, new drops before they hit the site, and the crew doing crew things.</p></div>
@@ -102,6 +103,20 @@ document.querySelectorAll('.cx-card .go').forEach((b) => b.addEventListener('cli
   document.getElementById('write').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   setTimeout(() => document.querySelector('.reach-form input[name=name]').focus({ preventScroll: true }), 450);
 }));
+// the latest @jerome_baker posts (Instagram API, refreshed every 6 hours by .github/workflows/ig-feed.yml into the
+// ig-feed data branch). Until there's a feed, the follow card stands on its own.
+(() => {
+  const RAW = 'https://raw.githubusercontent.com/zelidav/jerome-baker-site/ig-feed/';
+  const box = document.getElementById('igFeed');
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  fetch(RAW + 'feed.json', { cache: 'no-cache' }).then((r) => (r.ok ? r.json() : Promise.reject(r.status))).then((f) => {
+    const posts = (f.posts || []).slice(0, 8);
+    if (!posts.length) return;
+    box.innerHTML = posts.map((p) => `<a href="${esc(p.permalink)}" target="_blank" rel="noopener" title="${esc((p.caption || '').slice(0, 140))}">
+<img src="${RAW + esc(p.img)}" alt="${esc((p.caption || 'Instagram post').split(/\n/)[0].slice(0, 120))}" loading="lazy" decoding="async" width="320" height="320">${p.type === 'VIDEO' ? '<span>▶</span>' : ''}</a>`).join('');
+    box.hidden = false;
+  }).catch(() => {});
+})();
 // contact/?dept=wholesale preselects a department
 (() => {
   const d = new URLSearchParams(location.search).get('dept');

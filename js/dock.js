@@ -243,3 +243,12 @@ jbIdle(() => {
   s.defer = true;
   document.head.appendChild(s);
 })();
+
+// Collage parallax (js/parallax.js): the box-art collage between the folds drifts slower than the page. Every page.
+(() => {
+  if (document.querySelector('script[src$="js/parallax.js"]')) return;
+  const s = document.createElement('script');
+  s.src = (document.documentElement.dataset.base || '') + 'js/parallax.js';
+  s.defer = true;
+  document.head.appendChild(s);
+})();

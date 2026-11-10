@@ -9,6 +9,13 @@
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const money = (n) => '$' + (Number.isInteger(n) ? n.toLocaleString('en-US') : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  const blurb = (d) => {   // first sentence or two of the copy, about 110 characters (lead #36)
+    const t = String(d).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    let out = '';
+    for (const m of t.match(/[^.!?]+[.!?]+(\s|$)/g) || [t]) { if (out && (out + m).length > 120) break; out += m; if (out.length > 70) break; }
+    out = out.trim() || t;
+    return out.length > 130 ? out.slice(0, 127).replace(/\s+\S*$/, '') + '…' : out;
+  };
   const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
   const css = document.createElement('style');
@@ -33,6 +40,7 @@
 .fx-meta{padding:12px 14px 14px}
 .fx-meta b{display:block;font:800 16px/1.2 Montserrat,Helvetica,Arial,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fx-meta span{display:block;margin-top:2px;font:500 13px/1.3 Montserrat,Helvetica,Arial,sans-serif;color:#4a4f60}
+.fx-meta em{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;font:500 13px/1.4 Montserrat,Helvetica,Arial,sans-serif;font-style:normal;color:#2a2a2a;min-height:3.9em}
 .fx-meta i{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;font:900 18px/1 Montserrat,Helvetica,Arial,sans-serif;font-style:normal;color:#2A3B8E}
 .fx-meta i small{font:800 11px "JetBrains Mono",monospace;letter-spacing:.1em;color:#DA2342}
 .fx-dots{display:flex;justify-content:center;gap:6px;margin-top:4px}
@@ -69,14 +77,14 @@
       ...take((p) => p.shop === 'shopify' && p.shelf === 'daily', 1),
     ].map((p) => ({
       href: `${base}glass/#p=${encodeURIComponent(p.id)}`, img: `${base}assets/glass/${p.id}_t.webp`, name: p.name,
-      sub: p.shop === 'shopify' ? 'Studio store' : (p.series || 'Glass'), price: p.price, tag: p.edition || (p.shop ? 'In stock' : '1 of 1'), kind: 'glass',
+      sub: p.shop === 'shopify' ? 'Studio store' : (p.series || 'Glass'), price: p.price, tag: p.edition || (p.shop ? 'In stock' : '1 of 1'), kind: 'glass', blurb: p.desc,
     }));
     const byId = new Map(S.items.map((p) => [p.id, p]));
     const ours = shuffle((S.featured || []).map((id) => byId.get(id)).filter((p) => p && p.inStock)).slice(0, 4);
     const theirs = shuffle(S.items.filter((p) => p.shop === 'shopify' && p.inStock && !/gift card/i.test(p.name))).slice(0, 4);
     const merch = [...ours, ...theirs].map((p) => ({
       href: `${base}shop/#p=${encodeURIComponent(p.slug)}`, img: base + p.imgs[0].replace(/\.webp$/, '_t.webp'), full: base + p.imgs[0],
-      name: p.name.split(/\s+[–—-]\s+/)[0], sub: p.shop === 'shopify' ? 'Studio store merch' : (p.name.split(/\s+[–—-]\s+/)[1] || 'Ritual Merch'), price: p.price, tag: 'Merch', kind: 'merch',
+      name: p.name.split(/\s+[–—-]\s+/)[0], sub: p.shop === 'shopify' ? 'Studio store merch' : (p.name.split(/\s+[–—-]\s+/)[1] || 'Ritual Merch'), price: p.price, tag: 'Merch', kind: 'merch', blurb: p.desc,
     }));
     const mix = [];
     shuffle(glass);
@@ -86,7 +94,7 @@
     const T = ['-1.5deg', '1deg', '-.5deg', '1.5deg', '-1deg', '.5deg'];
     track.innerHTML = mix.map((c, i) => `<a class="fx-card ${c.kind}" href="${c.href}" style="--t:${T[i % T.length]}">
 <span class="fx-pic"><span class="fx-tag">${esc(c.tag)}</span><img src="${esc(c.img)}" alt="" loading="lazy" decoding="async"${c.full ? ` onerror="this.onerror=null;this.src='${esc(c.full)}'"` : ''}></span>
-<span class="fx-meta"><b>${esc(c.name)}</b><span>${esc(c.sub)}</span><i>${money(c.price)}<small>${c.kind === 'glass' ? 'SEE IT →' : 'GET IT →'}</small></i></span></a>`).join('');
+<span class="fx-meta"><b>${esc(c.name)}</b><span>${esc(c.sub)}</span>${c.blurb ? `<em>${esc(blurb(c.blurb))}</em>` : ''}<i>${money(c.price)}<small>${c.kind === 'glass' ? 'SEE IT →' : 'GET IT →'}</small></i></span></a>`).join('');
     dots.innerHTML = mix.map(() => '<i></i>').join('');
     rotate(mix.length);
   };

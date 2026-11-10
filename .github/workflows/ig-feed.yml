@@ -1,0 +1,60 @@
+# Instagram feed for the contact page (tools/ig_feed.py). Every 6 hours, pulls the latest @jerome_baker posts with the
+# IG_TOKEN secret and commits them to the `ig-feed` data branch, which the site reads directly. main stays untouched
+# (it's protected), so no site deploy is needed for a new post.
+name: Instagram feed
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: ig-feed
+jobs:
+  feed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Token set?
+        id: tok
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: |
+          if [ -z "$IG_TOKEN" ]; then
+            echo "::warning::IG_TOKEN secret is not set yet, so the Instagram feed was not updated."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.tok.outputs.ok == 'true'
+        with:
+          path: site
+      - name: Check out the data branch
+        if: steps.tok.outputs.ok == 'true'
+        run: |
+          cd site
+          if git ls-remote --exit-code --heads origin ig-feed >/dev/null; then
+            git fetch --depth=1 origin ig-feed
+            git worktree add ../out origin/ig-feed
+            cd ../out && git checkout -B ig-feed
+          else
+            git worktree add --orphan -b ig-feed ../out
+          fi
+      - uses: actions/setup-python@v5
+        if: steps.tok.outputs.ok == 'true'
+        with:
+          python-version: '3.12'
+      - name: Pull the posts
+        if: steps.tok.outputs.ok == 'true'
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: |
+          pip install --quiet pillow
+          python site/tools/ig_feed.py out
+      - name: Commit if anything changed
+        if: steps.tok.outputs.ok == 'true'
+        run: |
+          cd out
+          git add -A
+          if git diff --cached --quiet; then echo "no new posts"; exit 0; fi
+          git -c user.name="jb-ig-feed" -c user.email="actions@users.noreply.github.com" commit -q -m "Instagram feed $(date -u +%FT%RZ)"
+          git push -q origin ig-feed

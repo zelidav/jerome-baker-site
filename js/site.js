@@ -119,3 +119,19 @@
   addEventListener('resize', () => { clearTimeout(t); t = setTimeout(fit, 120); });
   addEventListener('load', fit);
 })();
+
+// home glass wall: a click anywhere on a tile opens that piece (its "See it" link); Cmd/Ctrl/middle click opens a new tab (lead #38)
+(() => {
+  const wall = document.querySelector('#glass .cards');
+  if (!wall) return;
+  const go = (e) => {
+    const card = e.target.closest('.card');
+    if (!card || e.target.closest('a, button')) return;
+    const a = card.querySelector('a.btn[href]');
+    if (!a) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) window.open(a.href, '_blank', 'noopener');
+    else a.click();
+  };
+  wall.addEventListener('click', go);
+  wall.addEventListener('auxclick', (e) => { if (e.button === 1) go(e); });
+})();
