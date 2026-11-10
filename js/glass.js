@@ -337,6 +337,12 @@
     if (!calm) bSmoke.on('idle', () => (bImg.complete ? benchMouth() : null), .18, { ...wisp, size: 16 });
   }
 
+  // Arrived from another page of the site straight into a product (#p=...)? Closing it goes back there,
+  // to the same scroll spot, instead of leaving you on this page.
+  let cameIn = (() => {
+    try { const r = new URL(document.referrer); return /^#p=/.test(location.hash) && r.origin === location.origin && r.pathname !== location.pathname; } catch (_) { return false; }
+  })();
+  const goBack = () => { if (!cameIn) return false; cameIn = false; if (history.length > 1) history.back(); else location.assign(document.referrer); return true; };
   function open(id) {
     const p = byId[id];
     if (!p) return;
@@ -351,6 +357,7 @@
     bSmoke.off('idle');
     release(true);
     history.replaceState(null, '', location.pathname + location.search);
+    if (goBack()) return;
     if (!calm) page.on('hero', mouthOf(heroImg, HERO), .32, { ...wisp, size: 16 });
   });
   $('#bClose').onclick = close;

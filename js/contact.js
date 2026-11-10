@@ -15,22 +15,28 @@
     ig: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor"/></svg>',
     yt: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 9l5 3-5 3z" fill="currentColor"/></svg>',
     ph: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3h3l1.6 4.4-2.1 1.4a12 12 0 0 0 6.1 6.1l1.4-2.1L21 14.4v3A2.6 2.6 0 0 1 18.4 20 15.4 15.4 0 0 1 4 5.6 2.6 2.6 0 0 1 6.6 3z" fill="currentColor"/></svg>',
+    li: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 10.2v6.3M7.5 7.4v.1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M11.2 16.5v-6.3m0 2.6c0-1.6 1.2-2.8 2.6-2.8s2.4 1 2.4 2.8v3.7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
     em: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 6.5l8.5 7 8.5-7" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
   };
   const SOCIAL = [
     ['ig', 'Instagram', '@jerome_baker', 'https://www.instagram.com/jerome_baker'],
     ['ig', 'Instagram, JB New York', '@jeromebakerny', 'https://www.instagram.com/jeromebakerny'],
     ['yt', 'YouTube', 'YouTube', 'https://www.youtube.com/channel/UCht08a4Veo4ktA5x4kDvaFQ'],
+    ['li', 'LinkedIn', 'LinkedIn', 'https://www.linkedin.com/company/jerome-baker-designs'],
   ];
+  window.JB_SOCIAL = SOCIAL.map(([k, label, handle, url]) => ({ k, label, handle, url, icon: ICON[k] }));
   const ext = 'target="_blank" rel="noopener"';
 
-  const css = document.createElement('link');
-  css.rel = 'stylesheet';
-  css.href = base + 'css/contact.css';
-  document.head.appendChild(css);
+  if (!document.querySelector('link[href$="css/contact.css"]')) {
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = base + 'css/contact.css';
+    document.head.appendChild(css);
+  }
 
   const foot = document.querySelector('footer.site-foot, footer.sfoot');
-  const contactHref = foot ? '#contact' : base + '#contact';
+  const contactHref = base + 'contact/';  // the contact page: every department, the form, the socials
+  const onContactPage = !!document.querySelector('[data-contact-page]');
 
   // ---------- 1. Contact + socials in the top menu ----------
   const head = document.querySelector('header.top, header.topbar');
@@ -56,7 +62,7 @@
     const s = document.createElement('div');
     s.className = 'hdr-social';
     s.innerHTML = SOCIAL.filter((x) => x[2] !== '@jeromebakerny')
-      .map(([k, label, , url]) => `<a href="${url}" ${ext} aria-label="Jerome Baker on ${label}">${ICON[k]}</a>`).join('');
+      .map(([k, label, , url]) => `<a class="s-${k}" href="${url}" ${ext} aria-label="Jerome Baker on ${label}">${ICON[k]}</a>`).join('');
     head.append(s);
   }
 
@@ -107,8 +113,9 @@
     });
   }
 
-  // ---------- 4. "Reach us" at the top of every footer ----------
-  if (!foot || document.getElementById('contact')) return;
+  // ---------- 4. "Reach us" at the top of every footer (the contact page has the full version instead) ----------
+  document.querySelectorAll('form[data-contact-form]').forEach(wire);
+  if (!foot || onContactPage || document.getElementById('contact')) return;
   const band = document.createElement('section');
   band.id = 'contact';
   band.className = 'reach';
@@ -118,7 +125,8 @@
 <b class="reach-k">Reach us</b>
 <a class="reach-phone" href="tel:${PHONE}">${ICON.ph}<span>${PHONE_TXT}</span></a>
 <a class="reach-mail" href="mailto:${EMAIL}">${ICON.em}<span>${EMAIL}</span></a>
-<div class="reach-social">${SOCIAL.map(([k, label, handle, url]) => `<a href="${url}" ${ext} aria-label="${label}">${ICON[k]}<span>${handle}</span></a>`).join('')}</div>
+<a class="reach-more" href="${contactHref}">Every department, one page →</a>
+<div class="reach-social">${SOCIAL.map(([k, label, handle, url]) => `<a class="s-${k}" href="${url}" ${ext} aria-label="${label}">${ICON[k]}<span>${handle}</span></a>`).join('')}</div>
 </div>
 <form class="reach-form" novalidate>
 <b class="reach-k">Customer service</b>
@@ -133,8 +141,10 @@
 <p class="reach-thanks" tabindex="-1" hidden>Got it. Someone from JB will get back to you soon.</p>
 </form></div>`;
   foot.prepend(band);
+  wire(band.querySelector('form'));
 
-  const form = band.querySelector('form'), err = band.querySelector('.reach-err'), btn = form.querySelector('button');
+  function wire(form) {
+  const err = form.querySelector('.reach-err'), btn = form.querySelector('button[type=submit]');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     err.textContent = '';
@@ -145,11 +155,13 @@
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return (err.textContent = 'That email address does not look right.');
     if (!msg) return (err.textContent = 'Add a message.');
     const topic = String(fd.get('topic') || '');
+    const dept = String(fd.get('dept') || 'Customer service');
     const data = {
       lead_type: 'feedback', // the app's lead list; feedback is the type that takes a free-form message
-      kind: 'customer-service',
+      kind: dept.toLowerCase().replace(/[^a-z]+/g, '-'),
+      department: dept,
       name, email, phone: String(fd.get('phone') || '').trim(), topic,
-      message: `Customer service (${topic}) from ${name} <${email}>${fd.get('phone') ? ', ' + fd.get('phone') : ''}:\n\n${msg}`,
+      message: `${dept}${topic ? ` (${topic})` : ''} from ${name} <${email}>${fd.get('phone') ? ', ' + fd.get('phone') : ''}:\n\n${msg}`,
       source_page: location.origin + location.pathname,
       referrer: document.referrer || '',
       submitted_at: new Date().toISOString(),
@@ -160,7 +172,7 @@
     fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) })
       .then((r) => r.json().catch(() => ({})).then((j) => (r.ok && j.ok ? j : Promise.reject(j.error || r.status))))
       .then(() => {
-        form.querySelectorAll('.reach-row, label, .reach-go, .reach-lede').forEach((x) => (x.hidden = true));
+        form.querySelectorAll('.reach-row, label, .reach-go, .reach-lede, .reach-dept').forEach((x) => (x.hidden = true));
         const t = form.querySelector('.reach-thanks');
         t.hidden = false;
         t.focus({ preventScroll: true });
@@ -171,4 +183,5 @@
         err.textContent = typeof why === 'string' && why ? why : `That didn't go through. Call ${PHONE_TXT} or email ${EMAIL}.`;
       });
   });
+  }
 })();
