@@ -120,6 +120,8 @@
     return [r.left + p.mouth[0] * r.width, r.top + p.mouth[1] * r.height + scrollY];
   };
   const wisp = { size: 16, grow: .6, alpha: .62, vy: .7, life: 170 };
+  // sculptures, Spirit Creatures, jars and kit aren't smoked: no sm0ke, no Take a hit (smoke:false from build_glass.py)
+  const smokes = (p) => !!p && p.smoke !== false;
 
   /* ---------------------------------------------------------------- the store */
   const HOST = 'https://jbcustomer.cannacrypted.com';
@@ -198,7 +200,7 @@
     clearTimeout(el._flip);
     if (!on) el.classList.remove('flip');
     if (calm) return;
-    if (on) page.on(el, mouthOf(el.querySelector('.cut'), byId[el.dataset.id]), .5, { ...wisp, gray: true });
+    if (on && smokes(byId[el.dataset.id])) page.on(el, mouthOf(el.querySelector('.cut'), byId[el.dataset.id]), .5, { ...wisp, gray: true });
     else page.off(el);
   };
   const flip = (el) => {
@@ -315,6 +317,7 @@
       ? (p.shop ? 'Available. Checkout and shipping happen on jeromebaker.com.' : p.online ? 'Available. Ships from the studio with its provenance record.' : 'Available through our team. Ask and we will hold it for you.')
       : p.status === 'sold' ? 'Sold. Somebody already took this one home.' : 'In a collection. It is registered to its owner.';
     ctas(p);
+    hit.hidden = !smokes(p);
     $('#b3d').hidden = !MODELS[p.id];
     // every photo of the piece, right there in the panel (they used to hide behind "Zoom in on the detail")
     const ph = photosOf(p).slice(1), ang = $('#bAngles');
@@ -334,7 +337,7 @@
       p.shop ? ['Order', `<a href="${p.verify}" target="_blank" rel="noopener">jeromebaker.com</a>`] : ['Provenance', `<a href="${p.verify}" target="_blank" rel="noopener">${p.id}</a>`],
     ].filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${k === 'Provenance' || k === 'Order' ? v : esc(v)}</dd>`).join('');
     history.replaceState(null, '', '#p=' + p.id);
-    if (!calm) bSmoke.on('idle', () => (bImg.complete ? benchMouth() : null), .18, { ...wisp, size: 16 });
+    if (!calm && smokes(p)) bSmoke.on('idle', () => (bImg.complete ? benchMouth() : null), .18, { ...wisp, size: 16 });
   }
 
   // Arrived from another page of the site straight into a product (#p=...)? Closing it goes back there,
@@ -687,7 +690,7 @@ ${treads}<rect x="${lx0 - 6}" y="0" width="${rx0 - lx0 + 12}" height="${capH}" r
     raf = requestAnimationFrame(tick);
   }
   function press(e) {
-    if (holding || !cur) return;
+    if (holding || !cur || !smokes(cur)) return;
     if (e && e.pointerId != null) e.currentTarget.setPointerCapture?.(e.pointerId);
     cancelAnimationFrame(drain);
     holding = true;

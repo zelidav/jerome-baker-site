@@ -203,6 +203,7 @@ body.in-shop .crew-layer{opacity:0;pointer-events:none;transition:opacity .4s}
 .hit-ring{width:34px;height:34px;border-radius:50%;border:3px solid var(--yellow);position:relative;overflow:hidden}
 .hit-ring span{position:absolute;left:0;right:0;bottom:0;height:calc(var(--lvl,0) * 100%);background:var(--yellow)}
 .hit.on{background:var(--yellow);color:var(--ink)}
+.hit[hidden]{display:none}
 .hit.on .hit-ring{border-color:var(--ink)}
 .hit.on .hit-ring span{background:var(--red)}
 /* piece to piece: labelled buttons in the bottom corners, out of the way of the photo (feedback: the side arrows
