@@ -1,27 +1,65 @@
-/* Jason Harris Maui Originals: the lead section on the home page (js/maui.js) */
-.maui{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(125deg,#141F5E 0%,#2A3B8E 55%,#4F67D6 100%);color:var(--white);padding-top:clamp(40px,6vw,72px);padding-bottom:clamp(44px,6vw,80px);border-bottom:4px solid var(--ink)}
-.maui::before{content:"";position:absolute;inset:0;z-index:-1;background:url(../assets/img/box-tile.webp) 0 0/1360px auto repeat;opacity:.12;mix-blend-mode:screen}
-.maui-head{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:end;margin-bottom:clamp(24px,4vw,44px)}
+/* Jason Harris Maui Originals: the lead section on the home page (js/maui.js).
+   A Maui sunset in the brand colors: red/gold sky, a yellow sun sinking into JB-blue ocean, and the crew on the beach:
+   Big Bill (toucan) perched on the cards, Ocho dancing on the sand, Crude surfing the wave strip. */
+.maui{--sky:clamp(420px,40vw,600px);position:relative;isolation:isolate;overflow:hidden;color:var(--white);background:#141F5E;padding-top:clamp(40px,6vw,72px);padding-bottom:0;border-bottom:4px solid var(--ink)}
+
+/* sky, sun, ocean */
+.maui-sky{position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#B5123A 0%,var(--red) 22%,#F0592B 52%,var(--gold) 82%,#FFD23F 100%) 0 0/100% var(--sky) no-repeat}
+.maui-rays{position:absolute;left:72%;top:var(--sky);width:1500px;height:1500px;margin:-750px 0 0 -750px;border-radius:50%;background:repeating-conic-gradient(rgba(255,241,0,.32) 0 7deg,transparent 7deg 18deg);animation:mauiSpin 90s linear infinite;-webkit-mask:radial-gradient(closest-side,#000 30%,transparent 100%);mask:radial-gradient(closest-side,#000 30%,transparent 100%)}
+.maui-sun{position:absolute;left:72%;top:var(--sky);width:clamp(220px,26vw,400px);aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle at 40% 35%,#FFFBB0 0%,var(--yellow) 45%,#FFC400 100%);border:5px solid var(--ink);box-shadow:0 0 0 14px rgba(255,241,0,.25),0 0 80px 30px rgba(255,200,0,.45)}
+.maui-sun::after{content:"";position:absolute;inset:0;border-radius:50%;background:repeating-linear-gradient(180deg,transparent 0 58%,var(--red) 58% 63%,transparent 63% 70%);opacity:.75}
+.maui-ocean{position:absolute;left:0;right:0;top:var(--sky);bottom:0;background:linear-gradient(180deg,#4F67D6 0%,var(--blue) 30%,#141F5E 100%);border-top:4px solid var(--ink)}
+.maui-ocean::before{content:"";position:absolute;inset:0;background:url(../assets/img/box-tile.webp) 0 0/1360px auto repeat;opacity:.1;mix-blend-mode:screen}
+.maui-ocean::after{content:"";position:absolute;left:0;right:0;top:-22px;height:24px;background:radial-gradient(circle at 20px -6px,transparent 18px,#4F67D6 19px) 0 0/40px 24px repeat-x;animation:mauiDrift 6s linear infinite}
+
+/* headline + copy */
+.maui-head{position:relative;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:end;margin-bottom:clamp(120px,12vw,170px)}
 .maui-kicker{display:inline-block;background:var(--yellow);color:var(--ink);font:800 14px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);rotate:-2deg;margin:0 0 18px}
-.maui-h{margin:0;font:900 clamp(40px,6.4vw,96px)/.9 var(--display);letter-spacing:-.01em}
-.maui-h span{white-space:nowrap}
-.maui-h span{display:inline-block;padding:2px 14px 6px;margin:0 6px 8px 0;border:4px solid var(--ink);box-shadow:7px 7px 0 var(--ink)}
+.maui-h{margin:0;font:900 clamp(40px,6.6vw,104px)/.9 var(--display);letter-spacing:-.01em}
+.maui-h span{display:inline-block;white-space:nowrap;padding:2px 14px 6px;margin:0 6px 8px 0;border:4px solid var(--ink);box-shadow:7px 7px 0 var(--ink)}
 .maui-h .a{background:var(--white);color:var(--blue);rotate:-2deg}
-.maui-h .b{background:var(--red);color:var(--white);rotate:2deg}
+.maui-h .b{background:var(--blue);color:var(--yellow);rotate:2deg}
 .maui-h .c{background:var(--yellow);color:var(--ink);rotate:-1deg}
-.maui-copy p{margin:0 0 12px;font:500 clamp(16px,1.5vw,19px)/1.55 var(--body);max-width:56ch}
+.maui-copy{background:rgba(10,10,10,.86);border:4px solid var(--ink);box-shadow:8px 8px 0 var(--ink);padding:18px 20px 8px;rotate:1deg}
+.maui-copy p{margin:0 0 12px;font:500 clamp(16px,1.45vw,18px)/1.55 var(--body);max-width:56ch}
 .maui-copy p b{color:var(--yellow)}
+.maui-stamp{position:absolute;right:clamp(-4px,1vw,12px);top:clamp(-30px,-2vw,-12px);width:112px;height:112px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:conic-gradient(from 0deg,#FF4FA3,#FFF100,#05B48F,#4F67D6,#B05CFF,#FF4FA3);border:4px solid var(--ink);box-shadow:5px 5px 0 var(--ink);color:var(--ink);rotate:12deg;animation:mauiWobble 3.2s ease-in-out infinite}
+.maui-stamp::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--white);border:3px dashed var(--ink);z-index:-1}
+.maui-stamp{isolation:isolate}
+.maui-stamp small{font:800 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em}
+.maui-stamp b{font:900 46px/.9 var(--display);color:var(--red)}
+
+/* the cards */
+.maui-pipes-wrap{position:relative}
 .maui-pipes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(18px,3vw,36px)}
-.maui-card{background:var(--white);color:var(--ink);border:4px solid var(--ink);box-shadow:10px 10px 0 var(--ink);padding:0 0 18px;display:flex;flex-direction:column;min-width:0}
-.maui-card:nth-child(2){rotate:.6deg}.maui-card:nth-child(1){rotate:-.6deg}
+.maui-card{position:relative;background:var(--white);color:var(--ink);border:4px solid var(--ink);box-shadow:10px 10px 0 var(--ink);padding:0 0 18px;display:flex;flex-direction:column;min-width:0;transition:translate .25s,box-shadow .25s}
+.maui-card:nth-child(1){rotate:-.6deg}.maui-card:nth-child(2){rotate:.6deg}
+.maui-card:hover{translate:-3px -4px;box-shadow:14px 14px 0 var(--ink)}
+.maui-card::before{content:"";position:absolute;inset:-4px;z-index:-1;background:conic-gradient(from var(--a,0deg),#FF4FA3,#FFF100,#05B48F,#4F67D6,#B05CFF,#FF4FA3);opacity:0;transition:opacity .3s}
+.maui-card:hover::before{opacity:1;animation:mauiHolo 3s linear infinite}
+@property --a{syntax:"<angle>";inherits:false;initial-value:0deg}
 .maui-stage{position:relative;aspect-ratio:4/3;background:radial-gradient(120% 90% at 50% 42%,#4F67D6 0%,#2A3B8E 55%,#141F5E 100%);border-bottom:4px solid var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:zoom-in}
-.maui-stage::after{content:"";position:absolute;left:12%;right:12%;bottom:9%;height:9%;background:radial-gradient(closest-side,rgba(10,10,10,.5),transparent);z-index:0;pointer-events:none}
-.maui-pipe{position:relative;z-index:1;width:88%;height:82%;object-fit:contain;filter:drop-shadow(0 14px 18px rgba(10,10,10,.45));transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.maui-stage::before{content:"";position:absolute;inset:0;background:url(../assets/img/box-tile.webp) 0 0/900px auto repeat;opacity:.08;mix-blend-mode:screen;pointer-events:none}
+.maui-stage::after{content:"";position:absolute;left:14%;right:14%;bottom:9%;height:8%;background:radial-gradient(closest-side,rgba(10,10,10,.55),transparent);z-index:0;pointer-events:none;animation:mauiShadow 5s ease-in-out infinite}
+.maui-float{position:relative;z-index:1;width:88%;height:82%;display:flex;align-items:center;justify-content:center;animation:mauiFloat 5s ease-in-out infinite}
+.maui-pipe{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 14px 18px rgba(10,10,10,.45));transition:transform .5s cubic-bezier(.2,.7,.2,1)}
 .maui-stage:hover .maui-pipe{transform:scale(1.03) rotate(-1deg)}
-.maui-pill{position:absolute;z-index:2;left:12px;top:12px;background:var(--yellow);color:var(--ink);border:3px solid var(--ink);font:800 13px var(--display);padding:4px 10px}
-.maui-pill.ship{left:auto;right:12px;background:var(--white)}
-.maui-loupe{position:absolute;z-index:3;width:200px;height:200px;border-radius:50%;border:4px solid var(--yellow);box-shadow:0 0 0 4px var(--ink),0 10px 24px rgba(0,0,0,.45);background:#2A3B8E no-repeat;pointer-events:none;opacity:0;transition:opacity .15s}
+.maui-sheen{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,79,163,.18) 44%,rgba(255,241,0,.22) 50%,rgba(5,180,143,.18) 56%,transparent 65%) -150% 0/250% 100% no-repeat;mix-blend-mode:screen;animation:mauiSweep 6s ease-in-out infinite}
+.maui-pill{position:absolute;z-index:4;left:12px;top:12px;background:var(--yellow);color:var(--ink);border:3px solid var(--ink);font:800 13px var(--display);padding:4px 10px;rotate:-3deg}
+.maui-pill.ship{left:auto;right:12px;background:var(--white);rotate:2deg}
+.maui-pill.ship::before{content:"\2600\FE0E";margin-right:5px;color:var(--red)}
+
+/* marble hotspots over the pipe */
+.maui-spots{position:absolute;z-index:3;pointer-events:none}
+.maui-spot{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;padding:0;border-radius:50%;border:3px solid var(--yellow);background:rgba(10,10,10,.15);box-shadow:0 0 0 2px var(--ink);cursor:zoom-in;pointer-events:auto;opacity:0;scale:.6;transition:opacity .2s,scale .2s}
+.maui-spot::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:2px solid var(--yellow);animation:mauiPing 1.8s ease-out infinite}
+.maui-stage:hover .maui-spot,.maui-spot:focus-visible,.maui-spot.hot{opacity:1;scale:1}
+.maui-spot.hot{border-color:var(--red);background:rgba(218,35,66,.25)}
+.maui-spots[hidden]{display:none}
+.maui-loupe{position:absolute;z-index:5;width:200px;height:200px;border-radius:50%;border:4px solid var(--yellow);box-shadow:0 0 0 4px var(--ink),0 10px 24px rgba(0,0,0,.45);background:#2A3B8E no-repeat;pointer-events:none;opacity:0;transition:opacity .15s}
 .maui-loupe.on{opacity:1}
+.maui-stage.lensing .maui-spot{opacity:0}
+
 .maui-angles{display:flex;gap:8px;padding:12px 16px 0}
 .maui-angles button{width:64px;height:48px;padding:2px;border:3px solid var(--ink);background:#2A3B8E;cursor:pointer;opacity:.6}
 .maui-angles button[aria-pressed=true]{opacity:1;outline:3px solid var(--yellow)}
@@ -30,13 +68,67 @@
 .maui-line{margin:0 16px 12px;font:500 15px/1.45 var(--body)}
 .maui-mk{margin:0 16px 8px;font:800 13px var(--mono);text-transform:uppercase;letter-spacing:.05em}
 .maui-mk span{font-weight:500;text-transform:none;letter-spacing:0;color:#555;margin-left:6px}
-.maui-marbles{display:flex;gap:10px;padding:0 16px 14px;overflow-x:auto;scrollbar-width:thin}
+.maui-marbles{display:flex;gap:10px;padding:4px 16px 14px;overflow-x:auto;scrollbar-width:thin}
 .maui-marbles button{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;width:84px;padding:0;border:0;background:none;cursor:zoom-in;font:700 12px/1.15 var(--body);color:var(--ink);text-align:center}
 .maui-marbles img{width:76px;height:76px;border-radius:50%;border:3px solid var(--ink);box-shadow:3px 3px 0 var(--ink);transition:transform .2s}
 .maui-marbles button:hover img,.maui-marbles button:focus-visible img{transform:scale(1.12) rotate(-6deg)}
 .maui-buy{margin-top:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:0 16px}
 .maui-price{font:900 32px/1 var(--display)}
 .maui-price small{display:block;font:600 12px/1.3 var(--body);margin-top:4px;color:#444}
-@media (max-width:860px){.maui-head{grid-template-columns:1fr}.maui-pipes{grid-template-columns:1fr}.maui-card:nth-child(n){rotate:0deg}}
-@media (max-width:480px){.maui-h span{box-shadow:5px 5px 0 var(--ink);border-width:3px}.maui-buy .btn{width:100%}}
-@media (prefers-reduced-motion:reduce){.maui-pipe,.maui-marbles img{transition:none}}
+
+/* the crew */
+.maui-bubble{position:absolute;z-index:2;background:var(--white);color:var(--ink);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);border-radius:18px;padding:8px 12px;font:900 15px/1.1 var(--display);white-space:nowrap}
+.maui-bubble::after{content:"";position:absolute;width:16px;height:16px;background:var(--white);border:solid var(--ink);border-width:0 3px 3px 0;rotate:45deg}
+.maui-bill{position:absolute;z-index:6;right:clamp(-8px,1vw,20px);top:calc(-1 * clamp(122px,12vw,165px));width:clamp(100px,10vw,134px);margin:0;pointer-events:none;transform-origin:50% 100%;animation:mauiPerch 4s ease-in-out infinite}
+.maui-bill img{width:100%;height:auto;display:block;filter:drop-shadow(5px 6px 0 rgba(10,10,10,.55))}
+.maui-bill .maui-bubble{right:100%;top:6%;margin-right:4px;rotate:-4deg}
+.maui-bill .maui-bubble::after{right:-10px;top:40%;rotate:-45deg}
+.maui-surf{position:relative;height:clamp(150px,16vw,210px);width:100vw;margin:clamp(30px,4vw,56px) 0 0 calc(50% - 50vw);overflow:hidden}
+.maui-waves{position:absolute;left:0;right:0;bottom:0;height:62%}
+.maui-waves span{position:absolute;left:0;right:0;bottom:0;height:100%;background:radial-gradient(circle at 60px 0,transparent 46px,var(--c) 48px) 0 18px/120px 100% repeat-x;border-top:0}
+.maui-waves span:nth-child(1){--c:#4F67D6;bottom:22%;animation:mauiDrift 9s linear infinite}
+.maui-waves span:nth-child(2){--c:var(--ink);height:44%;animation:mauiDrift 5s linear infinite reverse;background-image:radial-gradient(circle at 60px 0,transparent 46px,var(--ink) 48px)}
+.maui-crude{position:absolute;z-index:3;bottom:20%;left:0;width:clamp(110px,11vw,150px);height:auto;filter:drop-shadow(5px 6px 0 rgba(10,10,10,.55));animation:mauiSurf 16s linear infinite,mauiBob 1.6s ease-in-out infinite}
+.maui-ocho{position:absolute;z-index:4;left:clamp(8px,4vw,60px);bottom:6%;width:clamp(100px,10vw,140px);margin:0;transform-origin:50% 100%;animation:mauiJig .9s ease-in-out infinite alternate}
+.maui-ocho img{width:100%;height:auto;display:block;filter:drop-shadow(5px 6px 0 rgba(10,10,10,.55))}
+.maui-ocho .maui-bubble{left:88%;top:-4%;rotate:4deg}
+.maui-ocho .maui-bubble::after{left:-10px;bottom:4px;rotate:135deg}
+.maui-band{background:var(--yellow);border-bottom:4px solid var(--ink);overflow:hidden;position:relative;z-index:2}
+.maui-band .marq{padding:10px 0;font:900 clamp(18px,2.2vw,28px) var(--display);color:var(--ink);white-space:nowrap}
+.maui-band span{padding-right:40px}
+
+@keyframes mauiSpin{to{rotate:360deg}}
+@keyframes mauiDrift{to{background-position-x:120px}}
+@keyframes mauiWobble{0%,100%{rotate:12deg;scale:1}50%{rotate:4deg;scale:1.06}}
+@keyframes mauiHolo{to{--a:360deg}}
+@keyframes mauiFloat{0%,100%{translate:0 0;rotate:0deg}50%{translate:0 -10px;rotate:-1deg}}
+@keyframes mauiShadow{0%,100%{scale:1;opacity:1}50%{scale:.86;opacity:.7}}
+@keyframes mauiSweep{0%,40%{background-position:-150% 0}80%,100%{background-position:250% 0}}
+@keyframes mauiPing{from{scale:.7;opacity:1}to{scale:1.5;opacity:0}}
+@keyframes mauiPerch{0%,70%,100%{rotate:0deg}78%{rotate:-7deg}86%{rotate:4deg}}
+@keyframes mauiSurf{from{translate:-200px 0}to{translate:calc(100vw + 40px) 0}}
+@keyframes mauiBob{0%,100%{rotate:-4deg;margin-bottom:0}50%{rotate:5deg;margin-bottom:12px}}
+@keyframes mauiJig{from{rotate:-6deg;scale:1 1}to{rotate:6deg;scale:1.04 .96}}
+
+@media (max-width:860px){
+  .maui{--sky:520px}
+  .maui-head{grid-template-columns:1fr}
+  .maui-pipes{grid-template-columns:1fr}
+  .maui-card:nth-child(n){rotate:0deg}
+  .maui-rays,.maui-sun{left:78%}
+  .maui-stamp{top:-34px;width:92px;height:92px}.maui-stamp b{font-size:36px}
+}
+@media (max-width:480px){
+  .maui{--sky:470px}
+  .maui-h span{box-shadow:5px 5px 0 var(--ink);border-width:3px}
+  .maui-buy .btn{width:100%}
+  .maui-stamp{display:none}
+  .maui-head{margin-bottom:118px}
+  .maui-bill{top:-112px;width:90px}
+  .maui-bubble{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){
+  .maui *,.maui *::before,.maui *::after{animation:none!important;transition:none!important}
+  .maui-crude{left:auto;right:12%}
+  .maui-band .marq{animation:none}
+}
