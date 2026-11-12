@@ -102,5 +102,75 @@
       "w": 624,
       "h": 1754
     }
+  ],
+  "JBD-C4A961A67688": [
+    {
+      "src": "hires/maui-pipe1-back.webp",
+      "label": "The other side",
+      "w": 2547,
+      "h": 1551
+    },
+    {
+      "src": "hires/maui-pipe1-ring.webp",
+      "label": "Marble: Amber ring",
+      "w": 429,
+      "h": 429
+    },
+    {
+      "src": "hires/maui-pipe1-opal.webp",
+      "label": "Marble: Opal moon",
+      "w": 520,
+      "h": 520
+    },
+    {
+      "src": "hires/maui-pipe1-stripe.webp",
+      "label": "Marble: Dichro stripe",
+      "w": 520,
+      "h": 520
+    },
+    {
+      "src": "hires/maui-pipe1-ember.webp",
+      "label": "Marble: Ember",
+      "w": 515,
+      "h": 515
+    },
+    {
+      "src": "hires/maui-pipe1-amber.webp",
+      "label": "Marble: Honey drop",
+      "w": 297,
+      "h": 297
+    }
+  ],
+  "JBD-F685F0241C9C": [
+    {
+      "src": "hires/maui-pipe2-back.webp",
+      "label": "The other side",
+      "w": 2600,
+      "h": 1579
+    },
+    {
+      "src": "hires/maui-pipe2-ruby.webp",
+      "label": "Marble: Ruby",
+      "w": 495,
+      "h": 495
+    },
+    {
+      "src": "hires/maui-pipe2-pink.webp",
+      "label": "Marble: Pink nebula",
+      "w": 520,
+      "h": 520
+    },
+    {
+      "src": "hires/maui-pipe2-violet.webp",
+      "label": "Marble: Violet rim",
+      "w": 520,
+      "h": 520
+    },
+    {
+      "src": "hires/maui-pipe2-drop.webp",
+      "label": "Marble: Garnet drop",
+      "w": 212,
+      "h": 212
+    }
   ]
 }

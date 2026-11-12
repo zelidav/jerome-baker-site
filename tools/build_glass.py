@@ -37,6 +37,8 @@ STANDARD_CATS = ('Classic Clearboy', 'Skeeters')
 
 # shelves, in page order: (key, title, line, match)
 SHELVES = [
+    # David 2026-11-12: the Maui pipes are their own category and the first glass you see
+    ('maui', 'Jason Harris Maui Originals', 'Hand pipes Jason makes in his Maui studio. Every marble is fumed, then encased in molten clear glass and folded, so the color moves through bands of changing iridescence. Ships from Maui.', lambda p: p['series'] == 'Maui Originals'),
     ('giant', 'Giant bongs', 'Four feet of glass and up, pulled by a team of fifteen. One of each, ever.', lambda p: p['shape_code'] == 'GBG'),
     ('le', 'Limited Edition', 'The crown pieces. Wig-wag, millies, knuckles and marbles, worked at the bench and signed off as one of one.', lambda p: p['series'] == 'Limited Edition' and p['category'] == 'Signature Glass'),
     ('og', 'Original Series', 'The fifteen-inch Baker silhouette that started it. Fumed bulb, straight tube, built to hit and built to last.', lambda p: p['series'] == 'Original Series'),
@@ -47,6 +49,8 @@ SHELVES = [
     ('kit', 'Bowls, stems and kit', 'The parts that keep a piece working. Bowls, downstems, tips, trays and the fix-it kit.', None),
 ]
 SHELF_KEYS = [k for k, *_ in SHELVES]
+# hand pipes lie on their side, so the top-most point isn't the mouthpiece: [x, y] as fractions of the cutout
+MOUTH = {'JBD-C4A961A67688': [0.02, 0.383], 'JBD-F685F0241C9C': [0.98, 0.306]}
 
 # David 2026-11-11: only pieces you can actually smoke get the sm0ke + "Take a hit" treatment. Spirit Creatures,
 # sculptures (the whales on burl, Cupid's heart, pendants), jars, Skeeter boxes and the kit shelf don't.
@@ -193,6 +197,8 @@ def main():
             'inches': size_in(p),
             'desc': (p.get('description') or '').strip(),
             'buy': f'{HOST}/buy/{pid}', 'verify': f'{HOST}/c/piece/{pid}?prov=1', **img})
+        if pid in MOUTH:
+            pieces[-1]['mouth'] = MOUTH[pid]
         if pid in EXTRA_PHOTOS:
             pieces[-1]['photos'] = EXTRA_PHOTOS[pid]
             pieces[-1]['flip'] = EXTRA_PHOTOS[pid][0]['src']  # the tile's second look: our own photo, not the app's

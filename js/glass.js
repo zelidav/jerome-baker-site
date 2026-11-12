@@ -120,7 +120,7 @@
     return [r.left + p.mouth[0] * r.width, r.top + p.mouth[1] * r.height + scrollY];
   };
   const wisp = { size: 16, grow: .6, alpha: .62, vy: .7, life: 170 };
-  // sculptures, Spirit Creatures, jars and kit aren't smoked: no sm0ke, no Take a hit (smoke:false from build_glass.py)
+  // sculptures, Spirit Creatures, jars and kit aren't sm0ked: no sm0ke, no Take a hit (sm0ke:false from build_glass.py)
   const smokes = (p) => !!p && p.smoke !== false;
 
   /* ---------------------------------------------------------------- the store */
@@ -128,6 +128,7 @@
   // one smooth gradient per series, from the brand colors
   // Sasha's band colors (red, blue, green, yellow, orange), each a gradient within its own hue, under his JB pattern
   const BANDS = {
+    maui: 'linear-gradient(170deg,#B5123A 0%,#DA2342 30%,#F0592B 62%,#FDB514 100%)', // a Maui sunset
     giant: 'linear-gradient(125deg,#8E1028 0%,#DA2342 55%,#FF5A6E 100%)',
     le: 'linear-gradient(125deg,#141F5E 0%,#2A3B8E 55%,#4F67D6 100%)',
     og: 'linear-gradient(125deg,#036650 0%,#05B48F 55%,#3FE0B8 100%)',
@@ -314,7 +315,7 @@
     pr.textContent = money(p.price);
     pr.classList.toggle('sold', p.status !== 'available');
     $('#bStatus').textContent = p.status === 'available'
-      ? (p.shop ? 'Available. Checkout and shipping happen on jeromebaker.com.' : p.online ? 'Available. Ships from the studio with its provenance record.' : 'Available through our team. Ask and we will hold it for you.')
+      ? (p.shop ? 'Available. Checkout and shipping happen on jeromebaker.com.' : p.online ? (p.shelf === 'maui' ? 'Available. Ships from Jason’s studio on Maui, with its provenance record. Shipping is figured from Maui at checkout.' : 'Available. Ships from the studio with its provenance record.') : 'Available through our team. Ask and we will hold it for you.')
       : p.status === 'sold' ? 'Sold. Somebody already took this one home.' : 'In a collection. It is registered to its owner.';
     ctas(p);
     hit.hidden = !smokes(p);

@@ -25,7 +25,6 @@
 <link rel="stylesheet" href="css/site.css">
 <link rel="stylesheet" href="css/crew.css">
 <link rel="stylesheet" href="css/glitch.css">
-<link rel="stylesheet" href="css/maui.css">
 <style>
 .ticker{background:var(--yellow);overflow:hidden;border-bottom:3px solid var(--ink)}
 .ticker .marq{padding:8px 0;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.12em;white-space:nowrap}
@@ -74,6 +73,10 @@ section.glass{background-color:var(--gray);padding-top:96px;padding-bottom:112px
 .card-img .gl{height:100%;filter:drop-shadow(6px 8px 0 rgba(10,10,10,.35))}
 .card-mark{left:-36px;top:-40px;width:120px;rotate:-14deg;z-index:2}
 .oneofone{position:absolute;right:0;top:0;background:var(--ink);color:var(--yellow);font-family:var(--mono);font-weight:700;font-size:11px;letter-spacing:.18em;padding:6px 8px}
+.maui-card .card-img{background:radial-gradient(closest-side,rgba(255,241,0,.55),transparent 75%)}
+.maui-gl{width:100%;height:auto;max-height:100%;object-fit:contain;filter:drop-shadow(6px 8px 0 rgba(10,10,10,.35))}
+.maui-new{position:absolute;left:0;top:0;z-index:2;background:var(--yellow);color:var(--ink);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);font:900 14px var(--display);padding:4px 10px;rotate:-4deg;text-transform:uppercase}
+.maui-card .price small{font-size:13px;font-weight:700;color:var(--ink)}
 .card-body{background:var(--white);border:2px solid var(--ink);padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 12px}
 .card-body>div{min-width:0;flex:1 1 auto}
 .card-body h3{margin:0;font-family:var(--display);font-weight:400;font-size:18px;line-height:25px}
@@ -138,39 +141,16 @@ section.made{background:var(--ink);color:var(--white);padding-top:112px;padding-
 </header>
 
 <main id="main">
-<section id="maui" class="maui pad" aria-labelledby="maui-h">
-<div class="maui-sky" aria-hidden="true"><span class="maui-rays"></span><span class="maui-sun"></span><span class="maui-ocean"></span></div>
-<div class="maui-head">
-<div class="maui-title"><p class="maui-kicker">Just landed from the Maui studio</p>
-<h1 class="maui-h" id="maui-h"><span class="a">Jason Harris</span><br><span class="b">Maui</span><span class="c">Originals</span></h1></div>
-<div class="maui-copy">
-<p>Hand pipes Jason makes himself in his studio on Maui. Every marble is designed one at a time: <b>fumed, then encased in molten clear glass and folded</b>, so the color moves through bands of changing iridescence as you turn the piece.</p>
-<p>Two pipes, one of each. $450 each, plus shipping. Each one <b>ships from Maui</b>, with the rate worked out from the island at checkout.</p>
-</div>
-<div class="maui-stamp" aria-hidden="true"><small>Only</small><b>2</b><small>ever</small></div>
-</div>
-<div class="maui-pipes-wrap">
-<figure class="maui-bill" aria-hidden="true"><span class="maui-bubble">Tap a marble.<br>Trust me.</span><img src="assets/crew/toucan_m.webp" alt="" width="354" height="440" loading="lazy" decoding="async"></figure>
-<div class="maui-pipes"></div>
-</div>
-<div class="maui-surf" aria-hidden="true">
-<figure class="maui-ocho"><span class="maui-bubble">ALOHA, HUMANS!</span><img src="assets/crew/octo_m.webp" alt="" width="381" height="440" loading="lazy" decoding="async"></figure>
-<div class="maui-waves"><span></span><span></span></div>
-<img class="maui-crude" src="assets/crew/crude_m.webp" alt="" width="370" height="440" loading="lazy" decoding="async">
-</div>
-</section>
-<div class="maui-band" aria-hidden="true"><div class="marq"><span>JUST LANDED FROM MAUI ✱ ONLY TWO ✱ 1 OF 1 ✱ SHIPS FROM KIHEI ✱ FUMED, ENCASED, FOLDED ✱ </span><span>JUST LANDED FROM MAUI ✱ ONLY TWO ✱ 1 OF 1 ✱ SHIPS FROM KIHEI ✱ FUMED, ENCASED, FOLDED ✱ </span></div></div>
-
 <section id="top" class="hero boxbg pad">
 <div class="wash" aria-hidden="true"></div><div class="dots" aria-hidden="true"></div>
 <div class="hero-copy">
-<h2 class="ransom">
+<h1 class="ransom">
 <span style="background:#FFF100;color:#0A0A0A;rotate:-3deg">Hand pulled</span>
 <span style="background:#FFFFFF;color:#2A3B8E;rotate:2deg;font-style:italic">since '91.</span>
 <span style="background:#0A0A0A;color:#FFF100;rotate:3deg;text-decoration:line-through;text-decoration-color:#DA2342;text-decoration-thickness:10px">Seized.</span>
 <span style="background:#FFFFFF;color:#0A0A0A;rotate:-4deg">Still</span>
 <span style="background:#DA2342;color:#FFFFFF;rotate:2deg">lit.</span>
-</h2>
+</h1>
 <p class="lede">Glass pulled by hand since 1991. Raided by the feds in 2003, back on the torch ever since. Every piece is one of one and comes with its provenance on file. The streetwear is real too, and it ships now.</p>
 <div class="ctas"><a class="btn btn-red cta-a" href="#glass">Shop the glass</a><a class="btn btn-yellow cta-b" href="#wear">Shop the merch</a><a class="btn btn-ink cta-c" href="travel/">Open the trip guide</a></div>
 </div>
@@ -221,6 +201,14 @@ section.made{background:var(--ink);color:var(--white);padding-top:112px;padding-
 <img class="bob" src="assets/img/jb-mark.webp" alt="" aria-hidden="true" style="width:220px;rotate:10deg;filter:drop-shadow(8px 10px 0 #0A0A0A)" width="220" height="170" loading="lazy">
 <p class="wall-intro">On the shelf right now. Fumed bulbs, wig-wag crowns, critters at the j0int, and four-foot giants. Every one is the only one, and its provenance ID proves it.</p></div>
 <div class="cards">
+<article class="card maui-card" style="--bg:linear-gradient(180deg,#DA2342 0%,#F0592B 45%,#FDB514 100%);--tilt:-1.5deg">
+<div class="card-img"><span class="maui-new">New from Maui</span><img class="maui-gl" src="assets/glass/JBD-C4A961A67688_t.webp" alt="Jason Harris Maui Original No. 1, hand p!pe by Jason Harris" width="736" height="440" loading="lazy" decoding="async" style="rotate:-8deg"><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Jason Harris Maui Original No. 1</h3><p class="price">$450 <small>+ ships from Maui</small></p></div><a class="btn btn-red" href="glass/#p=JBD-C4A961A67688">See it</a></div>
+</article>
+<article class="card maui-card" style="--bg:linear-gradient(180deg,#DA2342 0%,#F0592B 45%,#FDB514 100%);--tilt:2deg">
+<div class="card-img"><span class="maui-new">New from Maui</span><img class="maui-gl" src="assets/glass/JBD-F685F0241C9C_t.webp" alt="Jason Harris Maui Original No. 2, hand p!pe by Jason Harris" width="668" height="440" loading="lazy" decoding="async" style="rotate:6deg"><span class="oneofone">1 OF 1</span></div>
+<div class="card-body"><div><h3>Jason Harris Maui Original No. 2</h3><p class="price">$450 <small>+ ships from Maui</small></p></div><a class="btn btn-red" href="glass/#p=JBD-F685F0241C9C">See it</a></div>
+</article>
 <article class="card" style="--bg:#FFF100;--tilt:-2deg">
 <div class="card-img"><img class="mark card-mark" src="assets/img/jb-mark.webp" alt="" width="120" height="93" loading="lazy" decoding="async"><div class="gl" role="img" aria-label="Agent Orange, hand-made Jerome Baker glass" style="background-position:0.000% 0;rotate:-6deg"></div><span class="oneofone">1 OF 1</span></div>
 <div class="card-body"><div><h3>Agent Orange</h3><p class="price">$25,000</p></div><a class="btn btn-red" href="glass/#p=JBD-7F9BF1B7B45F">See it</a></div>
@@ -352,7 +340,6 @@ section.made{background:var(--ink);color:var(--white);padding-top:112px;padding-
 <script src="js/featured.js" defer></script>
 <script src="js/holo/sample.js" defer></script>
 <script src="js/feedback.js" defer></script>
-<script src="js/zoomview.js" defer></script>
-<script src="js/maui.js" defer></script>
+<script src="js/maui-sign.js" defer></script>
 </body>
 </html>

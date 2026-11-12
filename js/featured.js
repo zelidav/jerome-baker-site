@@ -91,6 +91,12 @@
     shuffle(merch);
     // glass, merch, glass, merch... with the extra glass doubled up near the end
     while (glass.length || merch.length) { if (glass.length) mix.push(glass.shift()); if (merch.length) mix.push(merch.shift()); }
+    // David 2026-11-12: the Jason Harris Maui Originals lead the strip while they're on the shelf
+    const maui = live.filter((p) => p.shelf === 'maui').map((p) => ({
+      href: `${base}glass/#p=${encodeURIComponent(p.id)}`, img: `${base}assets/glass/${p.id}_t.webp`, name: p.name,
+      sub: 'New from Maui', price: p.price, tag: 'New · 1 of 1', kind: 'glass', blurb: p.desc,
+    }));
+    mix.unshift(...maui);
     const T = ['-1.5deg', '1deg', '-.5deg', '1.5deg', '-1deg', '.5deg'];
     track.innerHTML = mix.map((c, i) => `<a class="fx-card ${c.kind}" href="${c.href}" style="--t:${T[i % T.length]}">
 <span class="fx-pic"><span class="fx-tag">${esc(c.tag)}</span><img src="${esc(c.img)}" alt="" loading="lazy" decoding="async"${c.full ? ` onerror="this.onerror=null;this.src='${esc(c.full)}'"` : ''}></span>
