@@ -117,8 +117,9 @@
   -webkit-mask:linear-gradient(#000 0 0) 0 0/100% 100% no-repeat,linear-gradient(#000 0 0) calc(-1 * var(--hx)) calc(-1 * var(--hy))/100% 100% no-repeat;-webkit-mask-composite:xor;
   mask:linear-gradient(#000 0 0) 0 0/100% 100% no-repeat exclude,linear-gradient(#000 0 0) calc(-1 * var(--hx)) calc(-1 * var(--hy))/100% 100% no-repeat}
 .lxw{display:inline}
+.lxn{display:inline;white-space:nowrap}
 /* section rules like ".chips a span" or ".ticker span" must not restyle the swap wrappers */
-:is(.lxw,.lx){padding:0!important;margin:0!important;border:0!important;background:none!important;box-shadow:none!important;opacity:1!important;filter:none!important;color:inherit!important;font:inherit!important;letter-spacing:inherit!important;text-decoration:inherit}
+:is(.lxw,.lxn,.lx){padding:0!important;margin:0!important;border:0!important;background:none!important;box-shadow:none!important;opacity:1!important;filter:none!important;color:inherit!important;font:inherit!important;letter-spacing:inherit!important;text-decoration:inherit}
 .lx{display:inline-block;rotate:-6deg;translate:0 -.03em;margin:0;letter-spacing:inherit}
 .lx:nth-of-type(2n){rotate:5deg}`;
   document.head.append(css);
@@ -126,7 +127,9 @@
   // ---------- swapped letters (tools/scrub.py writes b0ng, p!pe, sm0ke...): the swapped character gets a little
   // graffiti tilt so it reads as lettering, not a typo
   const SWAP = /(?:b0ng|p!pe|sm0k|tr!pp|w33d|c@nnabis|m@rijuana|st0n|j0int|bl\*nt|n@rcotic|psych3delic|mu\$hroom|@cid|t0k|b@ked|h@sh|b0wl|r0lling|h!gh|k\*sh|spl!ff|d@b|v@p|3dible|d!spensar|dr\*g|d0pe|g@nja|\$tash)/i;
-  const SWAPS = new RegExp(SWAP.source, 'gi');
+  // the whole word around a swap, so it can be kept on one line (the tilted letter is an inline-block, and a line
+  // could break right after it: "sm0" / "ke")
+  const SWAPS = new RegExp(/\S*/.source + SWAP.source + /\S*/.source, 'gi');
   const letters = (root) => {
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => (SWAP.test(n.nodeValue) && !n.parentElement.closest('script,style,textarea,input,.lx,svg') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
@@ -138,9 +141,13 @@
       let last = 0;
       n.nodeValue.replace(SWAPS, (m, at) => {
         frag.append(n.nodeValue.slice(last, at));
-        for (const ch of m) {
-          if ('0!@3$*'.includes(ch)) { const sp = document.createElement('span'); sp.className = 'lx'; sp.textContent = ch; frag.append(sp); } else frag.append(ch);
-        }
+        const word = document.createElement('span');
+        word.className = 'lxn';
+        const core = m.search(SWAP), coreLen = m.match(SWAP)[0].length;
+        [...m].forEach((ch, k) => {
+          if (k >= core && k < core + coreLen && '0!@3$*'.includes(ch)) { const sp = document.createElement('span'); sp.className = 'lx'; sp.textContent = ch; word.append(sp); } else word.append(ch);
+        });
+        frag.append(word);
         last = at + m.length;
         return m;
       });

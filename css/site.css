@@ -29,6 +29,10 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-off
 .marq{display:flex;width:max-content;animation:marq 28s linear infinite}
 .marq.rev{animation-direction:reverse}
 @keyframes marq{to{transform:translateX(-50%)}}
+/* the yellow running line at the top of every page: one style everywhere, so no page falls back to the display font (feedback 11/12) */
+.ticker{background:var(--yellow);color:var(--ink);overflow:hidden;border-bottom:3px solid var(--ink)}
+.ticker .marq{padding:8px 0;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:.12em;white-space:nowrap;text-shadow:none;-webkit-text-stroke:0}
+.ticker span{padding-right:40px}
 .paused *,.paused{animation-play-state:paused!important}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
 

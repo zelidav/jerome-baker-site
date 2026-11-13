@@ -34,7 +34,7 @@
     ['The JB Crew', 'crew/', 'yellow', 'Twenty lunatics. No supervision.'],
     ['Find Your Crew', 'crew/match/', 'teal', 'Four questions. No lying.'],
     ['The Hot Shop', 'comics/', 'red', 'The comic. 21+.'],
-    ['The Story', '#made', 'white', 'Since 1991.'],
+    ['The Story', 'story/', 'white', 'Since 1991.'],
     ['Travel Guide', 'travel/', 'yellow', 'Where to go next.'],
     ['Join the JB Fam', 'join/', 'red', 'First look at every drop.'],
     ['Wholesale', 'wholesale/', 'teal', 'Carry JB in your store.'],
@@ -103,38 +103,52 @@
 (() => {
   const nav = document.querySelector('header nav[aria-label="Main"]');
   if (!nav || matchMedia('(prefers-reduced-motion: reduce)').matches || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-  const links = [...nav.querySelectorAll('a')];
-  if (!links.length) return;
+  if (!nav.querySelector('a')) return;
   nav.classList.add('lens');
-  const MAX = 0.55, REACH = 130, DROP = 10;   // extra scale at the cursor, how far the lens reaches (px), how far it drops (px)
-  let boxes = null, frame = 0, mx = 0;
+  const MAX = 0.4, REACH = 120, DROP = 8, GAP = 6;   // extra scale at the cursor, lens reach (px), drop (px), min space between links (px)
+  // the link list is read fresh each time the mouse comes in: Contact and the social icons are added to the menu
+  // after this runs (js/contact.js), and a list taken at load left them standing still while everything else moved
+  let links = [], boxes = null, frame = 0, mx = 0, edge = 0;
   const measure = () => {
-    // resting layout (offset* ignore transforms, so a half-finished swell can't throw the numbers off)
+    links = [...nav.querySelectorAll('a')].filter((a) => a.offsetWidth);
+    const nr = nav.getBoundingClientRect(); edge = nr.right + scrollX;   // the social icons sit just past the menu
+    // resting layout from the page box (offset* ignore transforms, so a half-finished swell can't throw the numbers off)
     boxes = links.map((a) => {
-      const p = (a.offsetParent || document.body).getBoundingClientRect();
-      return { cx: p.left + a.offsetLeft + a.offsetWidth / 2, w: a.offsetWidth, top: a.offsetTop };
+      let x = 0, y = 0;
+      for (let el = a; el; el = el.offsetParent) { x += el.offsetLeft; y += el.offsetTop; }
+      return { l: x, w: a.offsetWidth, cy: y + a.offsetHeight / 2 };
     });
   };
   const paint = () => {
     frame = 0;
     if (!boxes) measure();
-    const s = boxes.map((b) => { const d = Math.abs(mx - b.cx) / REACH; return d >= 1 ? 1 : 1 + MAX * (Math.cos(d * Math.PI) + 1) / 2; });
-    const shift = boxes.map(() => 0);
-    // push things outward from the cursor by half of each magnified neighbour's growth (same row only)
-    boxes.forEach((b, i) => {
-      const grow = (s[i] - 1) * b.w;
-      boxes.forEach((o, j) => {
-        if (j === i || Math.abs(o.top - b.top) > 4) return;
-        if (o.cx < b.cx) shift[j] -= grow / 2; else shift[j] += grow / 2;
+    const px = mx + scrollX;
+    const s = boxes.map((b) => { const d = Math.abs(px - (b.l + b.w / 2)) / REACH; return d >= 1 ? 1 : 1 + MAX * (Math.cos(d * Math.PI) + 1) / 2; });
+    // lay the row out again left to right at the magnified widths, keeping the row centred on where it was,
+    // so every link moves with its neighbours and none can overlap another (buttons and icons included)
+    const rows = [];
+    boxes.forEach((b, i) => { let r = rows.find((q) => Math.abs(q.cy - b.cy) < 24); if (!r) rows.push(r = { cy: b.cy, ix: [] }); r.ix.push(i); });
+    const tx = boxes.map(() => 0);
+    rows.forEach((r) => {
+      r.ix.sort((a, b) => boxes[a].l - boxes[b].l);
+      const first = boxes[r.ix[0]], last = boxes[r.ix[r.ix.length - 1]];
+      const restMid = (first.l + last.l + last.w) / 2;
+      let x = 0; const pos = [];
+      r.ix.forEach((i, k) => {
+        const b = boxes[i], nb = k ? boxes[r.ix[k - 1]] : null;
+        if (nb) x += Math.max(GAP, b.l - (nb.l + nb.w));   // keep the original spacing (at least GAP)
+        pos.push(x); x += b.w * s[i];
       });
+      const off = restMid - x / 2 - first.l;
+      r.ix.forEach((i, k) => { const b = boxes[i]; tx[i] = first.l + off + pos[k] + (b.w * s[i] - b.w) / 2 - b.l; });
     });
-    // never shove the last link off the right edge
+    // never past the end of the menu, into the social icons
     let over = 0;
-    boxes.forEach((b, i) => { over = Math.max(over, b.cx + shift[i] + (b.w * s[i]) / 2 - (innerWidth - 8)); });
+    boxes.forEach((b, i) => { over = Math.max(over, b.l + tx[i] + (b.w * (s[i] + 1)) / 2 - edge); });
     links.forEach((a, i) => {
       const k = s[i] - 1;
       a.classList.toggle('lensed', k > 0.02);
-      a.style.transform = `translate(${(shift[i] - over).toFixed(1)}px, ${(k / MAX * DROP).toFixed(1)}px) scale(${s[i].toFixed(3)})`;
+      a.style.transform = `translate(${(tx[i] - over).toFixed(1)}px, ${(k / MAX * DROP).toFixed(1)}px) scale(${s[i].toFixed(3)})`;
     });
   };
   nav.addEventListener('pointerenter', (e) => { if (e.pointerType !== 'mouse') return; measure(); nav.classList.add('lensing'); });
