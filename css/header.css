@@ -37,6 +37,10 @@ header.hdr nav a:not(.btn):not(.cartbtn){position:relative;text-decoration:none}
 header.hdr nav a:not(.btn):not(.cartbtn)::after{content:"";position:absolute;left:0;right:0;bottom:-9px;height:6px;pointer-events:none;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='6' viewBox='0 0 12 6'%3E%3Cpath d='M0 3 Q3 0 6 3 T12 3' fill='none' stroke='%23DA2342' stroke-width='2'/%3E%3C/svg%3E") repeat-x 0 50%/12px 6px}
 header.hdr nav a:not(.btn):not(.cartbtn):hover::after,header.hdr nav a:not(.btn):not(.cartbtn):focus-visible::after{animation:hdr-squiggle .32s linear infinite,hdr-squiggle-amp .64s ease-in-out infinite}
+/* the squiggle shows only under the link you're on or pointing at, not under every link (feedback 11/12) */
+header.hdr nav a:not(.btn):not(.cartbtn)::after{opacity:0;transition:opacity .15s}
+header.hdr nav a:not(.btn):not(.cartbtn):hover::after,header.hdr nav a:not(.btn):not(.cartbtn):focus-visible::after,header.hdr nav a[aria-current]:not(.btn)::after{opacity:1}
+header.hdr nav:has(a:hover) a[aria-current]:not(:hover)::after{opacity:0}
 @keyframes hdr-squiggle{to{background-position-x:-12px}}
 @keyframes hdr-squiggle-amp{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.7)}}
 @media (prefers-reduced-motion:reduce){header.hdr nav a::after{animation:none!important}}
