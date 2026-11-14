@@ -180,6 +180,7 @@
     aisles.querySelectorAll('.aisle').forEach((a) => { a.hidden = !a.querySelector('.tile:not([hidden])'); });
     $('#empty').hidden = shown > 0;
     renderChips();
+    if (window.JBSeries) window.JBSeries.refresh();
   };
   $('#priceSeg').addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -193,6 +194,94 @@
     only.checked = false;
     $('#priceSeg button[data-p=all]').click();
   });
+
+  // Series on phones (feedback 11/13: "easier way to see all the glass categories on mobile"). On a phone the
+  // yellow bar scrolls away with the page, so once it is gone a slim copy of the series row pins to the top:
+  // an "All series" button that opens a list of every series with counts, then the chips, with the series in
+  // view highlighted and slid into sight. Desktop keeps its sticky bar and just gets the highlight.
+  window.JBSeries = (() => {
+    const sbar = $('#sbar'), store = $('#shelves');
+    const pin = document.createElement('div');
+    pin.className = 'sbar-pin';
+    pin.setAttribute('aria-hidden', 'true');
+    pin.innerHTML = '<button type="button" class="sall" aria-haspopup="dialog" tabindex="-1">All series<i aria-hidden="true"></i></button><nav class="schips" aria-label="Series"></nav>';
+    const sheet = document.createElement('div');
+    sheet.className = 'ssheet';
+    sheet.hidden = true;
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-modal', 'true');
+    sheet.setAttribute('aria-label', 'All series');
+    sheet.innerHTML = '<div class="ssheet-in"><div class="ssheet-hd"><b>All series</b><button type="button" class="sx" aria-label="Close">✕</button></div><ol></ol></div>';
+    document.body.append(pin, sheet);
+    const pinChips = pin.querySelector('.schips'), list = sheet.querySelector('ol');
+    const phone = matchMedia('(max-width:760px)');
+    let cur = '', shown = false;
+
+    const refresh = () => {
+      pinChips.innerHTML = chips.innerHTML;
+      list.innerHTML = D.shelves.map((s) => {
+        const n = aisles.querySelectorAll(`#s-${s.key} .tile:not([hidden])`).length;
+        return n ? `<li><a href="#s-${s.key}" data-k="${s.key}" style="--g:${BANDS[s.key]}"><span>${esc(s.title)}</span><b>${n}</b></a></li>` : '';
+      }).join('');
+      cur = '';
+      track();
+    };
+    const mark = (k) => {
+      if (k === cur) return;
+      cur = k;
+      [chips, pinChips].forEach((row) => row.querySelectorAll('a').forEach((a) => {
+        const on = a.getAttribute('href') === `#s-${k}`;
+        a.classList.toggle('on', on);
+        if (on) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+        // slide the row (not the page) so the current chip is in view
+        if (on && row.scrollWidth > row.clientWidth) row.scrollTo({ left: a.getBoundingClientRect().left - row.getBoundingClientRect().left + row.scrollLeft - row.clientWidth / 2 + a.offsetWidth / 2, behavior: 'smooth' });
+      }));
+      list.querySelectorAll('a').forEach((a) => a.classList.toggle('on', a.dataset.k === k));
+    };
+    const track = () => {
+      // a section counts as current once its top reaches where a jump to it would land (its scroll margin)
+      let k = '';
+      aisles.querySelectorAll('.aisle:not([hidden])').forEach((a) => { if (a.getBoundingClientRect().top <= (parseFloat(getComputedStyle(a).scrollMarginTop) || 0) + 8) k = a.dataset.k; });
+      mark(k || (aisles.querySelector('.aisle:not([hidden])') || {}).dataset?.k || '');
+      const want = phone.matches && sbar.getBoundingClientRect().bottom < 0 && store.getBoundingClientRect().bottom > 140;
+      if (want !== shown) {
+        shown = want;
+        pin.classList.toggle('show', want);
+        pin.setAttribute('aria-hidden', String(!want));
+        pin.querySelectorAll('a,button').forEach((x) => (x.tabIndex = want ? 0 : -1));
+      }
+    };
+    let raf = 0;
+    addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; track(); }); }, { passive: true });
+    addEventListener('resize', track, { passive: true });
+
+    let back = null;
+    const open = () => {
+      back = document.activeElement;
+      sheet.hidden = false;
+      document.documentElement.classList.add('ssheet-open');
+      requestAnimationFrame(() => sheet.classList.add('in'));
+      (list.querySelector('a.on') || list.querySelector('a'))?.focus({ preventScroll: true });
+    };
+    const close = (go) => {
+      sheet.classList.remove('in');
+      document.documentElement.classList.remove('ssheet-open');
+      setTimeout(() => { sheet.hidden = true; }, 200);
+      if (!go && back) back.focus({ preventScroll: true });
+    };
+    pin.querySelector('.sall').addEventListener('click', open);
+    sheet.addEventListener('click', (e) => {
+      if (e.target === sheet || e.target.closest('.sx')) { close(); return; }
+      const a = e.target.closest('a');
+      if (!a) return;
+      e.preventDefault();
+      close(true);
+      const to = document.getElementById(`s-${a.dataset.k}`);
+      if (to) { to.scrollIntoView(); history.replaceState(null, '', `#s-${a.dataset.k}`); }
+    });
+    sheet.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    return { refresh };
+  })();
   apply();
 
   // hover: sm0ke off the mouthpiece; rest on it a moment and the studio photo fades in
