@@ -135,7 +135,9 @@ def site_footer(up, note=CREW_NOTE):
             f'<div><b>Follow</b><a href="https://www.instagram.com/jerome_baker" target="_blank" rel="noopener">@jerome_baker</a>'
             f'<b>Find the glass</b><a href="https://jeromebaker.com/" target="_blank" rel="noopener">jeromebaker.com</a>'
             f'<b>Shop merch</b><a href="{up}shop/">Ritual merch</a></div></div>'
-            f'<p class="sf-legal">© 2026 Jerome Baker Designs. Adults 21+ only. {note}</p></footer>')
+            f'<p class="sf-legal">© 2026 Jerome Baker Designs. Adults 21+ only. {note}</p>'
+            f'<nav class="sf-policy" aria-label="Policies"><a href="{up}privacy/">Privacy policy</a><a href="{up}terms/">Terms of service</a>'
+            f'<a href="{up}returns/">Returns and refunds</a></nav></footer>')
 
 
 def mate(slug, up, k):

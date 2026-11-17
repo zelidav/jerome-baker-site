@@ -119,3 +119,7 @@ img.sticker{height:auto}
 #glass .card{position:relative;cursor:pointer;transition:transform .18s ease}
 #glass .card:hover,#glass .card:focus-within{transform:rotate(-1.5deg) scale(1.03)}
 @media (prefers-reduced-motion:reduce){#glass .card{transition:none}#glass .card:hover,#glass .card:focus-within{transform:none}}
+/* the policy links every page footer carries */
+.sf-policy{max-width:1344px;margin:10px auto 0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12px}
+.sf-policy a{color:#c9c9c9;text-decoration:underline;text-underline-offset:2px}
+.sf-policy a:hover{color:var(--yellow)}

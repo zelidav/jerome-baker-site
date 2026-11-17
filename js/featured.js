@@ -43,9 +43,13 @@
 .fx-meta em{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin-top:6px;font:500 13px/1.4 Montserrat,Helvetica,Arial,sans-serif;font-style:normal;color:#2a2a2a;min-height:3.9em}
 .fx-meta i{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;font:900 18px/1 Montserrat,Helvetica,Arial,sans-serif;font-style:normal;color:#2A3B8E}
 .fx-meta i small{font:800 11px "JetBrains Mono",monospace;letter-spacing:.1em;color:#DA2342}
-.fx-dots{display:flex;justify-content:center;gap:6px;margin-top:4px}
-.fx-dots i{width:8px;height:8px;border-radius:50%;background:rgba(10,10,10,.25)}
-.fx-dots i.on{background:#0A0A0A}
+.fx-dots{display:flex;justify-content:center;flex-wrap:wrap;gap:2px;margin-top:4px}
+.fx-dots[hidden]{display:none}
+.fx-dots button{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;display:grid;place-items:center}
+.fx-dots button::before{content:"";width:9px;height:9px;border-radius:50%;background:rgba(10,10,10,.25);transition:background .15s,scale .15s}
+.fx-dots button:hover::before{background:rgba(10,10,10,.55);scale:1.25}
+.fx-dots button[aria-current]::before{background:#0A0A0A;scale:1.2}
+.fx-dots button:focus-visible{outline:3px solid #2A3B8E;outline-offset:1px;border-radius:50%}
 @media (max-width:560px){.fx-card{flex-basis:72vw}.fx-btns{display:none}}`;
   document.head.append(css);
 
@@ -55,7 +59,7 @@
   sec.setAttribute('aria-label', 'Featured right now');
   sec.innerHTML = `<div class="fx-head"><div><h2>On the shelf now.</h2><p>One-of-one glass, studio store pieces and the merch the crew wears. It turns over, so look twice.</p></div>
 <div class="fx-btns"><button type="button" data-d="-1" aria-label="Previous">←</button><button type="button" data-d="1" aria-label="Next">→</button></div></div>
-<div class="fx-track" tabindex="0" aria-label="Featured products"></div><div class="fx-dots" aria-hidden="true"></div>`;
+<div class="fx-track" tabindex="0" aria-label="Featured products"></div><div class="fx-dots" role="group" aria-label="Jump along the strip"></div>`;
   anchor.before(sec);
   const track = sec.querySelector('.fx-track'), dots = sec.querySelector('.fx-dots');
 
@@ -101,15 +105,49 @@
     track.innerHTML = mix.map((c, i) => `<a class="fx-card ${c.kind}" href="${c.href}" style="--t:${T[i % T.length]}">
 <span class="fx-pic"><span class="fx-tag">${esc(c.tag)}</span><img src="${esc(c.img)}" alt="" loading="lazy" decoding="async"${c.full ? ` onerror="this.onerror=null;this.src='${esc(c.full)}'"` : ''}></span>
 <span class="fx-meta"><b>${esc(c.name)}</b><span>${esc(c.sub)}</span>${c.blurb ? `<em>${esc(blurb(c.blurb))}</em>` : ''}<i>${money(c.price)}<small>${c.kind === 'glass' ? 'SEE IT →' : 'GET IT →'}</small></i></span></a>`).join('');
-    dots.innerHTML = mix.map(() => '<i></i>').join('');
     rotate(mix.length);
   };
 
   // ---------- the drift ----------
   function rotate(n) {
     const step = () => { const c = track.children[0], c2 = track.children[1]; return c && c2 ? c2.offsetLeft - c.offsetLeft : track.clientWidth * .8; };
-    const at = () => Math.round(track.scrollLeft / Math.max(1, step()));
-    const mark = () => { const k = at(); [...dots.children].forEach((d, i) => d.classList.toggle('on', i === k)); };
+    // one dot per place the strip can actually stop (feedback 11/17: the dots did nothing). On a wide screen several
+    // cards show at once and the strip runs out of scroll before the last card reaches the left edge, so there are
+    // fewer stops than cards; the last dot is the end of the strip.
+    // one dot per place the strip can actually stop (feedback 11/17: the dots did nothing). Stops are the real card
+    // positions (cards are not all the same width), and on a wide screen the strip runs out of scroll before the last
+    // cards reach the left edge, so the last dot is simply the end of the strip.
+    const maxL = () => track.scrollWidth - track.clientWidth;
+    const spots = () => {
+      const cs = [...track.children], m = maxL(), out = [];
+      if (!cs.length || m < 8) return [0];
+      for (const c of cs) { const x = c.offsetLeft - cs[0].offsetLeft; if (x >= m - 24) break; out.push(x); }
+      out.push(m);
+      return out;
+    };
+    let pos = [0], sig = '';
+    const mark = () => {
+      pos = spots();
+      const key = pos.join();
+      if (key !== sig) {
+        const rebuild = pos.length !== dots.children.length;
+        sig = key;
+        dots.hidden = pos.length < 2;
+        if (rebuild) dots.innerHTML = pos.map((_, i) => `<button type="button" data-i="${i}" aria-label="Go to stop ${i + 1} of ${pos.length}"></button>`).join('');
+      }
+      let k = 0;
+      pos.forEach((x, i) => { if (Math.abs(x - track.scrollLeft) < Math.abs(pos[k] - track.scrollLeft)) k = i; });
+      [...dots.children].forEach((d, i) => (i === k ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
+    };
+    let pauseUntil = 0;
+    const hold = (ms) => { pauseUntil = performance.now() + ms; };
+    dots.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-i]');
+      if (!b) return;
+      track.scrollTo({ left: pos[+b.dataset.i] ?? 0, behavior: reduce ? 'auto' : 'smooth' });
+      hold(8000);
+    });
+    addEventListener('resize', () => requestAnimationFrame(mark), { passive: true });
     const go = (d) => {
       const end = track.scrollWidth - track.clientWidth - 4;
       if (d > 0 && track.scrollLeft >= end) track.scrollTo({ left: 0, behavior: reduce ? 'auto' : 'smooth' });
@@ -121,8 +159,7 @@
     mark();
     // Lite mode (js/litemode.js): the strip holds still, swipe and arrows still work
     if (reduce || n < 2 || (() => { try { return localStorage.getItem('jb-lite') === '1'; } catch (e) { return false; } })()) return;
-    let pauseUntil = 0, held = false, seen = false;
-    const hold = (ms) => { pauseUntil = performance.now() + ms; };
+    let held = false, seen = false;
     // grab and drag it with a mouse (touch already swipes natively). A real drag swallows the click so the
     // card under the pointer doesn't open; snapping is off while dragging and comes back on release.
     let drag = null;
