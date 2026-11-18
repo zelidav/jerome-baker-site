@@ -1,0 +1,29 @@
+/* privacy/, terms/, returns/: the policy pages. Plain and readable; the brand lives in the band up top. */
+.lg-hero{background:var(--yellow);color:var(--ink);padding-top:clamp(40px,6vw,80px);padding-bottom:clamp(32px,5vw,56px);border-bottom:4px solid var(--ink)}
+.lg-hero .kicker{display:inline-block;margin:0 0 14px;padding:6px 10px;background:var(--ink);color:var(--yellow);font:700 12px var(--mono);letter-spacing:.2em;rotate:-2deg}
+.lg-hero h1{margin:0;font-family:var(--display);font-weight:900;font-size:clamp(44px,8vw,104px);line-height:.9;letter-spacing:-.03em;color:var(--blue)}
+.lg-hero p{max-width:60ch;margin:18px 0 0;font-size:clamp(16px,1.4vw,19px);line-height:1.5;font-weight:600}
+.lg-hero .upd{font:700 12px var(--mono);letter-spacing:.12em;margin-top:14px;opacity:.7}
+.lg-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.lg-tabs a{padding:8px 14px;border:2px solid var(--ink);background:var(--white);color:var(--ink);text-decoration:none;font-weight:800;font-size:14px;border-radius:999px}
+.lg-tabs a[aria-current]{background:var(--ink);color:var(--yellow)}
+.lg-tabs a:hover{background:var(--ink);color:var(--white)}
+.lg-body{background:var(--white);color:var(--ink);padding-top:clamp(40px,5vw,72px);padding-bottom:clamp(56px,7vw,96px)}
+.lg-body .wrap{display:grid;grid-template-columns:minmax(0,240px) minmax(0,1fr);gap:40px 64px;align-items:start}
+.lg-toc{position:sticky;top:110px;font-size:14px}
+.lg-toc b{display:block;font:700 12px var(--mono);letter-spacing:.16em;margin-bottom:10px;color:var(--red)}
+.lg-toc ol{margin:0;padding-left:20px;display:grid;gap:6px}
+.lg-toc a{color:var(--ink);font-weight:700}
+.lg-doc{max-width:72ch}
+.lg-doc h2{margin:44px 0 0;font-family:var(--display);font-weight:900;font-size:clamp(24px,2.6vw,32px);line-height:1.1;color:var(--blue)}
+.lg-doc h2:first-child{margin-top:0}
+.lg-doc h3{margin:24px 0 0;font-size:18px;font-weight:800}
+.lg-doc p,.lg-doc li{font-size:17px;line-height:1.65}
+.lg-doc p{margin:12px 0 0}
+.lg-doc ul{margin:12px 0 0;padding-left:22px}
+.lg-doc li+li{margin-top:6px}
+.lg-doc a{color:var(--blue);font-weight:700}
+.lg-doc .box{margin:18px 0 0;padding:16px 18px;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);background:var(--yellow)}
+.lg-doc .box p:first-child{margin-top:0}
+.lg-doc .caps{text-transform:uppercase;font-size:14px;letter-spacing:.02em}
+@media (max-width:860px){.lg-body .wrap{grid-template-columns:1fr}.lg-toc{position:static}}
