@@ -4,6 +4,10 @@ alt/title/aria-label text, page titles and share descriptions, and the prose str
 Links, file names, slugs, CSS classes and code are left alone. js/popfx.js gives the swapped characters a little
 graffiti tilt so they read as the look, not as typos.
 
+SEO exception: bong, pipe and blowpipe keep their real spelling where search engines read and rank the page:
+<title>, meta description, <h1>, image alt text and JSON-LD. Those are the words people search ("jerome baker bong").
+Share-card text (og:/twitter:) stays swapped, because that's what social link scanners read, and so does body copy.
+
 Run it after any copy change (the build scripts call it at the end):  python tools/scrub.py
 Check without writing:                                                python tools/scrub.py --check
 """
@@ -88,6 +92,17 @@ def prose(text):
     return WORDS.sub(lambda m: swap_word(m, text), text)
 
 
+# words that keep their real spelling in the SEO zones, and how to un-swap the stylized form
+SEO_REAL = re.compile(r'(?<![A-Za-z0-9])(b0ngs?|(?:blow)?p!pes?)(?![A-Za-z0-9])', re.I)
+SEO_KEEP = re.compile(r'^(?:bongs?|(?:blow)?pipes?)$', re.I)
+
+
+def seo(text):
+    """Search-engine zone: real spelling for bong/pipe, every other flagged word still swapped."""
+    text = SEO_REAL.sub(lambda m: m.group(1).replace('0', 'o').replace('!', 'i'), text)
+    return WORDS.sub(lambda m: m.group(1) if SEO_KEEP.match(m.group(1)) else swap_word(m, text), text)
+
+
 def js_prose(code):
     """Swap only inside prose: a quoted string or comment run that has spaces in it (sentences, names, labels).
     Single-token strings ('smoke', 'pointerdown') and code outside strings are never touched."""
@@ -126,33 +141,49 @@ def js_prose(code):
     return ''.join(out)
 
 
-ATTRS = re.compile(r'''(\b(?:alt|title|aria-label|placeholder|data-text)=)(["'])(.*?)\2''', re.S)
-META = re.compile(r'''(<meta\b[^>]*\b(?:name|property)=["'](?:description|og:title|og:description|twitter:title|twitter:description)["'][^>]*\bcontent=)(["'])(.*?)\2''', re.I | re.S)
-META2 = re.compile(r'''(<meta\b[^>]*\bcontent=)(["'])(.*?)\2([^>]*\b(?:name|property)=["'](?:description|og:title|og:description|twitter:title|twitter:description)["'])''', re.I | re.S)
+ATTRS = re.compile(r'''(\b(alt|title|aria-label|placeholder|data-text)=)(["'])(.*?)\3''', re.S)
+META = re.compile(r'''(<meta\b[^>]*\b(?:name|property)=["'](description|og:title|og:description|twitter:title|twitter:description)["'][^>]*\bcontent=)(["'])(.*?)\3''', re.I | re.S)
+META2 = re.compile(r'''(<meta\b[^>]*\bcontent=)(["'])(.*?)\2([^>]*\b(?:name|property)=["'](description|og:title|og:description|twitter:title|twitter:description)["'])''', re.I | re.S)
 
 
 def html(doc):
     out = []
+    zone = 0  # > 0 inside <title> or <h1>: search-engine text
     for part in re.split(r'(<script\b[^>]*>.*?</script>|<style\b[^>]*>.*?</style>|<[^>]+>)', doc, flags=re.S | re.I):
         if not part:
             continue
         low = part[:7].lower()
         if low.startswith('<script'):
             k = part.find('>') + 1
-            if 'src=' in part[:k] or 'application/ld+json' in part[:k] and False:
+            if 'src=' in part[:k]:
                 out.append(part)
+            elif 'application/ld+json' in part[:k]:
+                out.append(part[:k] + seo_js(part[k:-9]) + part[-9:])
             else:
                 out.append(part[:k] + js_prose(part[k:-9]) + part[-9:])
         elif low.startswith('<style'):
             out.append(part)
         elif part.startswith('<'):
-            t = ATTRS.sub(lambda m: m.group(1) + m.group(2) + prose(m.group(3)) + m.group(2), part)
-            t = META.sub(lambda m: m.group(1) + m.group(2) + prose(m.group(3)) + m.group(2), t)
-            t = META2.sub(lambda m: m.group(1) + m.group(2) + prose(m.group(3)) + m.group(2) + m.group(4), t)
+            if re.match(r'<(title|h1)\b', part, re.I):
+                zone += 1
+            elif re.match(r'</(title|h1)\s*>', part, re.I):
+                zone = max(0, zone - 1)
+            t = ATTRS.sub(lambda m: m.group(1) + m.group(3) + (seo if m.group(2) == 'alt' else prose)(m.group(4)) + m.group(3), part)
+            t = META.sub(lambda m: m.group(1) + m.group(3) + (seo if m.group(2).lower() == 'description' else prose)(m.group(4)) + m.group(3), t)
+            t = META2.sub(lambda m: m.group(1) + m.group(2) + (seo if m.group(5).lower() == 'description' else prose)(m.group(3)) + m.group(2) + m.group(4), t)
             out.append(t)
         else:
-            out.append(prose(part))
+            out.append(seo(part) if zone else prose(part))
     return ''.join(out)
+
+
+def seo_js(code):
+    """JSON-LD: the strings are what Google reads, so they get the search-engine spelling."""
+    # links and file paths keep their exact spelling (the URL has to resolve); only words get changed
+    def one(m):
+        v = m.group(1)
+        return m.group(0) if re.match(r'(?:https?:|/|\.\.?/)', v) or re.search(r'\.(?:webp|png|jpe?g|svg|html|js)$', v) else '"' + seo(v) + '"'
+    return re.sub(r'"((?:[^"\\]|\\.)*)"', one, code)
 
 
 SKIP_DIRS = {'.git', 'node_modules', 'tools', '.studio', 'assets'}
