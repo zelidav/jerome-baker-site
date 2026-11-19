@@ -5,7 +5,7 @@ window.JB_CREW = [
   "img": "lion",
   "name": "Torch",
   "title": "The lion on the torch",
-  "doing": "Pulling a glass bubble off a blowp!pe. On a skateboard.",
+  "doing": "Pulling a glass bubble off a blowpipe. On a skateboard.",
   "lines": [
    "Hold still. I'm pulling a bubble.",
    "Hood down. Fire code.",
