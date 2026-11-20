@@ -101,7 +101,7 @@ def main():
             continue
         st = {'available': 'available', 'sold': 'sold'}.get(g.get('status'), 'collected')
         status[pid] = {'status': st, 'price': g.get('price') or 0}
-        if (not g.get('cutout_url') or pid in have or g.get('is_grouped')
+        if (not g.get('cutout_url') or g.get('site') or pid in have or g.get('is_grouped')
                 or (g.get('category') or '').startswith(bg.SKIP_CATS + bg.OWN_CATS_ON_SHOPIFY)):
             continue
         keep = prev_src.get(pid) == g['cutout_url'] and pid in prev_pieces and (d / f'{pid}_z.webp').exists()
