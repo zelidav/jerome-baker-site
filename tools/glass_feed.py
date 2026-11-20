@@ -13,8 +13,11 @@ Every gallery piece's current status and price ride along in `status`, so a sale
 
   python tools/glass_feed.py <out_dir> [--site <dir with js/glass-data.js>] [--extra gallery_items.json] [--host URL]
 """
+
 import argparse, json, re, sys, time, urllib.error, urllib.request
 from pathlib import Path
+
+PID_OK = re.compile(r'^[A-Za-z0-9_-]{1,64}$')  # ids end up in file paths and page markup
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_glass as bg  # noqa: E402
@@ -92,6 +95,8 @@ def main():
     status, pieces, src = {}, [], {}
     for g in gallery:
         pid = g.get('provenance_id')
+        if not isinstance(pid, str) or not PID_OK.match(pid):
+            continue  # ids end up in file paths and page markup: only plain app ids get through
         if not pid:
             continue
         st = {'available': 'available', 'sold': 'sold'}.get(g.get('status'), 'collected')

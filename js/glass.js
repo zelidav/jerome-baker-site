@@ -146,7 +146,7 @@ const glassBoot = () => {
   const aisles = $('#aisles');
   const tile = (p, feature) => {
     const sub = [p.series === 'Limited Edition' || p.series === 'Original Series' || p.series === 'Giant B0ng Series' ? p.shape : p.series, p.inches && `${p.inches} in`].filter(Boolean).join(', ');
-    return `<button type="button" class="tile${feature ? ' feature' : ''}${sold(p) ? ' out' : ''}${p.w > p.h * .8 ? ' wide' : ''}" data-id="${p.id}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}">`
+    return `<button type="button" class="tile${feature ? ' feature' : ''}${sold(p) ? ' out' : ''}${p.w > p.h * .8 ? ' wide' : ''}" data-id="${esc(p.id)}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}">`
       + `<span class="frame">${p.standard && !p.edition && sold(p) ? '' : `<span class="pill">${esc(p.edition || (p.shop || p.standard ? 'In stock' : '1 of 1'))}</span>`}${sold(p) ? `<span class="pill gone">${tagOf(p)}</span>` : ''}`
       + `<img class="cut" src="${img(p, !feature)}" alt="" loading="lazy" decoding="async"></span>`
       + `<span class="t-name">${esc(p.name)}</span><span class="t-sub">${esc(sub)}</span>`
@@ -379,7 +379,7 @@ const glassBoot = () => {
       return;
     }
     box.innerHTML = p.online
-      ? `${p.variants && p.variants.length > 1 ? `<label class="bvar"><span>${esc(p.opt || 'Option')}</span><select id="bVar">${p.variants.map(([id, t, pr]) => `<option value="${id}" data-pr="${pr}">${esc(t)}, ${money(pr)}</option>`).join('')}</select></label>` : ''}<a class="btn btn-red" id="bBuy" href="${p.buy}" target="_blank" rel="noopener">Buy it, ${money(p.price)}</a>`
+      ? `${p.variants && p.variants.length > 1 ? `<label class="bvar"><span>${esc(p.opt || 'Option')}</span><select id="bVar">${p.variants.map(([id, t, pr]) => `<option value="${id}" data-pr="${pr}">${esc(t)}, ${money(pr)}</option>`).join('')}</select></label>` : ''}<a class="btn btn-red" id="bBuy" href="${esc(p.buy)}" target="_blank" rel="noopener">Buy it, ${money(p.price)}</a>`
       : `<a class="btn btn-red" id="bBuy" href="mailto:sales@jeromebakerny.com?subject=${encodeURIComponent(`Jerome Baker glass: ${p.name} (${p.id})`)}">Ask to buy this piece</a>`;
     const sel = $('#bVar');
     if (sel) sel.onchange = () => {
@@ -426,7 +426,7 @@ const glassBoot = () => {
       ['Series', p.series],
       p.shape && p.shop && ['Type', p.shape],
       p.inches && ['Height', `About ${p.inches} in`],
-      p.shop ? ['Order', `<a href="${p.verify}" target="_blank" rel="noopener">jeromebaker.com</a>`] : ['Provenance', `<a href="${p.verify}" target="_blank" rel="noopener">${p.id}</a>`],
+      p.shop ? ['Order', `<a href="${esc(p.verify)}" target="_blank" rel="noopener">jeromebaker.com</a>`] : ['Provenance', `<a href="${esc(p.verify)}" target="_blank" rel="noopener">${esc(p.id)}</a>`],
     ].filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${k === 'Provenance' || k === 'Order' ? v : esc(v)}</dd>`).join('');
     history.replaceState(null, '', '#p=' + p.id);
     if (!calm && smokes(p)) bSmoke.on('idle', () => (bImg.complete ? benchMouth() : null), .18, { ...wisp, size: 16 });
