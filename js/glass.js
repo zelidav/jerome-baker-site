@@ -1,10 +1,12 @@
 /* The Glass showcase: shelves from js/glass-data.js, sm0ke off any piece you hover, and the bench,
    where you hold a piece down to fill it with sm0ke and let it go. */
-(() => {
+/* waits for js/glass-feed.js (live pieces from the app, 2.5s at most) before drawing the shelves */
+const glassBoot = () => {
   const D = window.JB_GLASS;
   if (!D) return;
   const $ = (s, r = document) => r.querySelector(s);
-  const img = (p, thumb) => `../assets/glass/${p.id}${thumb ? '_t' : ''}.webp`;
+  const gimg = window.JBGlassImg || ((p, s, b) => b + 'assets/glass/' + p.id + s + '.webp');
+  const img = (p, thumb) => gimg(p, thumb ? '_t' : '', '../');
   const money = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarse = matchMedia('(pointer: coarse)').matches;
@@ -317,7 +319,7 @@
 
   // zoom (from the bench): the full-resolution cutout first, then the original photos
   const photosOf = (p) => [
-    { src: `../assets/glass/${p.id}_z.webp`, w: p.zw, h: p.zh, alt: `${p.name}, close up` },
+    { src: gimg(p, '_z', '../'), w: p.zw, h: p.zh, alt: `${p.name}, close up` },
     ...(p.photos || (p.shop ? [] : [`${HOST}/piece/${p.id}/image.jpg`])).map((ph, i) => typeof ph === 'string'
       ? { src: ph, alt: `${p.name}, photo ${i + 2}` }
       : { src: `../assets/glass/${ph.src}`, thumb: `../assets/glass/${ph.src.replace(/\.webp$/, '_t.webp')}`, w: ph.w, h: ph.h, alt: `${p.name}: ${ph.label}`, label: ph.label }),
@@ -488,7 +490,7 @@
       const r = bImg.getBoundingClientRect(), pr = bPiece.getBoundingClientRect();
       const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
       if (fx < 0 || fx > 1 || fy < 0 || fy > 1) { lens.classList.remove('on'); return; }
-      const url = `../assets/glass/${cur.id}_z.webp`;
+      const url = gimg(cur, '_z', '../');
       if (lens.dataset.src !== url) { lens.dataset.src = url; lens.style.backgroundImage = `url(${url})`; }
       const L = lens.offsetWidth || 190;
       lens.style.backgroundSize = `${r.width * LK}px ${r.height * LK}px`;
@@ -842,7 +844,8 @@ ${treads}<rect x="${lx0 - 6}" y="0" width="${rx0 - lx0 + 12}" height="${capH}" r
   };
   addEventListener('hashchange', route);
   route();
-})();
+};
+(window.JBGlassFeed ? window.JBGlassFeed.ready : Promise.resolve()).then(glassBoot);
 
 // the JB pattern on each band drifts a little slower than the page (a light parallax). Only bands on screen update.
 (() => {

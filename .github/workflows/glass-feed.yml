@@ -1,0 +1,44 @@
+# Live glass feed (tools/glass_feed.py). Every 15 minutes, takes the pieces added in the JB app (they have a cutout_url
+# and aren't in js/glass-data.js yet), makes their site images, and commits glass-feed.json + assets/glass/ to the
+# `glass-feed` data branch, which js/glass-feed.js reads straight from raw.githubusercontent.com. It also carries the
+# current status and price of every piece, so a sale or price change shows with no rebuild. main stays untouched
+# (it's protected), so no site deploy is needed. Needs no secrets. Same pattern as ig-feed.yml.
+name: Glass feed
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: glass-feed
+jobs:
+  feed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: site
+      - name: Check out the data branch
+        run: |
+          cd site
+          if git ls-remote --exit-code --heads origin glass-feed >/dev/null; then
+            git fetch --depth=1 origin glass-feed
+            git worktree add ../out origin/glass-feed
+            cd ../out && git checkout -B glass-feed
+          else
+            git worktree add --orphan -b glass-feed ../out
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build the feed
+        run: |
+          pip install --quiet pillow numpy opencv-python-headless
+          python site/tools/glass_feed.py out --site site
+      - name: Commit if anything changed
+        run: |
+          cd out
+          git add -A
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git -c user.name="jb-glass-feed" -c user.email="actions@users.noreply.github.com" commit -q -m "Glass feed $(date -u +%FT%RZ)"
+          git push -q origin glass-feed

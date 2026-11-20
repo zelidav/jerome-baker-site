@@ -71,6 +71,7 @@
     document.head.append(s);
   });
 
+  const gimg = (p, s) => (window.JBGlassImg || ((q, x, b) => b + 'assets/glass/' + q.id + x + '.webp'))(p, s, base);
   const build = () => {
     const G = window.JB_GLASS || { pieces: [] }, S = window.JBShop || { items: [], featured: [] };
     const live = G.pieces.filter((p) => p.online !== false && p.status === 'available');
@@ -80,7 +81,7 @@
       ...take((p) => p.shop === 'shopify' && p.shelf === 'studio', 3), ...take((p) => p.shelf === 'creatures', 2),
       ...take((p) => p.shop === 'shopify' && p.shelf === 'daily', 1),
     ].map((p) => ({
-      href: `${base}glass/#p=${encodeURIComponent(p.id)}`, img: `${base}assets/glass/${p.id}_t.webp`, name: p.name,
+      href: `${base}glass/#p=${encodeURIComponent(p.id)}`, img: gimg(p, '_t'), name: p.name,
       sub: p.shop === 'shopify' ? 'Studio store' : (p.series || 'Glass'), price: p.price, tag: p.edition || (p.shop ? 'In stock' : '1 of 1'), kind: 'glass', blurb: p.desc,
     }));
     const byId = new Map(S.items.map((p) => [p.id, p]));
@@ -97,10 +98,15 @@
     while (glass.length || merch.length) { if (glass.length) mix.push(glass.shift()); if (merch.length) mix.push(merch.shift()); }
     // David 2026-11-12: the Jason Harris Maui Originals lead the strip while they're on the shelf
     const maui = live.filter((p) => p.shelf === 'maui').map((p) => ({
-      href: `${base}glass/#p=${encodeURIComponent(p.id)}`, img: `${base}assets/glass/${p.id}_t.webp`, name: p.name,
+      href: `${base}glass/#p=${encodeURIComponent(p.id)}`, img: gimg(p, '_t'), name: p.name,
       sub: 'New from Maui', price: p.price, tag: 'New · 1 of 1', kind: 'glass', blurb: p.desc,
     }));
-    mix.unshift(...maui);
+    // pieces added in the app since the last site build (js/glass-feed.js) lead the strip too
+    const fresh = live.filter((p) => p.img && p.shelf !== 'maui').map((p) => ({
+      href: `${base}glass/#p=${encodeURIComponent(p.id)}`, img: gimg(p, '_t'), name: p.name,
+      sub: p.series || 'New glass', price: p.price, tag: 'New · ' + (p.edition || '1 of 1'), kind: 'glass', blurb: p.desc,
+    }));
+    mix.unshift(...fresh, ...maui);
     const T = ['-1.5deg', '1deg', '-.5deg', '1.5deg', '-1deg', '.5deg'];
     track.innerHTML = mix.map((c, i) => `<a class="fx-card ${c.kind}" href="${c.href}" style="--t:${T[i % T.length]}">
 <span class="fx-pic"><span class="fx-tag">${esc(c.tag)}</span><img src="${esc(c.img)}" alt="" loading="lazy" decoding="async"${c.full ? ` onerror="this.onerror=null;this.src='${esc(c.full)}'"` : ''}></span>
@@ -207,7 +213,7 @@
   const io = new IntersectionObserver((es) => {
     if (!es.some((e) => e.isIntersecting)) return;
     io.disconnect();
-    Promise.all([load('js/glass-data.js', () => window.JB_GLASS), load('js/shop-data.js', () => window.JBShop)]).then(build);
+    Promise.all([load('js/glass-data.js', () => window.JB_GLASS).then(() => load('js/glass-feed.js', () => window.JBGlassFeed)).then(() => (window.JBGlassFeed ? window.JBGlassFeed.ready : null)), load('js/shop-data.js', () => window.JBShop)]).then(build);
   }, { rootMargin: '600px 0px' });
   io.observe(sec);
 })();
