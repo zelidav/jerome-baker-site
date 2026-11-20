@@ -31,7 +31,7 @@
     });
     return loaded[file];
   };
-  const glass = () => load('js/glass-data.js', () => window.JB_GLASS);
+  const glass = () => load('js/glass-data.js', () => window.JB_GLASS).then((d) => (d ? load('js/glass-feed.js', () => window.JBGlassFeed).then(() => (window.JBGlassFeed ? window.JBGlassFeed.ready : null)).then(() => d) : d));
   const shop = () => load('js/shop-data.js', () => window.JBShop);
   const crew = () => load('js/crew-data.js', () => window.JB_CREW);
 
@@ -45,7 +45,7 @@
         const shelves = D.shelves.map((s) => {
           const ps = D.pieces.filter((p) => p.shelf === s.key);
           const show = ps.find((p) => p.status === 'available' && p.w) || ps.find((p) => p.w) || ps[0];
-          return { s, n: ps.length, img: show ? base + 'assets/glass/' + show.id + '_t.webp' : '' };
+          return { s, n: ps.length, img: show ? (window.JBGlassImg || ((p, s, b) => b + 'assets/glass/' + p.id + s + '.webp'))(show, '_t', base) : '' };
         }).filter((x) => x.n);
         return `<p class="mm-h">Every shelf in the shop</p><ul class="mm-shelves">${shelves.map((x, i) =>
           `<li style="--t:${((i * 5) % 7 - 3) * .9}deg"><a class="mm-stk" href="${base}glass/#s-${esc(x.s.key)}"><span class="mm-pic"><img src="${esc(x.img)}" alt="" loading="lazy" decoding="async"></span><span class="mm-tx"><b>${esc(x.s.title)}</b><small>${x.n} ${x.n === 1 ? 'piece' : 'pieces'}</small></span></a></li>`).join('')}</ul>

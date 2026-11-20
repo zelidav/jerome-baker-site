@@ -1,10 +1,12 @@
 /* The Glass showcase: shelves from js/glass-data.js, sm0ke off any piece you hover, and the bench,
    where you hold a piece down to fill it with sm0ke and let it go. */
-(() => {
+/* waits for js/glass-feed.js (live pieces from the app, 2.5s at most) before drawing the shelves */
+const glassBoot = () => {
   const D = window.JB_GLASS;
   if (!D) return;
   const $ = (s, r = document) => r.querySelector(s);
-  const img = (p, thumb) => `../assets/glass/${p.id}${thumb ? '_t' : ''}.webp`;
+  const gimg = window.JBGlassImg || ((p, s, b) => b + 'assets/glass/' + p.id + s + '.webp');
+  const img = (p, thumb) => gimg(p, thumb ? '_t' : '', '../');
   const money = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarse = matchMedia('(pointer: coarse)').matches;
@@ -144,7 +146,7 @@
   const aisles = $('#aisles');
   const tile = (p, feature) => {
     const sub = [p.series === 'Limited Edition' || p.series === 'Original Series' || p.series === 'Giant B0ng Series' ? p.shape : p.series, p.inches && `${p.inches} in`].filter(Boolean).join(', ');
-    return `<button type="button" class="tile${feature ? ' feature' : ''}${sold(p) ? ' out' : ''}${p.w > p.h * .8 ? ' wide' : ''}" data-id="${p.id}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}">`
+    return `<button type="button" class="tile${feature ? ' feature' : ''}${sold(p) ? ' out' : ''}${p.w > p.h * .8 ? ' wide' : ''}" data-id="${esc(p.id)}" aria-label="${esc(p.name)}, ${sold(p) ? tagOf(p) : money(p.price)}">`
       + `<span class="frame">${p.standard && !p.edition && sold(p) ? '' : `<span class="pill">${esc(p.edition || (p.shop || p.standard ? 'In stock' : '1 of 1'))}</span>`}${sold(p) ? `<span class="pill gone">${tagOf(p)}</span>` : ''}`
       + `<img class="cut" src="${img(p, !feature)}" alt="" loading="lazy" decoding="async"></span>`
       + `<span class="t-name">${esc(p.name)}</span><span class="t-sub">${esc(sub)}</span>`
@@ -317,7 +319,7 @@
 
   // zoom (from the bench): the full-resolution cutout first, then the original photos
   const photosOf = (p) => [
-    { src: `../assets/glass/${p.id}_z.webp`, w: p.zw, h: p.zh, alt: `${p.name}, close up` },
+    { src: gimg(p, '_z', '../'), w: p.zw, h: p.zh, alt: `${p.name}, close up` },
     ...(p.photos || (p.shop ? [] : [`${HOST}/piece/${p.id}/image.jpg`])).map((ph, i) => typeof ph === 'string'
       ? { src: ph, alt: `${p.name}, photo ${i + 2}` }
       : { src: `../assets/glass/${ph.src}`, thumb: `../assets/glass/${ph.src.replace(/\.webp$/, '_t.webp')}`, w: ph.w, h: ph.h, alt: `${p.name}: ${ph.label}`, label: ph.label }),
@@ -377,7 +379,7 @@
       return;
     }
     box.innerHTML = p.online
-      ? `${p.variants && p.variants.length > 1 ? `<label class="bvar"><span>${esc(p.opt || 'Option')}</span><select id="bVar">${p.variants.map(([id, t, pr]) => `<option value="${id}" data-pr="${pr}">${esc(t)}, ${money(pr)}</option>`).join('')}</select></label>` : ''}<a class="btn btn-red" id="bBuy" href="${p.buy}" target="_blank" rel="noopener">Buy it, ${money(p.price)}</a>`
+      ? `${p.variants && p.variants.length > 1 ? `<label class="bvar"><span>${esc(p.opt || 'Option')}</span><select id="bVar">${p.variants.map(([id, t, pr]) => `<option value="${id}" data-pr="${pr}">${esc(t)}, ${money(pr)}</option>`).join('')}</select></label>` : ''}<a class="btn btn-red" id="bBuy" href="${esc(p.buy)}" target="_blank" rel="noopener">Buy it, ${money(p.price)}</a>`
       : `<a class="btn btn-red" id="bBuy" href="mailto:sales@jeromebakerny.com?subject=${encodeURIComponent(`Jerome Baker glass: ${p.name} (${p.id})`)}">Ask to buy this piece</a>`;
     const sel = $('#bVar');
     if (sel) sel.onchange = () => {
@@ -424,7 +426,7 @@
       ['Series', p.series],
       p.shape && p.shop && ['Type', p.shape],
       p.inches && ['Height', `About ${p.inches} in`],
-      p.shop ? ['Order', `<a href="${p.verify}" target="_blank" rel="noopener">jeromebaker.com</a>`] : ['Provenance', `<a href="${p.verify}" target="_blank" rel="noopener">${p.id}</a>`],
+      p.shop ? ['Order', `<a href="${esc(p.verify)}" target="_blank" rel="noopener">jeromebaker.com</a>`] : ['Provenance', `<a href="${esc(p.verify)}" target="_blank" rel="noopener">${esc(p.id)}</a>`],
     ].filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${k === 'Provenance' || k === 'Order' ? v : esc(v)}</dd>`).join('');
     history.replaceState(null, '', '#p=' + p.id);
     if (!calm && smokes(p)) bSmoke.on('idle', () => (bImg.complete ? benchMouth() : null), .18, { ...wisp, size: 16 });
@@ -488,7 +490,7 @@
       const r = bImg.getBoundingClientRect(), pr = bPiece.getBoundingClientRect();
       const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
       if (fx < 0 || fx > 1 || fy < 0 || fy > 1) { lens.classList.remove('on'); return; }
-      const url = `../assets/glass/${cur.id}_z.webp`;
+      const url = gimg(cur, '_z', '../');
       if (lens.dataset.src !== url) { lens.dataset.src = url; lens.style.backgroundImage = `url(${url})`; }
       const L = lens.offsetWidth || 190;
       lens.style.backgroundSize = `${r.width * LK}px ${r.height * LK}px`;
@@ -842,7 +844,8 @@ ${treads}<rect x="${lx0 - 6}" y="0" width="${rx0 - lx0 + 12}" height="${capH}" r
   };
   addEventListener('hashchange', route);
   route();
-})();
+};
+(window.JBGlassFeed ? window.JBGlassFeed.ready : Promise.resolve()).then(glassBoot);
 
 // the JB pattern on each band drifts a little slower than the page (a light parallax). Only bands on screen update.
 (() => {

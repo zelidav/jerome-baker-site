@@ -134,14 +134,17 @@ def shape_cut(p):
     return None
 
 
-def make_images(pid, fallback=None):
-    """Trim the cutout to the glass, save two sizes, and find the mouthpiece and the base."""
+def make_images(pid, fallback=None, src=None, out=None):
+    """Trim the cutout to the glass, save two sizes, and find the mouthpiece and the base.
+    src / out: an explicit cutout file and output folder (tools/glass_feed.py); then the images are always remade."""
     from PIL import Image
-    full, thumb, zoom = OUT / f'{pid}.webp', OUT / f'{pid}_t.webp', OUT / f'{pid}_z.webp'
-    src = CUTS / f'{pid}.png'
+    forced = src is not None
+    out = Path(out) if out else OUT
+    full, thumb, zoom = out / f'{pid}.webp', out / f'{pid}_t.webp', out / f'{pid}_z.webp'
+    src = Path(src) if forced else CUTS / f'{pid}.png'
     if not src.exists() and fallback:
         src = fallback
-    if not zoom.exists() or FX_STALE or (src.exists() and src.stat().st_mtime > zoom.stat().st_mtime):
+    if forced or not zoom.exists() or FX_STALE or (src.exists() and src.stat().st_mtime > zoom.stat().st_mtime):
         if not src.exists():
             return None
         im = Image.open(src).convert('RGBA')
@@ -176,6 +179,26 @@ def make_images(pid, fallback=None):
             'base': [r((base[0] + base[1]) / 2 / w), r(wy / h)], 'bw': r(widest / w)}
 
 
+def gallery_piece(p, img):
+    """One piece record from a /api/gallery item and its make_images() result."""
+    pid = p['provenance_id']
+    shelf = next(k for k, _, _, match in SHELVES if match and match(p))
+    status = {'available': 'available', 'sold': 'sold'}.get(p['status'], 'collected')
+    piece = {
+        'id': pid, 'name': p['name'], 'shelf': shelf, 'series': p.get('series') or '', 'shape': p.get('shape') or '',
+        'price': p.get('price') or 0, 'status': status, 'online': bool(p.get('online_sale')),
+        'edition': p.get('edition') or '', 'standard': (p.get('category') or '').startswith(STANDARD_CATS),
+        'inches': size_in(p),
+        'desc': (p.get('description') or '').strip(),
+        'buy': f'{HOST}/buy/{pid}', 'verify': f'{HOST}/c/piece/{pid}?prov=1', **img}
+    if pid in MOUTH:
+        piece['mouth'] = MOUTH[pid]
+    if pid in EXTRA_PHOTOS:
+        piece['photos'] = EXTRA_PHOTOS[pid]
+        piece['flip'] = EXTRA_PHOTOS[pid][0]['src']  # the tile's second look: our own photo, not the app's
+    return piece
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     gallery = json.loads(get(HOST + '/api/gallery'))
@@ -188,20 +211,7 @@ def main():
         if not img:
             missing.append(f"{p['name']} ({pid})")
             continue
-        shelf = next(k for k, _, _, match in SHELVES if match and match(p))
-        status = {'available': 'available', 'sold': 'sold'}.get(p['status'], 'collected')
-        pieces.append({
-            'id': pid, 'name': p['name'], 'shelf': shelf, 'series': p.get('series') or '', 'shape': p.get('shape') or '',
-            'price': p.get('price') or 0, 'status': status, 'online': bool(p.get('online_sale')),
-            'edition': p.get('edition') or '', 'standard': (p.get('category') or '').startswith(STANDARD_CATS),
-            'inches': size_in(p),
-            'desc': (p.get('description') or '').strip(),
-            'buy': f'{HOST}/buy/{pid}', 'verify': f'{HOST}/c/piece/{pid}?prov=1', **img})
-        if pid in MOUTH:
-            pieces[-1]['mouth'] = MOUTH[pid]
-        if pid in EXTRA_PHOTOS:
-            pieces[-1]['photos'] = EXTRA_PHOTOS[pid]
-            pieces[-1]['flip'] = EXTRA_PHOTOS[pid][0]['src']  # the tile's second look: our own photo, not the app's
+        pieces.append(gallery_piece(p, img))
     shop, shop_missing = shopify_pieces()
     pieces += shop
     missing += shop_missing
@@ -222,9 +232,9 @@ def main():
         print('waiting for a cutout (run jbsite-work/glass/cutouts.py):', ', '.join(missing), file=sys.stderr)
 
 
-if __name__ == '__main__':
-    main()
-
 # site rule: flaggable words get number/symbol swaps (b0ng, p!pe, sm0ke...). See tools/scrub.py.
 import scrub as _scrub  # noqa: E402
-_scrub.main()
+
+if __name__ == '__main__':
+    main()
+    _scrub.main()
