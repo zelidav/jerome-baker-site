@@ -79,7 +79,7 @@ def pin(c, up, i):
             f'<span class="tape">{e(c["name"])}<small>{e(c["title"])}</small></span></a>')
 
 
-def head(title, desc, up, extra=""):
+def head(title, desc, up, extra="", og="assets/icons/og.jpg"):
     return f"""<!doctype html>
 <html lang="en" data-base="{up}">
 <head>
@@ -92,7 +92,9 @@ def head(title, desc, up, extra=""):
 <link rel="icon" href="{up}assets/icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="{up}assets/icons/apple-touch-icon.png">
 <link rel="manifest" href="{up}site.webmanifest">
-<meta property="og:image" content="https://jeromebaker.cannacrypted.com/assets/icons/og.jpg">
+<meta property="og:title" content="{e(title)}">
+<meta property="og:description" content="{e(desc)}">
+<meta property="og:image" content="https://jeromebaker.cannacrypted.com/{og}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -286,7 +288,8 @@ def crew_page(c, i):
     rots = ["-3deg", "2deg", "-1deg", "3deg"]
     name = "".join(f'<span style="--r:{rots[k % 4]}">{e(w)}</span>' for k, w in enumerate(words))
     cards = "".join(merch_card(m, up, k, worn=False) for k, m in enumerate(c["wear"]))
-    return head(f'{c["name"]}. The JB Crew', f'{c["name"]}: {c["doing"]} Wearing real Jerome Baker merch.', up) + f"""<body data-weird="{c['weird']}" data-crew-self="{c['slug']}" data-crew-count="5" data-glitch="{GLITCH[i % len(GLITCH)]}">
+    return head(f'{c["name"]}. The JB Crew', f'{c["name"]}: {c["doing"]} Wearing real Jerome Baker merch.', up,
+                og=f'assets/og/crew-{c["slug"]}.jpg') + f"""<body data-weird="{c['weird']}" data-crew-self="{c['slug']}" data-crew-count="5" data-glitch="{GLITCH[i % len(GLITCH)]}">
 <a class="skip" href="#main">Skip to content</a>
 <div class="page">
 {topbar(up)}
@@ -421,6 +424,12 @@ def redirect_page(old, new):
 <title>{name}. The JB Crew</title>
 <meta name="robots" content="noindex">
 <link rel="canonical" href="{url}">
+<meta property="og:title" content="{name}. The JB Crew">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="https://jeromebaker.cannacrypted.com/assets/og/crew-{new}.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta http-equiv="refresh" content="0; url=../{new}/">
 <script>location.replace('../{new}/' + location.search + location.hash);</script>
 </head>
