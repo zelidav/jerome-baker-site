@@ -24,7 +24,7 @@
       if (RANK[s.status] !== undefined) p.status = s.status;
       if (typeof s.price === 'number') p.price = s.price;
     });
-    const fresh = f.pieces.filter((p) => p && typeof p.id === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(p.id) && p.shelf && !have.has(p.id) && /^https:\/\//.test(p.buy || '') && /^https:\/\//.test(p.verify || ''));
+    const fresh = f.pieces.filter((p) => p && typeof p.id === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(p.id) && p.shelf && !have.has(p.id) && /^https:\/\//.test(p.buy || '') && /^https:\/\//.test(p.verify || '') && (!p.img || p.img.startsWith(FEED.slice(0, FEED.lastIndexOf('/') + 1))));
     if (!fresh.length && !Object.keys(st).length) return;
     fresh.forEach((p) => D.pieces.push(p));
     const shelves = D.shelves || (D.shelves = []);
