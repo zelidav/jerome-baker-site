@@ -43,6 +43,7 @@ SHELVES = [
     ('le', 'Limited Edition', 'The crown pieces. Wig-wag, millies, knuckles and marbles, worked at the bench and signed off as one of one.', lambda p: p['series'] == 'Limited Edition' and p['category'] == 'Signature Glass'),
     ('og', 'Original Series', 'The fifteen-inch Baker silhouette that started it. Fumed bulb, straight tube, built to hit and built to last.', lambda p: p['series'] == 'Original Series'),
     ('second', 'Second Life', 'Worked tubes rebuilt into cork-top jars. Each one was something else first.', lambda p: p['category'] == 'Second Life Series'),
+    ('keiki', 'Keikis', 'Small hand-blown bongs, each one worked a little differently. The NY Keiki Collection, plus the Jerome Baker Designs Keikis.', lambda p: p.get('shape_code') == 'KEI'),
     ('studio', 'Studio one-offs', 'Rigs, calumets and showpieces off the bench, sold straight from the studio store.', None),
     ('creatures', 'Spirit Creatures', 'Little sea animals worked in clear and color, each one numbered. Turtles, whales, octopus, starfish.', None),
     ('daily', 'Everyday glass', 'The pieces you actually reach for. Beakers, tubes, jars, Clearboys and the Skeeter lunch boxes.', lambda p: True),
@@ -66,6 +67,8 @@ def shopify_shelf(p):
     t = p['title'].lower()
     if 'spirit creature' in t:
         return 'creatures'
+    if 'keiki' in t:
+        return 'keiki'
     if re.search(r'evo |steeze|nug jug|dipper', t):
         return 'daily'
     if float(p['variants'][0]['price']) >= 300:
@@ -90,7 +93,7 @@ def shopify_pieces():
         opt = shopify.options(p)
         out.append({
             'id': pid, 'name': shopify.short_name(p['title']), 'shelf': shelf,
-            'series': 'Studio store', 'shape': p['product_type'] if p['product_type'] not in ('', 'Glass') else '',
+            'series': 'Jerome Baker Designs' if shelf == 'keiki' else 'Studio store', 'shape': p['product_type'] if p['product_type'] not in ('', 'Glass') else '',
             'price': min(v[2] for v in vs), 'status': 'available', 'online': True, 'shop': 'shopify',
             'edition': '1 of 1' if one else '', 'inches': None,
             'desc': shopify.clean(p['body_html'])[:900],
@@ -185,7 +188,7 @@ def gallery_piece(p, img):
     shelf = next(k for k, _, _, match in SHELVES if match and match(p))
     status = {'available': 'available', 'sold': 'sold'}.get(p['status'], 'collected')
     piece = {
-        'id': pid, 'name': p['name'], 'shelf': shelf, 'series': p.get('series') or '', 'shape': p.get('shape') or '',
+        'id': pid, 'name': p['name'], 'shelf': shelf, 'series': 'NY Keiki Collection' if p.get('shape_code') == 'KEI' else (p.get('series') or ''), 'shape': p.get('shape') or '',
         'price': p.get('price') or 0, 'status': status, 'online': bool(p.get('online_sale')),
         'edition': p.get('edition') or '', 'standard': (p.get('category') or '').startswith(STANDARD_CATS),
         'inches': size_in(p),
@@ -204,7 +207,7 @@ def main():
     gallery = json.loads(get(HOST + '/api/gallery'))
     pieces, missing = [], []
     for p in gallery:
-        if not p.get('has_image') or (p.get('category') or '').startswith(SKIP_CATS + OWN_CATS_ON_SHOPIFY):
+        if not (p.get('has_image') or shape_cut(p)) or (p.get('category') or '').startswith(SKIP_CATS + OWN_CATS_ON_SHOPIFY):
             continue
         pid = p['provenance_id']
         img = make_images(pid, shape_cut(p))
@@ -212,7 +215,15 @@ def main():
             missing.append(f"{p['name']} ({pid})")
             continue
         pieces.append(gallery_piece(p, img))
-    shop, shop_missing = shopify_pieces()
+    try:
+        shop, shop_missing = shopify_pieces()
+    except Exception as e:  # Shopify rate-limits (429) or is down: keep the Shopify listings from the last good build
+        prev = ROOT / 'js' / 'glass-data.js'
+        old = json.loads(prev.read_text(encoding='utf-8').split('window.JB_GLASS = ', 1)[1].rstrip().rstrip(';'))
+        shop = [x for x in old['pieces'] if x.get('shop') == 'shopify']
+        shop_missing = []
+        print(f'WARNING: Shopify pull failed ({e!r}). Kept {len(shop)} Shopify listings from the previous build, UNREFRESHED: '
+              'no new Shopify items (e.g. Keikis), no price or stock changes. Rerun when Shopify answers.', file=sys.stderr)
     pieces += shop
     missing += shop_missing
     order = {k: i for i, (k, *_) in enumerate(SHELVES)}

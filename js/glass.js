@@ -135,6 +135,7 @@ const glassBoot = () => {
     le: 'linear-gradient(125deg,#141F5E 0%,#2A3B8E 55%,#4F67D6 100%)',
     og: 'linear-gradient(125deg,#036650 0%,#05B48F 55%,#3FE0B8 100%)',
     second: 'linear-gradient(125deg,#F2C200 0%,#FFF100 55%,#FFF86A 100%)',
+    keiki: 'linear-gradient(125deg,#141F5E 0%,#2A3B8E 55%,#4F67D6 100%)', // blue, between the yellow and red bands
     daily: 'linear-gradient(125deg,#B23A06 0%,#F06A2A 55%,#FF9A52 100%)',
     studio: 'linear-gradient(125deg,#8E1028 0%,#DA2342 55%,#FF5A6E 100%)',
     creatures: 'linear-gradient(125deg,#036650 0%,#05B48F 55%,#3FE0B8 100%)',
