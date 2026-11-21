@@ -67,7 +67,7 @@ def shopify_shelf(p):
     t = p['title'].lower()
     if 'spirit creature' in t:
         return 'creatures'
-    if 'keiki' in t:
+    if 'keiki' in t or 'keiki' in [x.lower() for x in p.get('tags', [])]:
         return 'keiki'
     if re.search(r'evo |steeze|nug jug|dipper', t):
         return 'daily'

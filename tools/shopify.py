@@ -18,15 +18,17 @@ MERCH_VENDORS = {'printify', 'the kind group'}
 
 
 def get(url, accept='application/json', tries=5):
-    req = urllib.request.Request(url, headers={'User-Agent': UA, 'Accept': accept})
+    # Shopify's bot filter 429s Python's urllib (TLS fingerprint) while curl gets 200, so shell out to curl.
+    import subprocess
     for n in range(tries):
-        try:
-            with urllib.request.urlopen(req, timeout=60) as r:
-                return r.read()
-        except urllib.error.HTTPError as e:
-            if e.code not in (429, 430, 503) or n == tries - 1:
-                raise
-            time.sleep(4 * 2 ** n)
+        r = subprocess.run(['curl', '-sS', '--max-time', '60', '-H', f'Accept: {accept}', '-w', '\n%{http_code}', url],
+                           capture_output=True)
+        body, _, code = r.stdout.rpartition(b'\n')
+        if code == b'200':
+            return body
+        if code not in (b'429', b'430', b'503') or n == tries - 1:
+            raise urllib.error.HTTPError(url, int(code or 0), 'curl fetch failed ' + r.stderr.decode()[:200], None, None)
+        time.sleep(4 * 2 ** n)
 
 
 def clean(s):
