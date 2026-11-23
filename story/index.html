@@ -43,6 +43,7 @@
 </section>
 
 <nav class="st-jump pad" aria-label="Chapters"><ol>
+<li><a href="#way-back"><b>&#9654;</b>The way back</a></li>
 <li><a href="#ch1"><b>01</b>The Dead show</a></li>
 <li><a href="#ch2"><b>02</b>The Mothership</a></li>
 <li><a href="#ch3"><b>03</b>Operation P!pe Dreams</a></li>
@@ -59,6 +60,29 @@
 <button type="button" data-yt="7TVXy-I_jYo" aria-label="Play the Jerome Baker story video">The Jerome Baker story</button>
 </div>
 <p>The video plays from YouTube when you press play.</p>
+</div>
+</section>
+
+<section class="wbm boxbg pad" id="way-back" aria-labelledby="wbm-h">
+<div class="wrap">
+<div class="wbm-text">
+<span class="num">NEW &#10033; THE WAY BACK</span>
+<h2 id="wbm-h">Rewind<br><span>the site.</span></h2>
+<p class="big">Jerome Baker has been online since 1998. The Internet Archive kept it.</p>
+<p>Scroll through every era of jeromebaker.com: the 1-888-420-RIPS order line, the graffiti redesign, the Piece of the Week years, one logo on a landing page, a government notice, the comeback with a lion, and the $150,000 NFT b0ng.</p>
+<ul class="facts">
+<li><b>1998</b><span>the earliest home page saved</span></li>
+<li><b>418</b><span>pages saved in 2001 alone</span></li>
+<li><b>24</b><span>frames, 24 years</span></li>
+</ul>
+<p class="wbm-cta"><a class="btn btn-red" href="tour/">Take the tour</a><small>About five minutes. Missing pictures are filled with close stand-ins, and every one is marked.</small></p>
+</div>
+<a class="wbm-win" href="tour/" aria-label="Take the tour: 24 years of jeromebaker.com">
+<img class="wbm-lion bob" src="../assets/cut/tealjbd.webp" alt="" width="200" height="122" loading="lazy" decoding="async">
+<span class="wbm-bar"><i></i><i></i><i></i><span class="wbm-url"><span style="--i:0">jeromebaker.com/j2_.htm</span><span style="--i:1">jeromebaker.com/about/about.html</span><span style="--i:2">jeromebaker.com/about/CannCup.html</span><span style="--i:3">jeromebaker.com/</span><span style="--i:4">jeromebaker.com/</span><span style="--i:5">jeromebaker.com/p/burnt-orange</span><span style="--i:6">jeromebaker.com/blogs/news/giant-nft-bong-auctioned-off-for-150-000</span></span><span class="wbm-yr"><span style="--i:0">Dec 1998</span><span style="--i:1">Dec 2000</span><span style="--i:2">Feb 2001</span><span style="--i:3">Mar 2002</span><span style="--i:4">Jun 2016</span><span style="--i:5">Aug 2020</span><span style="--i:6">May 2022</span></span></span>
+<span class="wbm-view"><span class="wbs" style="--i:0;--sy:0%"><img src="tour/img/01s.webp" alt="" width="1100" height="900" decoding="async"></span><span class="wbs" style="--i:1;--sy:0%"><img src="tour/img/07.webp" alt="" width="1100" height="900" loading="lazy" decoding="async"></span><span class="wbs" style="--i:2;--sy:-4%"><img src="tour/img/11.webp" alt="" width="1100" height="900" loading="lazy" decoding="async"></span><span class="wbs" style="--i:3;--sy:0%"><img src="tour/img/14s.webp" alt="" width="1100" height="900" loading="lazy" decoding="async"></span><span class="wbs" style="--i:4;--sy:-52%"><img src="tour/img/19.webp" alt="" width="1100" height="900" loading="lazy" decoding="async"></span><span class="wbs" style="--i:5;--sy:0%"><img src="tour/img/23s.webp" alt="" width="1100" height="900" loading="lazy" decoding="async"></span><span class="wbs" style="--i:6;--sy:-38%"><img src="tour/img/24s.webp" alt="" width="1100" height="900" loading="lazy" decoding="async"></span><span class="wbm-scan" aria-hidden="true"></span></span>
+<ul class="wbm-time" aria-hidden="true"><li style="--i:0"><i></i>1998</li><li style="--i:1"><i></i>2000</li><li style="--i:2"><i></i>2001</li><li style="--i:3"><i></i>2002</li><li style="--i:4"><i></i>2016</li><li style="--i:5"><i></i>2020</li><li style="--i:6"><i></i>2022</li></ul>
+</a>
 </div>
 </section>
 
@@ -183,6 +207,7 @@ document.querySelectorAll('.st-video [data-yt]').forEach((b) => b.addEventListen
   f.title = 'The Jerome Baker story';
   f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
   f.allowFullscreen = true;
+  f.referrerPolicy = 'strict-origin-when-cross-origin';
   b.replaceWith(f);
 }));
 </script>
