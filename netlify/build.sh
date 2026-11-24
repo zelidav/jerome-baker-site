@@ -9,6 +9,7 @@ if [ "$MODE" = "lander" ]; then
   : "${OLD_HOST:?set OLD_HOST to the host the old store answers on, e.g. shop.jeromebaker.com}"
   if [ "$OLD_HOST" = "jeromebaker.com" ]; then echo "WARNING: OLD_HOST=jeromebaker.com is for previews only. Once DNS points at Netlify this would redirect in a loop." >&2; fi
   cp -r netlify/lander/. dist/
+  mkdir -p dist/js && cp js/analytics.js dist/js/analytics.js
   sed "s#__OLD_HOST__#${OLD_HOST}#g" netlify/_redirects.lander > dist/_redirects
   sed -i "s#\"https://jeromebaker.com/\"#\"https://${OLD_HOST}/\"#" dist/index.html
 elif [ "$MODE" = "cutover" ]; then
