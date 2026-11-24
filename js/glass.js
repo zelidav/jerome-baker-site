@@ -4,9 +4,10 @@
 const glassBoot = () => {
   const D = window.JB_GLASS;
   if (!D) return;
+  const BASE = document.documentElement.dataset.base || '../';
   const $ = (s, r = document) => r.querySelector(s);
   const gimg = window.JBGlassImg || ((p, s, b) => b + 'assets/glass/' + p.id + s + '.webp');
-  const img = (p, thumb) => gimg(p, thumb ? '_t' : '', '../');
+  const img = (p, thumb) => gimg(p, thumb ? '_t' : '', BASE);
   const money = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarse = matchMedia('(pointer: coarse)').matches;
@@ -301,7 +302,7 @@ const glassBoot = () => {
       ph = document.createElement('img');
       ph.className = 'photo'; ph.alt = ''; ph.decoding = 'async';
       const pp = byId[el.dataset.id];
-      ph.src = pp.flip ? `../assets/glass/${pp.flip}` : pp.shop ? (pp.photos[0] || '').replace(/width=\d+/, 'width=800') : `${HOST}/piece/${el.dataset.id}/image.jpg`;
+      ph.src = pp.flip ? `${BASE}assets/glass/${pp.flip}` : pp.shop ? (pp.photos[0] || '').replace(/width=\d+/, 'width=800') : `${HOST}/piece/${el.dataset.id}/image.jpg`;
       el.querySelector('.frame').appendChild(ph);
     }
     el._flip = setTimeout(() => { if (el.classList.contains('lit')) { page.off(el); el.classList.add('flip'); } }, 1600);
@@ -319,10 +320,10 @@ const glassBoot = () => {
 
   // zoom (from the bench): the full-resolution cutout first, then the original photos
   const photosOf = (p) => [
-    { src: gimg(p, '_z', '../'), w: p.zw, h: p.zh, alt: `${p.name}, close up` },
+    { src: gimg(p, '_z', BASE), w: p.zw, h: p.zh, alt: `${p.name}, close up` },
     ...(p.photos || (p.shop ? [] : [`${HOST}/piece/${p.id}/image.jpg`])).map((ph, i) => typeof ph === 'string'
       ? { src: ph, alt: `${p.name}, photo ${i + 2}` }
-      : { src: `../assets/glass/${ph.src}`, thumb: `../assets/glass/${ph.src.replace(/\.webp$/, '_t.webp')}`, w: ph.w, h: ph.h, alt: `${p.name}: ${ph.label}`, label: ph.label }),
+      : { src: `${BASE}assets/glass/${ph.src}`, thumb: `${BASE}assets/glass/${ph.src.replace(/\.webp$/, '_t.webp')}`, w: ph.w, h: ph.h, alt: `${p.name}: ${ph.label}`, label: ph.label }),
   ];
   const zoom = (p, at, index = 0) => window.JBZoom && JBZoom.open({ photos: photosOf(p), at, index });
 
@@ -461,7 +462,7 @@ const glassBoot = () => {
   // pieces with a finished 3D model: a full-screen spin view, loaded only when asked for (the models are 0.5-4 MB)
   const spin = $('#spin3d'), spinF = $('#spin3dF');
   const closeSpin = () => { spin.hidden = true; spinF.removeAttribute('src'); };
-  $('#b3d').onclick = () => { if (!cur || !MODELS[cur.id]) return; release(true); spinF.src = '../assets/3d/' + MODELS[cur.id] + '.html'; spin.hidden = false; $('#spin3dX').focus(); };
+  $('#b3d').onclick = () => { if (!cur || !MODELS[cur.id]) return; release(true); spinF.src = BASE + 'assets/3d/' + MODELS[cur.id] + '.html'; spin.hidden = false; $('#spin3dX').focus(); };
   $('#spin3dX').onclick = closeSpin;
   bench.addEventListener('cancel', (e) => { if (!spin.hidden) { e.preventDefault(); closeSpin(); } });
   bench.addEventListener('close', closeSpin);
@@ -490,7 +491,7 @@ const glassBoot = () => {
       const r = bImg.getBoundingClientRect(), pr = bPiece.getBoundingClientRect();
       const fx = (e.clientX - r.left) / r.width, fy = (e.clientY - r.top) / r.height;
       if (fx < 0 || fx > 1 || fy < 0 || fy > 1) { lens.classList.remove('on'); return; }
-      const url = gimg(cur, '_z', '../');
+      const url = gimg(cur, '_z', BASE);
       if (lens.dataset.src !== url) { lens.dataset.src = url; lens.style.backgroundImage = `url(${url})`; }
       const L = lens.offsetWidth || 190;
       lens.style.backgroundSize = `${r.width * LK}px ${r.height * LK}px`;
