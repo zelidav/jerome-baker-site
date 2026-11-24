@@ -1,0 +1,5 @@
+# LANDER MODE. jeromebaker.com serves the "Pick your Jerome" page at / and everything else goes to the old store untouched.
+# __OLD_HOST__ is filled in by build.sh (env OLD_HOST). Static files (the lander itself) win over these rules.
+# 302 on purpose: temporary, so Google keeps the old URLs indexed until real cutover.
+https://www.jeromebaker.com/*  https://jeromebaker.com/:splat  301!
+/*  https://__OLD_HOST__/:splat  302
