@@ -86,7 +86,7 @@ def check_redirects(base):
             if res:
                 fails.append(res)
     # pattern rules: one synthetic sample each
-    samples = [("/collections/x/products/y", "/products/y"), ("/posts/anything", "/news/"), ("/collections/zzz-not-real", "/glass/"), ("/products/zzz-not-real", "/glass/")]
+    samples = [("/collections/x/products/y", "/products/y"), ("/posts/anything", "/story/"), ("/collections/zzz-not-real", "/glass/"), ("/products/zzz-not-real", "/glass/")]
     for src, dst in samples:
         st, loc, _ = hit(base + src)
         if st not in (301, 302) or norm_target(loc or "", base).rstrip("/") != norm_target(dst, base).rstrip("/"):
