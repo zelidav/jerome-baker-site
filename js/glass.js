@@ -385,7 +385,7 @@ const glassBoot = () => {
     const sel = $('#bVar');
     if (sel) sel.onchange = () => {
       const o = sel.selectedOptions[0];
-      $('#bBuy').href = `https://jeromebaker.com/cart/${sel.value}:1`;
+      $('#bBuy').href = `https://shop.jeromebaker.com/cart/${sel.value}:1`;
       $('#bBuy').textContent = `Buy it, ${money(o.dataset.pr)}`;
       $('#bPrice').textContent = money(o.dataset.pr);
     };
