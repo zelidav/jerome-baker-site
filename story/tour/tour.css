@@ -222,3 +222,26 @@ img{max-width:100%}
   .hero-bg img,.crewfx img{animation:none!important}
   .go i,.dark .scan{animation:none}
 }
+
+.srcpill{position:absolute;left:10px;bottom:10px;z-index:9;max-width:calc(100% - 20px);padding:6px 11px;background:var(--yellow);color:#111;border:2px solid #111;font:800 12px var(--mono);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:3px 3px 0 #111}
+.srcpill:hover{background:#fff}
+@media (max-width:860px){.srcpill{bottom:70px;font-size:11px}}
+@media (max-width:860px){.card .note{display:none}}
+
+.br{border:0;padding:0;margin:0;max-width:100vw;max-height:100vh;width:100vw;height:100vh;height:100dvh;background:#000;color:#fff}
+.br::backdrop{background:#000}
+.brbar{position:absolute;left:0;right:0;top:0;z-index:3;height:52px;display:flex;align-items:center;gap:10px;padding:0 10px;background:var(--yellow);color:#111;border-bottom:3px solid #111;font:800 12px var(--mono)}
+.brx{flex:none;width:38px;height:38px;border:3px solid #111;background:#fff;color:#111;font:900 24px/1 var(--body);cursor:pointer}
+.bru{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brw{flex:none;padding:7px 10px;border:3px solid #111;background:#111;color:var(--yellow);text-decoration:none}
+.brs{position:absolute;inset:52px 0 0 0;overflow:auto;-webkit-overflow-scrolling:touch;background:#000}
+.brp{position:relative;margin:0 auto}
+.brp img{display:block;width:100%;height:auto}
+.brp .hs{border:2px dashed rgba(255,241,0,.8);background:rgba(255,241,0,.08)}
+.brp .hs:hover,.brp .hs:active{background:rgba(255,241,0,.35);border-style:solid}
+.brh{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);margin:0;padding:8px 14px;background:rgba(0,0,0,.82);border:2px solid var(--yellow);font:700 12px var(--mono);color:#fff;pointer-events:none;max-width:92vw;text-align:center}
+.card .act button{white-space:nowrap}
+
+.hs.nl,.brp .hs.nl{border-color:rgba(5,180,143,.9)!important;background:rgba(5,180,143,.14)}
+.links-on .hs.nl{border-color:var(--teal)}
+.hs.nl:hover,.brp .hs.nl:hover{background:rgba(5,180,143,.45)!important;border-color:var(--teal)!important}
