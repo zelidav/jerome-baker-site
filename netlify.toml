@@ -1,0 +1,8 @@
+# Netlify config for the new Jerome Baker site. See netlify/README.md.
+[build]
+  command = "bash netlify/build.sh"
+  publish = "dist"
+
+[build.environment]
+  MODE = "lander"
+  OLD_HOST = "jeromebaker.com"
