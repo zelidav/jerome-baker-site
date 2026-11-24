@@ -14,7 +14,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 RULES = HERE.parent / "_redirects.cutover"
-KEY_PAGES = ["/", "/glass/", "/shop/", "/crew/", "/wholesale/", "/contact/", "/story/", "/story/tour/", "/travel/", "/comics/", "/privacy/", "/terms/", "/returns/"]
+KEY_PAGES = ["/", "/glass/", "/shop/", "/crew/", "/wholesale/", "/contact/", "/story/", "/story/tour/", "/travel/", "/comics/", "/privacy/", "/terms/", "/returns/", "/404.html", "/robots.txt", "/sitemap.xml",
+             "/glass/bongs/", "/glass/studio/", "/glass/dab-rigs/", "/glass/accessories/", "/glass/tommy-chong/", "/glass/calumets/", "/glass/limited-edition/",
+             "/glass/original-series/", "/glass/everyday/", "/glass/spirit-creatures/", "/glass/tubes/", "/glass/pipes/", "/glass/second-life/"]
 # the shopping spine: if any of these break, do not cut over
 SHOPPING = ["/glass/", "/shop/", "/wholesale/", "/contact/", "/returns/"]
 UA = {"User-Agent": "jb-cutover-checker/1.0"}
@@ -114,8 +116,11 @@ def check_links(base):
         if st != 200:
             fails.append(f"PAGE {page}: {st}" + ("  <-- SHOPPING" if page in SHOPPING else ""))
             continue
+        text = body.decode("utf-8", "replace")
+        if "noindex" in text and host in ("jeromebaker.com", "www.jeromebaker.com") and page not in ("/404.html",):
+            fails.append(f"NOINDEX on live host: {page}")
         p = Links()
-        p.feed(body.decode("utf-8", "replace"))
+        p.feed(text)
         for v in p.found:
             u = urllib.parse.urljoin(base + page, v).split("#")[0]
             if urllib.parse.urlparse(u).netloc == host:

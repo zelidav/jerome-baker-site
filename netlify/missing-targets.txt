@@ -1,25 +1,12 @@
-# Redirect targets that 404 on the new site today (checked 2026-11-24 against jeromebaker.cannacrypted.com).
-# Every one of these is the destination of at least one rule in _redirects.cutover, so it must exist before cutover.
-# Format: number of rules pointing at it, then the path. Regenerate: python netlify/tools/check.py targets <base>
-# 106 missing of 116 unique targets. Existing: /, /contact/, /glass/, /join/, /privacy/, /returns/, /shop/, /story/, /terms/, /wholesale/
+# Redirect targets that still 404 after the 13 category pages shipped (checked 2026-11-24, local build of main + category-pages).
+# Each is the destination of at least one rule in _redirects.cutover. Collapse or retarget per redirect-fixes.md, then rerun check.py redirects.
+# Format: rules pointing at it, then the path.
+# 93 missing of 116 unique targets. Existing now (23): /, /contact/, /glass/, /glass/accessories/, /glass/bongs/, /glass/calumets/, /glass/dab-rigs/, /glass/everyday/, /glass/limited-edition/, /glass/original-series/, /glass/pipes/, /glass/second-life/, /glass/spirit-creatures/, /glass/studio/, /glass/tommy-chong/, /glass/tubes/, /join/, /privacy/, /returns/, /shop/, /story/, /terms/, /wholesale/
 
- 363  /glass/bongs/
- 243  /glass/studio/
-  81  /glass/dab-rigs/
-  79  /glass/accessories/
-  65  /glass/tommy-chong/
-  59  /glass/calumets/
   44  /news/
-  40  /glass/limited-edition/
-  22  /glass/original-series/
-  21  /glass/everyday/
   21  /news/burnt-orange-nft-tube/
-  19  /glass/spirit-creatures/
-  16  /glass/tubes/
-  12  /glass/pipes/
    9  /news/bongzilla-worlds-largest-bong/
    8  /glass/jbd-little-dipper-dip-device/
-   7  /glass/second-life/
    6  /glass/fat-freddy-freekowtski/
    6  /glass/iridium-illusion-1549/
    6  /glass/kitty/
