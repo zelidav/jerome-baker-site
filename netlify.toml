@@ -5,7 +5,7 @@
 
 [build.environment]
   MODE = "lander"
-  OLD_HOST = "jeromebaker.com"
+  OLD_HOST = "shop.jeromebaker.com"
 
 # previews and branch deploys test the cutover build; production stays the lander until DNS moves
 [context.deploy-preview.environment]
