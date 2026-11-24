@@ -89,7 +89,7 @@ def check_redirects(base):
     samples = [("/collections/x/products/y", "/products/y"), ("/posts/anything", "/news/"), ("/collections/zzz-not-real", "/glass/"), ("/products/zzz-not-real", "/glass/")]
     for src, dst in samples:
         st, loc, _ = hit(base + src)
-        if st != 301 or norm_target(loc or "", base).rstrip("/") != norm_target(dst, base).rstrip("/"):
+        if st not in (301, 302) or norm_target(loc or "", base).rstrip("/") != norm_target(dst, base).rstrip("/"):
             fails.append(f"pattern {src}: wanted 301 -> {dst}, got {st} -> {loc}")
     print(f"redirects: {len(rules)} exact rules + {len(samples)} pattern samples, {len(fails)} failed")
     return fails

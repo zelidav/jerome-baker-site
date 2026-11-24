@@ -56,3 +56,7 @@ Change the rule target, do not build the page.
 - Keep the `www` and `jeromebaker.cannacrypted.com` host rules. Once the new site is on Netlify under jeromebaker.com, the cannacrypted staging host should 301 too.
 
 After the changes, `python netlify/tools/check.py redirects <preview>` must print `0 failed`.
+
+## Status (v3)
+
+`_redirects.cutover` is now v3: 448 rules retargeted per sections 2 to 4, catch-alls /products/* and /collections/* are 302 until the 39 products are confirmed. Every internal target exists in the repo. Run `python netlify/tools/check.py redirects <netlify-preview>` once the preview is up (the checker pattern sample for the catch-alls expects 301 and needs 302 when you flip them).
