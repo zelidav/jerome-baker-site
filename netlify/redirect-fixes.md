@@ -1,0 +1,54 @@
+# Redirect fixes: what is wrong with v2 today and what to change
+
+Checked 2026-11-24 against the live new site. Of the 116 unique destinations in `_redirects.cutover`, 106 are 404 today (full list with rule counts in `missing-targets.txt`). Only these exist: `/`, `/contact/`, `/glass/`, `/join/`, `/privacy/`, `/returns/`, `/shop/`, `/story/`, `/terms/`, `/wholesale/`.
+
+`/glass/` is one interactive page. There are no category or piece pages yet. So every redirect that points at a category or piece URL 404s on arrival. Redirecting ~1,000 old URLs to a generic page is also what Google calls a soft 404, so the choice is build a real page or collapse the target.
+
+## 1. Build as real pages (13 category pages cover 1,009 rules)
+
+| Target | Rules | Note |
+|---|---|---|
+| /glass/bongs/ | 363 | |
+| /glass/studio/ | 243 | |
+| /glass/dab-rigs/ | 81 | |
+| /glass/accessories/ | 79 | |
+| /glass/tommy-chong/ | 65 | collab line, slug is a person's name, David to approve |
+| /glass/calumets/ | 59 | |
+| /glass/limited-edition/ | 40 | |
+| /glass/original-series/ | 22 | |
+| /glass/everyday/ | 21 | |
+| /glass/spirit-creatures/ | 19 | |
+| /glass/tubes/ | 16 | |
+| /glass/pipes/ | 12 | |
+| /glass/second-life/ | 7 | |
+
+## 2. Collapse instead of building (66 of the 87 piece targets in the file)
+
+Change the rule target, do not build the page.
+
+- All numbered spirit creatures (`small-honu-spirit-creature-1` to `-21`, small/large octopus, whale, dolphin, starfish, hammerhead, honu, 43 targets) to `/glass/spirit-creatures/`. They are a one-of-one series, 43 near-identical pages is thin content.
+- `evo-beaker-*`, `evo-straight-*` (8 targets) to `/glass/tubes/`.
+- `everyday-steeze-25mm/32mm/38mm/45mm/50mm` to `/glass/everyday/`.
+- `black-tip-10pk`, `glass-rolling-tips`, `conversion-kit`, `snap-n-pull-downstem`, `jbd-fix-it-kit`, `wood-light-base`, `glimmer-trays`, `pumpkin-spice-pendant`, `jbd-flower-bowl-usa`, `jbd-little-dipper-dip-device` to `/glass/accessories/`.
+- `giant-bongs` to `/glass/bongs/` until the giant bongs have their own page.
+
+## 3. Build a piece page only if the piece still sells or ranks
+
+20 named pieces remain: `mystique-mirage`, `cactus-mirage`, `iridium-illusion-1549`, `iridium-illusion-6365`, `lovers-delight`, `dolls-garden`, `dolls-fall`, `ethereal-harvest`, `galaxy-gulp`, `dusk-dreamer`, `opulent-oasis`, `rosie`, `cupid`, `kitty`, `fat-freddy-freekowtski`, `first-breath-on-burl-1`, `first-breath-on-burl-2`, `saki-drops`, `grateful-dead`, `luke-olsen`. For each one that is sold out and not a search landing page, point the rule at `/glass/limited-edition/` (or `/glass/studio/`). Semi to pull Search Console clicks for the old URLs and keep pages only where there is traffic. The Grateful Dead slug is a trademarked name, so rename the slug (David's rule on trademarked names).
+
+## 4. Rename or retarget (no new pages)
+
+- `/news/` (44 rules) to `/story/`. Do not build a news section for two articles.
+- `/news/burnt-orange-nft-tube/` (21 rules) to `/story/tour/#m24`. Moment 24 of the history tour is that exact article.
+- `/news/bongzilla-worlds-largest-bong/` (9 rules) to `/story/tour/#m24`, same story.
+- `/shipping/` to `/returns/`, and rename that page "Shipping and returns" (it already carries the shipping copy).
+- `/faq/` to `/returns/` until a FAQ exists, or to `/contact/`.
+- `/stores/` (3 rules) to `/wholesale/`.
+
+## 5. Other changes
+
+- Both catch-alls (`/products/*`, `/collections/*`) are `301` to `/glass/`. Keep as 301 only after the 39 still-selling products are confirmed. Until then ship them as 302.
+- `/my-account/*` points at `shop.jeromebaker.com/account`, so `shop.` must be live on Shopify first. Semi said it is still on an old Tymber setup.
+- Keep the `www` and `jeromebaker.cannacrypted.com` host rules. Once the new site is on Netlify under jeromebaker.com, the cannacrypted staging host should 301 too.
+
+After the changes, `python netlify/tools/check.py redirects <preview>` must print `0 failed`.
