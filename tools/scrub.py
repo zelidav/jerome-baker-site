@@ -4,7 +4,7 @@ alt/title/aria-label text, page titles and share descriptions, and the prose str
 Links, file names, slugs, CSS classes and code are left alone. js/popfx.js gives the swapped characters a little
 graffiti tilt so they read as the look, not as typos.
 
-SEO exception: bong and pipe keep their real spelling where search engines read and rank the page:
+SEO exception: bong, pipe, dab and bowl keep their real spelling where search engines read and rank the page:
 <title>, meta description, <h1>, image alt text and JSON-LD. Those are the words people search ("jerome baker bong").
 Share-card text (og:/twitter:) stays swapped, because that's what social link scanners read, and so does body copy.
 
@@ -93,13 +93,14 @@ def prose(text):
 
 
 # words that keep their real spelling in the SEO zones, and how to un-swap the stylized form
-SEO_REAL = re.compile(r'(?<![A-Za-z0-9])(b0ngs?|p!pes?)(?![A-Za-z0-9])', re.I)
-SEO_KEEP = re.compile(r'^(?:bongs?|pipes?)$', re.I)
+SEO_REAL = re.compile(r'(?<![A-Za-z0-9])(b0ngs?|p!pes?|d@bs?|d@bbing|b0wls?)(?![A-Za-z0-9])', re.I)
+SEO_KEEP = re.compile(r'^(?:bongs?|pipes?|dabs?|dabbing|bowls?)$', re.I)
+SEO_UNSWAP = str.maketrans({'0': 'o', '!': 'i', '@': 'a'})
 
 
 def seo(text):
     """Search-engine zone: real spelling for bong/pipe, every other flagged word still swapped."""
-    text = SEO_REAL.sub(lambda m: m.group(1).replace('0', 'o').replace('!', 'i'), text)
+    text = SEO_REAL.sub(lambda m: m.group(1).translate(SEO_UNSWAP), text)
     return WORDS.sub(lambda m: m.group(1) if SEO_KEEP.match(m.group(1)) else swap_word(m, text), text)
 
 
