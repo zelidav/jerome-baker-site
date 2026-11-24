@@ -35,6 +35,25 @@
   const archiveUrl = (b, fi) => X.wb[b.img] || ('https://web.archive.org/web/' + b.ts + '/' + fi.page);
   const linkUrl = (href, ts) => 'https://web.archive.org/web/' + ts + '/' + href;
 
+  // old link -> the page that does that job on the new site (null = leave it pointing at the archive)
+  const LIVE = [
+    [/wholesale/, '../../wholesale/', 'Wholesale'],
+    [/contact|email|mailto/, '../../contact/', 'Contact'],
+    [/privacy|terms|merchant|policy/, '../../privacy/', 'Privacy'],
+    [/returns/, '../../returns/', 'Returns'],
+    [/about-us|history|jbdnews|informer|lounge|phreak|chat\.|links\.html|forum|tubetalk|glassifieds|gal2|on tour|locations/, '../', 'The story'],
+    [/shop|cart|search|apparel|headwear|skate|sticker|collections\/(apparel|smoking|calumets)|category|glitter|pouch|sleeve/, '../../shop/', 'Ritual Merch'],
+    [/tube|water|pipe|bubbl|slide|gallery|gal\.|prlst|price|hdpcs|access|artwork|art_gal|a-series|limited|sidecar|calumet|collections/, '../../glass/', 'Glass'],
+    [/homepage|jbd\.html|^[a-z.]*jeromebaker\.com\/?$|^web\.archive\.org\/?$/, '../../', 'Home']
+  ];
+  function liveFor(l) {
+    const h = (l.href || '').toLowerCase().replace(/^https?:\/\/(www\.)?/, '').replace(/:80(?=\/|$)/, '').replace(/[#?].*$/, '');
+    if (/^(disney|ghettoweb)\./.test(h)) return null;
+    const t = h.replace(/^web\.archive\.org\//, 'web.archive.org/') + ' ' + (l.label || '').toLowerCase();
+    for (const r of LIVE) if (r[0].test(t) || r[0].test(h)) return { href: r[1], name: r[2] };
+    return null;
+  }
+
   // ---------- build ----------
   const chapters = [];                  // generic stage chapters
   const moments = [];                   // every overview step, in order (for the stepper and link jumps)
@@ -81,7 +100,7 @@
         act = '<a href="' + esc(b.live) + '">Open this page &#8599;</a>';
       } else {
         const n = fi.links.length;
-        act = '<a href="' + esc(archiveUrl(b, fi)) + '" target="_blank" rel="noopener">archive.org &#8599;</a><button type="button" data-full="' + esc(fi.src) + '" data-cap="' + esc(b.date + '. ' + b.url) + '">Full page</button>';
+        act = '<a href="' + esc(archiveUrl(b, fi)) + '" target="_blank" rel="noopener">archive.org &#8599;</a><button type="button" data-full="' + esc(fi.src) + '" data-cap="' + esc(b.date + '. ' + b.url) + '" data-b="' + b.mi + '">Browse the old page</button>';
         if (n) note = '<div class="note">' + n + ' of the old links on this page still work. Hover or tap them. Press L to outline them.</div>';
         if (fi.pins.length) note += '<div class="note">' + fi.pins.length + (fi.pins.length > 1 ? ' pictures were' : ' picture was') + ' never saved by the archive. The yellow boxes are close stand-ins, not the originals.</div>';
       }
@@ -116,6 +135,7 @@
         '<button type="button" class="tb-pins" aria-pressed="true" title="Show or hide stand-ins">Stand-ins</button>' +
         '<button type="button" class="tb-loupe" aria-pressed="true" title="Magnifier (M)">Loupe</button>');
     const view = el('div', 'view');
+    const pill = el('a', 'srcpill'); pill.target = '_blank'; pill.rel = 'noopener'; view.appendChild(pill);
     screen.append(chrome, view);
     const cards = el('div', 'cards');
     const intro = el('div', 'intro', '<p class="yrs">' + esc(c.years) + '</p><h2>' + esc(c.title) + '</h2><p>' + esc(c.lede) + '</p>');
@@ -136,7 +156,7 @@
         const img = new Image();
         img.alt = 'jeromebaker.com as the archive saved it, ' + st.b.date;
         img.decoding = 'async';
-        img.loading = 'lazy';
+        img.loading = chapters.length < 2 ? 'eager' : 'lazy';
         if (live) {
           img.src = st.b.src;
           img.dataset.m = st.b.srcM;
@@ -150,13 +170,14 @@
           const a = el('a', 'hs');
           a.style.cssText = 'left:' + l.x + '%;top:' + l.y + '%;width:' + l.w + '%;height:' + l.h + '%';
           a.dataset.label = l.label || '';
-          if (l.live) { a.href = l.href; a.dataset.live = '1'; } else {
+          const lv = !l.live && liveFor(l);
+          if (lv) { a.href = lv.href; a.target = '_blank'; a.dataset.nl = lv.name; a.classList.add('nl'); } else if (l.live) { a.href = l.href; a.dataset.live = '1'; } else {
             const hit = byPage.get(norm(l.href));
             if (hit) {
               const best = hit.reduce((p, q) => (Math.abs(+q.ts.slice(0, 8) - +fi.ts.slice(0, 8)) < Math.abs(+p.ts.slice(0, 8) - +fi.ts.slice(0, 8)) ? q : p));
               if (best.fi !== fi && best.mi != null) { a.dataset.go = best.mi; a.href = '#m' + best.mi; a.dataset.to = best.date + (best.cap ? '' : ''); }
             }
-            if (!a.href) { a.href = linkUrl(l.href, fi.ts); a.target = '_blank'; a.rel = 'noopener'; }
+            if (!a.getAttribute('href')) { a.href = linkUrl(l.href, fi.ts); a.target = '_blank'; a.rel = 'noopener'; }
           }
           ov.appendChild(a);
         });
@@ -337,6 +358,7 @@
   function camFor(ch, st) {
     const l = ch.layers.get(st.key), W = ch.W, H = ch.H, ar = l.cur_ar, Hi = W * ar, m = mob();
     let s = 1, tx = 0, ty = Hi > H ? 0 : (H - Hi) / 2;
+    if (!st.region && !ch.live) { s = m ? 2.0 : 1.32; tx = (W - W * s) / 2; ty = Hi * s > H ? 0 : (H - Hi * s) / 2; }
     if (st.region) {
       const r = st.region, rw = r.w / 100, rh = r.h / 100;
       s = clamp((m ? 0.92 : 0.5) / rw, 1, 4.4);
@@ -411,8 +433,40 @@
   lb.addEventListener('click', (e) => { if (e.target === lb) lb.close(); });
   main.addEventListener('click', (e) => {
     const f = e.target.closest('[data-full]');
-    if (f) openLb(f.dataset.full, f.dataset.cap);
+    if (f) { if (f.dataset.b != null) openBrowse(moments[+f.dataset.b]); else openLb(f.dataset.full, f.dataset.cap); }
   });
+  // ---------- browse the old page: full-screen, links live ----------
+  const br = el('dialog', 'br');
+  br.setAttribute('aria-label', 'Browse the old page');
+  br.innerHTML = '<div class="brbar"><button type="button" class="brx" aria-label="Close">&times;</button><span class="bru"></span><a class="brw" target="_blank" rel="noopener">archive.org &#8599;</a></div><div class="brs"><div class="brp"><img alt=""></div></div><p class="brh">Tap a link. Teal ones are live on the new site, yellow ones open the archive copy.</p>';
+  document.body.appendChild(br);
+  $('.brx', br).addEventListener('click', () => br.close());
+  function openBrowse(st) {
+    const fi = st.fi, b = st.b, sc = $('.brs', br), pg = $('.brp', br), img = $('img', pg);
+    $('.bru', br).textContent = b.url + '  ·  ' + b.date;
+    $('.brw', br).href = archiveUrl(b, fi);
+    pg.querySelectorAll('.hs,.pin').forEach((n) => n.remove());
+    const w = mob() ? Math.round(innerWidth * 1.9) : Math.min(innerWidth - 24, 1500);
+    pg.style.width = w + 'px';
+    img.src = fi.src;
+    fi.links.forEach((l) => {
+      const a = el('a', 'hs');
+      a.style.cssText = 'left:' + l.x + '%;top:' + l.y + '%;width:' + l.w + '%;height:' + l.h + '%';
+      const hit = byPage.get(norm(l.href));
+      const lv = liveFor(l);
+      let go = null;
+      if (lv) { a.href = lv.href; a.target = '_blank'; a.classList.add('nl'); a.dataset.nl = lv.name; a.title = (l.label ? l.label + ': ' : '') + 'live on the new site (' + lv.name + ')'; pg.appendChild(a); return; }
+      if (hit) { const best = hit.reduce((p, q) => (Math.abs(+q.ts.slice(0, 8) - +fi.ts.slice(0, 8)) < Math.abs(+p.ts.slice(0, 8) - +fi.ts.slice(0, 8)) ? q : p)); if (best.fi !== fi && best.mi != null) go = best.mi; }
+      if (go != null) { a.href = '#m' + go; a.addEventListener('click', (e) => { e.preventDefault(); br.close(); goMoment(go); }); }
+      else { a.href = linkUrl(l.href, fi.ts); a.target = '_blank'; a.rel = 'noopener'; }
+      a.title = l.label || '';
+      pg.appendChild(a);
+    });
+    br.showModal();
+    sc.scrollTop = 0;
+    sc.scrollLeft = Math.max(0, (pg.offsetWidth - sc.clientWidth) / 2);
+  }
+
   function share() {
     const url = location.href.split('#')[0];
     if (navigator.share) { navigator.share({ title: 'The way back: 24 years of jeromebaker.com', url }).catch(() => {}); return; }
@@ -441,6 +495,7 @@
   function hideTip() { tip.classList.remove('on'); tipFor = null; document.querySelectorAll('.hs.sel').forEach((n) => n.classList.remove('sel')); }
   function hsInfo(a) {
     const label = a.dataset.label ? '<b>' + esc(a.dataset.label) + '</b>' : '';
+    if (a.dataset.nl) return label + '<small>Live: opens ' + esc(a.dataset.nl) + ' on the new site</small>';
     if (a.dataset.live) return '<b>Open this page</b><small>The live new site</small>';
     if (a.dataset.go != null) return label + '<small>Jumps to ' + esc(moments[+a.dataset.go].b.date) + ' in this tour</small>';
     return label + '<small>The link still works: opens the archive&rsquo;s copy</small>';
@@ -462,7 +517,7 @@
       if (pin && coarse) { e.preventDefault(); hideTip(); showTip(pin, '<b>Stand-in: ' + esc(pin.dataset.chip) + '</b><small>' + esc(pin.dataset.note) + '</small>'); return; }
       if (!a) return;
       if (a.dataset.go != null) { e.preventDefault(); hideTip(); goMoment(+a.dataset.go); return; }
-      if (coarse && !a.classList.contains('sel') && !a.dataset.live) {
+      if (coarse && !a.classList.contains('sel') && !a.dataset.live && !a.dataset.nl) {
         e.preventDefault(); hideTip(); a.classList.add('sel');
         showTip(a, hsInfo(a) + '<a href="' + esc(a.href) + '" target="_blank" rel="noopener">Open &#8599;</a>', true);
       }
@@ -517,7 +572,7 @@
       const u = i === 0 || i >= ch.nseg - 1 ? 0 : ease(clamp((t - HOLD) / (1 - HOLD), 0, 1));
       const same = A.key === B.key;
       const fa = ch.layers.get(A.key), fb = ch.layers.get(B.key);
-      const introMul = i === 0 ? 0.22 + 0.78 * sm(0.35, 1, f) : 1;
+      const introMul = i === 0 ? 0.45 + 0.55 * sm(0.2, 0.9, f) : 1;
       ch.layers.forEach((l) => { l.el.style.opacity = 0; l.el.style.pointerEvents = 'none'; });
       const put = (l, c, o, dy) => {
         l.el.style.opacity = o; l.el.style.transform = 'translate3d(' + c.tx.toFixed(1) + 'px,' + (c.ty + (dy || 0)).toFixed(1) + 'px,0) scale(' + c.s.toFixed(4) + ')';
@@ -536,12 +591,12 @@
         ch.cur.el.style.pointerEvents = 'auto';
       }
       // intro title, screen entrance
-      ch.intro.style.opacity = 1 - sm(0.3, 0.9, f);
+      ch.intro.style.opacity = 1 - sm(0.12, 0.6, f);
       ch.intro.style.transform = 'translateY(' + (-f * 90) + 'px)';
       ch.intro.style.visibility = f > 1 ? 'hidden' : 'visible';
       const se = i === 0 ? sm(0.2, 1, f) : 1;
-      ch.screen.style.opacity = 0.18 + 0.82 * se;
-      ch.screen.style.transform = 'scale(' + (0.955 + 0.045 * se) + ')';
+      ch.screen.style.opacity = 1;
+      ch.screen.style.transform = 'translateY(' + ((1 - se) * 40).toFixed(1) + 'px) scale(' + (0.97 + 0.03 * se) + ')';
       ch.ghost.style.transform = 'translate(-50%,-50%) translateX(' + ((0.5 - clamp(f / ch.nseg, 0, 1)) * 160) + 'px)';
       // cards
       ch.steps.forEach((st) => {
@@ -558,6 +613,7 @@
       if (cs && ch.chrome._st !== cs) {
         ch.chrome._st = cs;
         $('.url', ch.chrome).textContent = cs.b.url;
+        const sp = $('.srcpill', ch.view); sp.textContent = (ch.live ? '' : 'Archived: ') + cs.b.url + ' ↗'; sp.href = ch.live ? cs.b.live : archiveUrl(cs.b, cs.fi);
         $('.when', ch.chrome).textContent = cs.b.date;
         const w = $('.wb', ch.chrome); if (w) w.href = archiveUrl(cs.b, cs.fi);
         const o = $('.open', ch.chrome); if (o) o.href = cs.b.live;
