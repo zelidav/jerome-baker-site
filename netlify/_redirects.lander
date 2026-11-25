@@ -6,4 +6,21 @@ https://jerome-baker-site.netlify.app/*  https://jeromebaker.com/:splat  301!
 # www: home goes to the root, every other path goes straight to the old store in one hop
 https://www.jeromebaker.com/  https://jeromebaker.com/  301!
 https://www.jeromebaker.com/*  https://__OLD_HOST__/:splat  302!
+# new-site sections that have no old-store address: send them to the new site until cutover instead of the old store 404
+/story  https://jeromebaker.cannacrypted.com/story/  302
+/story/*  https://jeromebaker.cannacrypted.com/story/:splat  302
+/crew  https://jeromebaker.cannacrypted.com/crew/  302
+/crew/*  https://jeromebaker.cannacrypted.com/crew/:splat  302
+/glass  https://jeromebaker.cannacrypted.com/glass/  302
+/glass/*  https://jeromebaker.cannacrypted.com/glass/:splat  302
+/travel  https://jeromebaker.cannacrypted.com/travel/  302
+/travel/*  https://jeromebaker.cannacrypted.com/travel/:splat  302
+/comics  https://jeromebaker.cannacrypted.com/comics/  302
+/comics/*  https://jeromebaker.cannacrypted.com/comics/:splat  302
+/returns  https://jeromebaker.cannacrypted.com/returns/  302
+/returns/*  https://jeromebaker.cannacrypted.com/returns/:splat  302
+/privacy  https://jeromebaker.cannacrypted.com/privacy/  302
+/privacy/*  https://jeromebaker.cannacrypted.com/privacy/:splat  302
+/terms  https://jeromebaker.cannacrypted.com/terms/  302
+/terms/*  https://jeromebaker.cannacrypted.com/terms/:splat  302
 /*  https://__OLD_HOST__/:splat  302
