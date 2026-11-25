@@ -245,3 +245,9 @@ img{max-width:100%}
 .hs.nl,.brp .hs.nl{border-color:rgba(5,180,143,.9)!important;background:rgba(5,180,143,.14)}
 .links-on .hs.nl{border-color:var(--teal)}
 .hs.nl:hover,.brp .hs.nl:hover{background:rgba(5,180,143,.45)!important;border-color:var(--teal)!important}
+
+/* opened from the splash page: a clear close button at the top returns to it */
+.closex{flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:var(--red);color:#fff;border:2px solid #fff;font:800 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;box-shadow:3px 3px 0 #000}
+.closex[hidden]{display:none}
+.closex:hover{background:#fff;color:var(--red)}
+@media (max-width:860px){.closex span{display:none}.closex{padding:7px 10px;font-size:15px}}
