@@ -30,6 +30,7 @@
   <div class="rail" id="rail" role="navigation" aria-label="Timeline"></div>
   <div class="now" aria-live="off"><b id="nowYear">1998</b><span id="nowTitle"></span></div>
   <button class="share" id="share" type="button" aria-label="Copy a link to this tour">Share</button>
+  <a class="closex" id="closeTour" href="https://jeromebaker.com/" hidden aria-label="Close the tour and go back to the Jerome Baker splash page">&#10005;<span> Close</span></a>
   <div class="bar" id="prog" aria-hidden="true"><i></i></div>
 </header>
 
@@ -66,5 +67,6 @@
 <script src="extras.js"></script>
 <script src="regions.js"></script>
 <script src="tour.js"></script>
+<script>if(/[?&]from=splash/.test(location.search)){var c=document.getElementById("closeTour");if(c){c.hidden=false;document.body.classList.add("from-splash");}}</script>
 </body>
 </html>
