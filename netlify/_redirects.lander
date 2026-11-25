@@ -1,5 +1,9 @@
 # LANDER MODE. jeromebaker.com serves the "Pick your Jerome" page at / and everything else goes to the old store untouched.
 # __OLD_HOST__ is filled in by build.sh (env OLD_HOST). Static files (the lander itself) win over these rules.
 # 302 on purpose: temporary, so Google keeps the old URLs indexed until real cutover.
-https://www.jeromebaker.com/*  https://jeromebaker.com/:splat  301!
+# the lander's own address is the real site until cutover: no duplicate on the netlify.app host
+https://jerome-baker-site.netlify.app/*  https://jeromebaker.com/:splat  301!
+# www: home goes to the root, every other path goes straight to the old store in one hop
+https://www.jeromebaker.com/  https://jeromebaker.com/  301!
+https://www.jeromebaker.com/*  https://__OLD_HOST__/:splat  302!
 /*  https://__OLD_HOST__/:splat  302

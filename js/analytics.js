@@ -2,6 +2,11 @@
    Skips visitors who send Global Privacy Control or Do Not Track. Loaded by every page via
    <script defer src="/js/analytics.js">; tools/build_analytics.py keeps that tag on every page. */
 (function () {
+  // staging copy on GitHub Pages: keep it out of search until cutover, and out of the analytics numbers
+  if (location.hostname === 'jeromebaker.cannacrypted.com') {
+    var m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex,nofollow'; document.head.appendChild(m);
+    return;
+  }
   var ID = 'G-0XBD57ESG6';
   if (!ID || navigator.globalPrivacyControl || navigator.doNotTrack === '1') return;
   window.dataLayer = window.dataLayer || [];

@@ -11,7 +11,7 @@ if [ "$MODE" = "lander" ]; then
   cp -r netlify/lander/. dist/
   mkdir -p dist/js && cp js/analytics.js dist/js/analytics.js
   sed "s#__OLD_HOST__#${OLD_HOST}#g" netlify/_redirects.lander > dist/_redirects
-  sed -i "s#\"https://jeromebaker.com/\"#\"https://${OLD_HOST}/\"#" dist/index.html
+  sed -i "/rel=\"canonical\"/!s#\"https://jeromebaker.com/\"#\"https://${OLD_HOST}/\"#" dist/index.html
 elif [ "$MODE" = "cutover" ]; then
   tar --exclude=./.git --exclude=./netlify --exclude=./dist --exclude=./node_modules --exclude=./dev --exclude=./tools -cf - . | tar -xf - -C dist
   cp netlify/_redirects.cutover dist/_redirects
