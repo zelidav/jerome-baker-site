@@ -1,5 +1,6 @@
 /* Ritual Merch. Renders js/shop-data.js (built by tools/build_shop.py). Checkout happens on jeromebakerny.com. */
-(() => {
+(async () => {
+  if (window.JBShopFeed) await window.JBShopFeed.ready;
   const D = window.JBShop;
   const base = document.documentElement.dataset.base || '';
   const $ = (id) => document.getElementById(id);
@@ -19,7 +20,11 @@
     (/Red\b/.test(p.name) ? 'Indica' : /Yellow\b/.test(p.name) ? 'Sativa' : /Green\b/.test(p.name) ? 'Hybrid' : '');
   const TILTS = ['-2deg', '1.5deg', '-1deg', '2deg', '-1.5deg', '1deg'];
   // cards use the 480px thumbnail (built next to each photo); the product view loads the full 900px one
-  const thumb = (src) => src.replace(/\.webp$/, '_t.webp');
+  const abs = (s) => /^https:/.test(s);
+  const sized = (s, w) => s + (s.includes('?') ? '&' : '?') + 'width=' + w; // feed photos live on Shopify's CDN, which resizes on request
+  const thumb = (src) => (abs(src) ? sized(src, 480) : src.replace(/\.webp$/, '_t.webp'));
+  const full = (src) => (abs(src) ? sized(src, 900) : base + src);
+  const tsrc = (src) => (abs(src) ? thumb(src) : base + thumb(src));
 
   // the preview line on a card: the first sentence or two of the product copy, about 110 characters (leads #36, #46)
   const blurb = (d) => {
@@ -35,7 +40,7 @@
     const c = D.crew[p.crew];
     const bg = st ? STRAIN[st][0] : ['#FFFFFF', '#FDB514', '#F1F1F1'][i % 3];
     return `<button type="button" class="pcard" data-slug="${esc(p.slug)}" style="--bg:${bg};--tilt:${TILTS[i % TILTS.length]}" aria-label="${esc(p.name)}, ${money(p.price)}">
-<span class="pic">${p.imgs[1] ? `<img class="alt" src="${base}${thumb(p.imgs[1])}" alt="" loading="lazy" decoding="async">` : ''}<img class="main" src="${base}${thumb(p.imgs[0])}" alt="" loading="lazy" decoding="async"></span>
+<span class="pic">${p.imgs[1] ? `<img class="alt" src="${tsrc(p.imgs[1])}" alt="" loading="lazy" decoding="async">` : ''}<img class="main" src="${tsrc(p.imgs[0])}" alt="" loading="lazy" decoding="async"></span>
 ${c ? `<img class="worn" src="${base}assets/crew/${c.img}_s.webp" alt="" loading="lazy">` : ''}
 ${st ? `<span class="strain" style="--sc:${STRAIN[st][1]}">${st.toUpperCase()}</span>` : ''}
 ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
@@ -214,8 +219,8 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
     pd.innerHTML = `<button type="button" class="pd-x" aria-label="Close">×</button>
 <div class="pd-crumb"><a href="#collection" data-close>RITUAL MERCH</a>${firstCat ? ` / <a href="#cat=${slugify(firstCat[0])}" data-close>${esc(firstCat[0].toUpperCase())}</a>` : ''} / ${esc(title.toUpperCase())}</div>
 <div class="pd-main">
-<div class="pd-gal"><div class="pd-big"><img id="pdImg" src="${base}${p.imgs[0]}" alt="${esc(p.name)}"><button type="button" class="pd-zoom" aria-label="Zoom in on the photo"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M15 15l6 6M10 7v6M7 10h6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button></div>
-${p.imgs.length > 1 ? `<div class="pd-thumbs">${p.imgs.map((s, i) => `<button type="button" data-img="${i}" class="${i ? '' : 'on'}" aria-label="Photo ${i + 1}"><img src="${base}${thumb(s)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}</div>
+<div class="pd-gal"><div class="pd-big"><img id="pdImg" src="${full(p.imgs[0])}" alt="${esc(p.name)}"><button type="button" class="pd-zoom" aria-label="Zoom in on the photo"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M15 15l6 6M10 7v6M7 10h6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button></div>
+${p.imgs.length > 1 ? `<div class="pd-thumbs">${p.imgs.map((s, i) => `<button type="button" data-img="${i}" class="${i ? '' : 'on'}" aria-label="Photo ${i + 1}"><img src="${tsrc(s)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}</div>
 <div class="pd-info">
 <h2 id="pdTitle">${esc(title)}</h2>${sub ? `<span class="sub">${esc(sub.toUpperCase())}</span>` : ''}
 <span class="pd-price">${money(p.price)}</span>
@@ -263,12 +268,12 @@ ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="gri
       if ((zb || (big && !big.classList.contains('holo-live'))) && window.JBZoom) {
         const r = $('pdImg').getBoundingClientRect();
         const at = !zb && r.width ? [(e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height] : null;
-        JBZoom.open({ photos: p.imgs.map((s, i) => ({ src: base + s, thumb: base + thumb(s), alt: `${p.name}, photo ${i + 1}` })), index: img, at: at && at.every((v) => v >= 0 && v <= 1) ? at : null });
+        JBZoom.open({ photos: p.imgs.map((s, i) => ({ src: full(s), thumb: tsrc(s), alt: `${p.name}, photo ${i + 1}` })), index: img, at: at && at.every((v) => v >= 0 && v <= 1) ? at : null });
         return;
       }
       const th = t.closest('[data-img]');
       if (th) {
-        img = +th.dataset.img; $('pdImg').src = base + p.imgs[img];
+        img = +th.dataset.img; $('pdImg').src = full(p.imgs[img]);
         pd.querySelectorAll('.pd-thumbs button').forEach((b, i) => b.classList.toggle('on', i === img));
         return;
       }
