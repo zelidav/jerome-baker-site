@@ -1,0 +1,47 @@
+# Live merch feed (tools/shop_feed.py). Every 15 minutes, reads everything for sale on www.jeromebaker.shop (the one
+# store Printify publishes to) and commits shop-feed.json to the `shop-feed` data branch, which js/shop-feed.js reads
+# straight from raw.githubusercontent.com. New products, prices, copy and sold-out sizes show with no site deploy.
+# Secrets SHOPIFY_JBSHOP_KEY / SHOPIFY_JBSHOP_SECRET are the read-only app on that store; without them it uses the
+# public product list, which Shopify can refuse. Same pattern as glass-feed.yml.
+name: Shop feed
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: shop-feed
+jobs:
+  feed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: site
+      - name: Check out the data branch
+        run: |
+          cd site
+          if git ls-remote --exit-code --heads origin shop-feed >/dev/null; then
+            git fetch --depth=1 origin shop-feed
+            git worktree add ../out origin/shop-feed
+            cd ../out && git checkout -B shop-feed
+          else
+            git worktree add --orphan -b shop-feed ../out
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build the feed
+        env:
+          SHOPIFY_JBSHOP_KEY: ${{ secrets.SHOPIFY_JBSHOP_KEY }}
+          SHOPIFY_JBSHOP_SECRET: ${{ secrets.SHOPIFY_JBSHOP_SECRET }}
+        run: |
+          pip install --quiet pillow
+          python site/tools/shop_feed.py out
+      - name: Commit if anything changed
+        run: |
+          cd out
+          git add -A
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git -c user.name="jb-shop-feed" -c user.email="actions@users.noreply.github.com" commit -q -m "Shop feed $(date -u +%FT%RZ)"
+          git push -q origin shop-feed
