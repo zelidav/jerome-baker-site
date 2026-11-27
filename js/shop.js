@@ -39,7 +39,7 @@
     const st = strainOf(p);
     const c = D.crew[p.crew];
     const bg = st ? STRAIN[st][0] : ['#FFFFFF', '#FDB514', '#F1F1F1'][i % 3];
-    return `<a class="pcard" href="${base}shop/${esc(p.slug.replace(/^shp-/, ''))}/" data-slug="${esc(p.slug)}" style="--bg:${bg};--tilt:${TILTS[i % TILTS.length]}" aria-label="${esc(p.name)}, ${money(p.price)}">
+    return `<a class="pcard" href="${base}shop/${esc((window.JBShopPaths||{})[p.slug]||p.slug.replace(/^shp-/, ''))}/" data-slug="${esc(p.slug)}" style="--bg:${bg};--tilt:${TILTS[i % TILTS.length]}" aria-label="${esc(p.name)}, ${money(p.price)}">
 <span class="pic">${p.imgs[1] ? `<img class="alt" src="${tsrc(p.imgs[1])}" alt="" loading="lazy" decoding="async">` : ''}<img class="main" src="${tsrc(p.imgs[0])}" alt="" loading="lazy" decoding="async"></span>
 ${c ? `<img class="worn" src="${base}assets/crew/${c.img}_s.webp" alt="" loading="lazy">` : ''}
 ${st ? `<span class="strain" style="--sc:${STRAIN[st][1]}">${st.toUpperCase()}</span>` : ''}

@@ -16,7 +16,7 @@ scrub.seo()/scrub.prose() and then runs the finished page through scrub.html(), 
 Idempotent. After the Dec 8 cutover set ASSET_HOST to HOST so og:image of site-hosted photos points at jeromebaker.com.
 """
 import html as _html
-import json
+import json, shutil
 import re
 import sys
 import urllib.request
@@ -93,8 +93,35 @@ def valid(p):
         return False
 
 
-def path_of(p):
+PATHS_FILE = ROOT / 'tools' / 'shop-paths.json'
+PATHS = {}  # product slug -> URL segment. FROZEN once assigned (committed), so renaming a product never moves its URL
+
+
+def legacy_path(p):
     return re.sub(r'^shp-', '', p['slug']) if p.get('shop') == 'shopify' else p['slug']
+
+
+def path_of(p):
+    return PATHS[p['slug']]
+
+
+def assign_paths(items):
+    """Shopify products get a clean URL from their current (real-spelling) title; existing assignments never change."""
+    if PATHS_FILE.exists():
+        PATHS.update(json.loads(PATHS_FILE.read_text(encoding='utf-8')))
+    taken = set(PATHS.values()) | RESERVED
+    for p in items:
+        if p['slug'] in PATHS:
+            continue
+        base = slugify(scrub.seo(p['name']).translate(scrub.SEO_UNSWAP)) if p.get('shop') == 'shopify' else p['slug']
+        seg, i = base, 2
+        while seg in taken:
+            seg = f'{base}-{i}'
+            i += 1
+        PATHS[p['slug']] = seg
+        taken.add(seg)
+    PATHS_FILE.write_text(json.dumps(dict(sorted(PATHS.items())), indent=1) + NL, encoding='utf-8', newline='')
+    (ROOT / 'js' / 'shop-paths.js').write_text('window.JBShopPaths=' + json.dumps({p['slug']: PATHS[p['slug']] for p in items}, separators=(',', ':')) + ';' + NL, encoding='utf-8', newline='')
 
 
 def money(n):
@@ -303,6 +330,7 @@ def browse_block(items, cats):
 def main():
     data = load()
     items = data['items']
+    assign_paths(items)
     taken = set()
     for p in items:
         s = path_of(p)
@@ -335,6 +363,11 @@ def main():
                 opts = ', '.join(sorted_terms(p['attrs'][0])[:3]) if p['attrs'] else ''
                 alt = {q['id']: ', '.join(sorted_terms(q['attrs'][0])[:3]) if q['attrs'] else '' for q in g}
                 twin[p['id']] = f' ({opts})' if opts and list(alt.values()).count(opts) == 1 else f' (No. {i + 1})'
+    keep = {path_of(p) for p in items}
+    for p in items:  # generated pages left under their old handle-based URL
+        old = legacy_path(p)
+        if old not in keep and (shop_dir / old / 'index.html').exists() and old not in CATPATH.values():
+            shutil.rmtree(shop_dir / old)
     for p in items:
         out = shop_dir / path_of(p) / 'index.html'
         out.parent.mkdir(parents=True, exist_ok=True)
