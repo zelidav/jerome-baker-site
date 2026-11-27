@@ -39,9 +39,20 @@ jobs:
           pip install --quiet pillow
           python site/tools/shop_feed.py out
       - name: Commit if anything changed
+        id: commit
         run: |
           cd out
           git add -A
           if git diff --cached --quiet; then echo "no change"; exit 0; fi
           git -c user.name="jb-shop-feed" -c user.email="actions@users.noreply.github.com" commit -q -m "Shop feed $(date -u +%FT%RZ)"
           git push -q origin shop-feed
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      # The shop pages (shop/<slug>/) are built at deploy time from this feed, so a changed feed means a new Netlify build.
+      # Inert until the NETLIFY_BUILD_HOOK secret exists.
+      - name: Rebuild the site when the feed changed
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          HOOK: ${{ secrets.NETLIFY_BUILD_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then echo "no NETLIFY_BUILD_HOOK secret; skipping"; exit 0; fi
+          curl -fsS -X POST -d '{}' "$HOOK" >/dev/null && echo "build triggered"
