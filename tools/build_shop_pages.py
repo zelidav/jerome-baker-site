@@ -71,8 +71,26 @@ def load():
             if p not in shop and (p['slug'] in slugs or norm(p['name']) in names):
                 continue
         kept.append(p)
-    data['items'] = kept
+    data['items'] = [p for p in kept if valid(p)]
+    dropped = len(kept) - len(data['items'])
+    if dropped:
+        print(f'skipped {dropped} item(s) that failed validation')
     return data
+
+
+HTTPS = re.compile(r'^https://[^\s"<>]+$')
+SAFE_SLUG = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
+LOCAL_IMG = re.compile(r'^assets/[\w./-]+$')
+
+
+def valid(p):
+    """Anything that becomes a URL path, link or image address must look like one: the feed comes from outside this repo."""
+    try:
+        path = re.sub(r'^shp-', '', p['slug']) if p.get('shop') == 'shopify' else p['slug']
+        return bool(SAFE_SLUG.match(path) and HTTPS.match(p['url']) and isinstance(p['id'], int) and isinstance(p['price'], (int, float))
+                    and p['imgs'] and all(isinstance(i, str) and (HTTPS.match(i) or LOCAL_IMG.match(i)) for i in p['imgs']))
+    except (KeyError, TypeError):
+        return False
 
 
 def path_of(p):
@@ -166,7 +184,10 @@ TAIL = '''</div>
 
 
 def ld_tag(obj):
-    return '<script type="application/ld+json">' + json.dumps(obj, ensure_ascii=False, separators=(',', ':')) + '</script>' + NL
+    # feed text is untrusted: no </script> or <!-- can end the block early
+    body = json.dumps(obj, ensure_ascii=False, separators=(',', ':'))
+    body = body.replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
+    return '<script type="application/ld+json">' + body + '</script>' + NL
 
 
 def card_html(p, up):
