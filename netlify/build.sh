@@ -13,6 +13,9 @@ if [ "$MODE" = "lander" ]; then
   sed "s#__OLD_HOST__#${OLD_HOST}#g" netlify/_redirects.lander > dist/_redirects
   sed -i "/rel=\"canonical\"/!s#\"https://jeromebaker.com/\"#\"https://${OLD_HOST}/\"#" dist/index.html
 elif [ "$MODE" = "cutover" ]; then
+  # product and category pages from the live merch feed, so a deploy always carries today's prices and names
+  # (soft-fail: if the feed or python is unavailable, the pages committed in shop/ ship as they are)
+  python3 tools/build_shop_pages.py || echo "shop pages: kept the committed copies"
   tar --exclude=./.git --exclude=./netlify --exclude=./dist --exclude=./node_modules --exclude=./dev --exclude=./tools -cf - . | tar -xf - -C dist
   cp netlify/_redirects.cutover dist/_redirects
   echo "ok: $(grep -vc '^#\|^$' dist/_redirects) redirect rules"
