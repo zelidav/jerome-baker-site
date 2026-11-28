@@ -47,4 +47,6 @@
 .pp-browse li{break-inside:avoid;padding:3px 0}
 .pp-browse a{color:var(--ink);font-weight:600;font-size:14px}
 .pp-browse-cats a{font-weight:900}
+.pp-all{margin-top:8px}
+.pp-all summary{cursor:pointer;font-weight:700;font-size:14px;padding:8px 0;color:var(--ink)}
 @media (max-width:560px){.pp{gap:22px}.pp-main{padding-top:16px}}

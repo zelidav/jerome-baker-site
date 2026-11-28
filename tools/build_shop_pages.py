@@ -329,7 +329,8 @@ def browse_block(items, cats):
     cat_links = [(c, f'{CATPATH[c]}/') for c in cats]
     prod_links = sorted(((p['name'], f'{path_of(p)}/') for p in items), key=lambda x: x[0].lower())
     return ('<!--PRODUCTS-->' + NL + '<section class="pad" aria-labelledby="browseAll"><div class="wrap"><h2 id="browseAll">Browse every piece</h2>'
-            '<ul class="pp-browse pp-browse-cats">' + lis(cat_links) + '</ul><ul class="pp-browse">' + lis(prod_links) + '</ul></div></section>' + NL + '<!--/PRODUCTS-->')
+            '<ul class="pp-browse pp-browse-cats">' + lis(cat_links) + '</ul>'
+            f'<details class="pp-all"><summary>See all {len(prod_links)} pieces as a list</summary><ul class="pp-browse">' + lis(prod_links) + '</ul></details></div></section>' + NL + '<!--/PRODUCTS-->')
 
 
 def main():
