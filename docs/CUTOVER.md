@@ -19,9 +19,9 @@ Status: `done` / `open` / `blocked` / `David` (waiting on David) / `later` (afte
 | # | Item | Status | Notes |
 |---|---|---|---|
 | 1 | Printify titles and copy cleaned (33 titles, 5 descriptions) | done | Live on www.jeromebaker.shop. Backup in the session scratchpad (`inc_backup_pre_rename.json`) |
-| 2 | OG Tee prices: Shopify still $25.73 to $34.60, Printify has $55 to $70 | David | Click Publish on it in Printify, or edit the 7 Black variants in Shopify |
+| 2 | OG Tee prices | done | Re-published variants 2026-11-28; live price now $55 (was $25.73) |
 | 3 | Out-of-stock products (Bucket Hat x2, Mesh Cap, Bento Box) | David | Printify can't edit them. Decide: hide or restock |
-| 4 | Two Printify shops merged into one (David is doing this) | David | Site reads www.jeromebaker.shop and jeromebakerny.com (Woo) only |
+| 4 | Two Printify shops merged | open | NOT merged as of 2026-11-28: Printify still has 'Jerome Baker Designs, Inc' (55 products, ac535d.myshopify.com, behind www.jeromebaker.shop) and the old 'Jerome Baker Designs' (25 products, jerome-baker-designs.myshopify.com, behind shop.jeromebaker.com). All 25 old titles also exist in Inc. Printify has no transfer API; the old shop stays only as the checkout-only host until cutover |
 | 5 | Thin-margin stickers ($5, $10) | later | Prices left alone |
 | 6 | `ASSET_HOST` in `tools/build_shop_pages.py` flipped from `jeromebaker.cannacrypted.com` to `https://jeromebaker.com` | open | Then rebuild pages, rerun `scrub.py --check` and the link check |
 | 7 | `build_shop.py` reads the .shop store only | open | Drop the old shop.jeromebaker.com source |
@@ -59,3 +59,4 @@ Status: `done` / `open` / `blocked` / `David` (waiting on David) / `later` (afte
 ## Log
 
 - 2026-11-27: plan created. Shop copy and titles fixed in Printify, pages and clean URLs pushed to PR #110, feed validation added after the security review.
+- 2026-11-28: OG Tee price fixed ($55 live). Stores found NOT merged; see section 2 item 4.
