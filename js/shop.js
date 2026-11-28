@@ -40,7 +40,7 @@
     const c = D.crew[p.crew];
     const bg = st ? STRAIN[st][0] : ['#FFFFFF', '#FDB514', '#F1F1F1'][i % 3];
     return `<a class="pcard" href="${base}shop/${esc((window.JBShopPaths||{})[p.slug]||p.slug.replace(/^shp-/, ''))}/" data-slug="${esc(p.slug)}" style="--bg:${bg};--tilt:${TILTS[i % TILTS.length]}" aria-label="${esc(p.name)}, ${money(p.price)}">
-<span class="pic">${p.imgs[1] ? `<img class="alt" src="${tsrc(p.imgs[1])}" alt="" loading="lazy" decoding="async">` : ''}<img class="main" src="${tsrc(p.imgs[0])}" alt="" loading="lazy" decoding="async"></span>
+<span class="pic">${p.imgs[1] ? `<img class="alt" src="${tsrc(p.imgs[1])}" alt="" loading="lazy" decoding="async">` : ''}<img class="main" src="${tsrc(p.imgs[0])}" alt="${esc(p.name)}" loading="lazy" decoding="async"></span>
 ${c ? `<img class="worn" src="${base}assets/crew/${c.img}_s.webp" alt="" loading="lazy">` : ''}
 ${st ? `<span class="strain" style="--sc:${STRAIN[st][1]}">${st.toUpperCase()}</span>` : ''}
 ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
@@ -220,7 +220,7 @@ ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
 <div class="pd-crumb"><a href="#collection" data-close>RITUAL MERCH</a>${firstCat ? ` / <a href="#cat=${slugify(firstCat[0])}" data-close>${esc(firstCat[0].toUpperCase())}</a>` : ''} / ${esc(title.toUpperCase())}</div>
 <div class="pd-main">
 <div class="pd-gal"><div class="pd-big"><img id="pdImg" src="${full(p.imgs[0])}" alt="${esc(p.name)}"><button type="button" class="pd-zoom" aria-label="Zoom in on the photo"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="3"/><path d="M15 15l6 6M10 7v6M7 10h6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button></div>
-${p.imgs.length > 1 ? `<div class="pd-thumbs">${p.imgs.map((s, i) => `<button type="button" data-img="${i}" class="${i ? '' : 'on'}" aria-label="Photo ${i + 1}"><img src="${tsrc(s)}" alt="" loading="lazy"></button>`).join('')}</div>` : ''}</div>
+${p.imgs.length > 1 ? `<div class="pd-thumbs">${p.imgs.map((s, i) => `<button type="button" data-img="${i}" class="${i ? '' : 'on'}" aria-label="Photo ${i + 1}"><img src="${tsrc(s)}" alt="${esc(p.name)}, photo ${i + 1}" loading="lazy"></button>`).join('')}</div>` : ''}</div>
 <div class="pd-info">
 <h2 id="pdTitle">${esc(title)}</h2>${sub ? `<span class="sub">${esc(sub.toUpperCase())}</span>` : ''}
 <span class="pd-price">${money(p.price)}</span>
@@ -248,8 +248,8 @@ ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="gri
       const url = p.inStock && !missing.length ? cartUrl(p, sel, qty) : '';
       if (url) { buy.href = url; buy.removeAttribute('aria-disabled'); } else { buy.removeAttribute('href'); buy.setAttribute('aria-disabled', 'true'); }
       buy.textContent = p.inStock ? 'Add to cart' : 'Gone forever';
-      note.innerHTML = !p.inStock ? 'This one sold out. Told you.' : missing.length ? `Pick a ${esc(missing.join(' and a '))} first.` :
-        `Adds it to your cart on <a href="${esc(p.url)}" target="_blank" rel="noopener">${p.shop === 'shopify' ? (p.store || 'https://jeromebaker.com').replace(/^https:\/\/(www\.)?/, '') : 'jeromebakerny.com'}</a>, where checkout and shipping happen.`;
+      note.innerHTML = !p.inStock ? 'This one sold out. Told you.' : missing.length ? `Pick ${missing.map((w) => (/^[aeiou]/i.test(w) ? 'an ' : 'a ') + esc(w)).join(' and ')} first.` :
+        `Adds it to your cart on <a href="${esc(p.url)}" target="_blank" rel="noopener">${p.shop === 'shopify' ? (p.store || 'https://jeromebaker.com').replace(/^https:\/\/(www\.)?/, '') : 'jeromebakerny.com'}</a>, where checkout and shipping happen. <a href="${base}returns/">Returns and refunds</a>.`;
       $('pdQty').textContent = qty;
     };
     pd.onclick = (e) => {
