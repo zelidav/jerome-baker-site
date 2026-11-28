@@ -7,7 +7,8 @@
 (() => {
   if (window.JBShopFeed) return;
   const FEED = 'https://raw.githubusercontent.com/zelidav/jerome-baker-site/shop-feed/shop-feed.json';
-  const STORE = 'https://www.jeromebaker.shop';
+  const STORE = 'https://shop.jeromebaker.com';
+  const RETIRED = 'https://www.jeromebaker.shop'; // the old merch store: its listings never show once the feed is the single source
   const isShop = (p) => p && p.shop === 'shopify' && p.store === STORE;
   const ok = (p) => p && Number.isInteger(p.id) && typeof p.name === 'string' && typeof p.slug === 'string' && p.slug.startsWith('shp-') &&
     typeof p.price === 'number' && isFinite(p.price) && Array.isArray(p.imgs) && p.imgs.length && p.imgs.every((u) => /^https:\/\/cdn\.shopify\.com\//.test(u)) &&
@@ -37,7 +38,7 @@
     const names = new Set(shop.map((p) => norm(p.name)));
     D.items = D.items.filter((p) => {
       if (p.shop !== 'shopify') return true;
-      if (NOT_SELLABLE.has(p.slug)) return false;
+      if (NOT_SELLABLE.has(p.slug) || p.store === RETIRED) return false;
       if (isShop(p)) return true;
       return !(slugs.has(p.slug) || names.has(norm(p.name)));
     });
