@@ -39,13 +39,13 @@
     const st = strainOf(p);
     const c = D.crew[p.crew];
     const bg = st ? STRAIN[st][0] : ['#FFFFFF', '#FDB514', '#F1F1F1'][i % 3];
-    return `<button type="button" class="pcard" data-slug="${esc(p.slug)}" style="--bg:${bg};--tilt:${TILTS[i % TILTS.length]}" aria-label="${esc(p.name)}, ${money(p.price)}">
+    return `<a class="pcard" href="${base}shop/${esc((window.JBShopPaths||{})[p.slug]||p.slug.replace(/^shp-/, ''))}/" data-slug="${esc(p.slug)}" style="--bg:${bg};--tilt:${TILTS[i % TILTS.length]}" aria-label="${esc(p.name)}, ${money(p.price)}">
 <span class="pic">${p.imgs[1] ? `<img class="alt" src="${tsrc(p.imgs[1])}" alt="" loading="lazy" decoding="async">` : ''}<img class="main" src="${tsrc(p.imgs[0])}" alt="" loading="lazy" decoding="async"></span>
 ${c ? `<img class="worn" src="${base}assets/crew/${c.img}_s.webp" alt="" loading="lazy">` : ''}
 ${st ? `<span class="strain" style="--sc:${STRAIN[st][1]}">${st.toUpperCase()}</span>` : ''}
 ${p.inStock ? '' : '<span class="soldout">GONE</span>'}
 <span class="meta"><h3>${esc(title)}</h3>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}${p.desc ? `<span class="blurb">${esc(blurb(p.desc))}</span>` : ''}<span class="row"><span class="pr">${money(p.price)}</span><span class="go">${p.attrs.length ? 'PICK SIZE →' : 'GET IT →'}</span></span></span>
-</button>`;
+</a>`;
   };
 
   // ---------- Featured rail ----------
@@ -278,7 +278,7 @@ ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="gri
         return;
       }
       const pc = t.closest('.pcard');
-      if (pc) { open(pc.dataset.slug, true); pd.scrollTop = 0; return; }
+      if (pc) { e.preventDefault(); open(pc.dataset.slug, true); pd.scrollTop = 0; return; }
       if (t.closest('#pdBuy[aria-disabled]')) { e.preventDefault(); note.animate([{ transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'none' }], 240); }
     };
     // single-option attributes come preselected
@@ -309,7 +309,7 @@ ${rec.length ? `<div class="pd-rec"><h3>Recommended products</h3><div class="gri
 
   document.addEventListener('click', (e) => {
     const pc = e.target.closest('.pcard');
-    if (pc && !pd.contains(pc)) open(pc.dataset.slug, true);
+    if (pc && !pd.contains(pc)) { if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return; e.preventDefault(); open(pc.dataset.slug, true); }
   });
 
   // ---------- Routing: #p=<slug>, #cat=<slug> ----------
