@@ -20,8 +20,8 @@ import crew_data  # noqa: E402
 import scrub  # noqa: E402
 import shopify  # noqa: E402
 
-SHOP = 'ac535d.myshopify.com'
-STORE = shopify.STORE2
+SHOP = 'jerome-baker-designs.myshopify.com'
+STORE = 'https://shop.jeromebaker.com'  # the one store: Printify publishes here, glass lives here too (filtered out below)
 # on the store but with nothing behind them in Printify (no way to print or ship them), so the site does not list them
 NOT_SELLABLE = {'womenssmoking-slacks', 'soho-baker-beach-towel', 'tote-bag-aop', 'smoking-dress',
                 'bed-time-baker-womens-satin-pajamas', 'jbd-jerome-baker-designs-small-cell-phone-wallet'}
@@ -65,7 +65,7 @@ def items_from(products):
     worn = {pid: c['slug'] for c in crew_data.CREW for pid in c['wear']}
     out = []
     for x in products:
-        if x['handle'] in NOT_SELLABLE or not x['images'] or not any(v['available'] for v in x['variants']):
+        if x.get('vendor') != 'Printify' or x['handle'] in NOT_SELLABLE or not x['images'] or not any(v['available'] for v in x['variants']):
             continue
         if any(k in x['title'].lower() for k in shopify.SKIP_TITLES):
             continue
@@ -95,7 +95,7 @@ def items_from(products):
 
 def main(outdir):
     key, secret = os.environ.get('SHOPIFY_JBSHOP_KEY'), os.environ.get('SHOPIFY_JBSHOP_SECRET')
-    products = pull_storefront(key, secret) if key and secret else shopify.pull(STORE)
+    products = shopify.pull(STORE)  # public product list; the storefront app belongs to the retired www.jeromebaker.shop store
     items = items_from(products)
     if len(items) < 5:  # a half-empty read must never wipe the shop: leave the last good feed in place
         sys.exit(f'only {len(items)} products came back; not writing the feed')

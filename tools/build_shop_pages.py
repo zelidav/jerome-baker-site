@@ -29,7 +29,8 @@ ROOT = Path(__file__).resolve().parent.parent
 HOST = 'https://jeromebaker.com'  # canonical host
 ASSET_HOST = 'https://jeromebaker.cannacrypted.com'  # where site-hosted photos resolve today (flip to HOST at cutover)
 FEED = 'https://raw.githubusercontent.com/zelidav/jerome-baker-site/shop-feed/shop-feed.json'
-SHOP_STORE = 'https://www.jeromebaker.shop'
+SHOP_STORE = 'https://shop.jeromebaker.com'
+RETIRED_STORE = 'https://www.jeromebaker.shop'
 NOT_SELLABLE = {'shp-' + h for h in ('womenssmoking-slacks', 'soho-baker-beach-towel', 'tote-bag-aop', 'smoking-dress',
                                      'bed-time-baker-womens-satin-pajamas', 'jbd-jerome-baker-designs-small-cell-phone-wallet', 'bucket-hat-aop', 'mesh-cap', 'two-tier-bento-box')}
 SIZE_ORDER = ['2XS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', 'S/M', 'L/XL']
@@ -59,14 +60,14 @@ def load():
         fresh = feed['items']
         have = {p['id'] for p in fresh}
         is_shop = lambda p: p.get('shop') == 'shopify' and p.get('store') == SHOP_STORE  # noqa: E731
-        items = [p for p in items if not is_shop(p) and p['id'] not in have] + fresh
+        items = [p for p in items if not is_shop(p) and p.get('store') != RETIRED_STORE and p['id'] not in have] + fresh
     shop = [p for p in items if p.get('shop') == 'shopify' and p.get('store') == SHOP_STORE]
     norm = lambda s: re.sub(r'[^a-z0-9]+', '', s.lower())  # noqa: E731
     slugs, names = {p['slug'] for p in shop}, {norm(p['name']) for p in shop}
     kept = []
     for p in items:
         if p.get('shop') == 'shopify':
-            if p['slug'] in NOT_SELLABLE:
+            if p['slug'] in NOT_SELLABLE or p.get('store') == RETIRED_STORE:
                 continue
             if p not in shop and (p['slug'] in slugs or norm(p['name']) in names):
                 continue
@@ -109,7 +110,9 @@ def assign_paths(items):
     """Shopify products get a clean URL from their current (real-spelling) title; existing assignments never change."""
     if PATHS_FILE.exists():
         PATHS.update(json.loads(PATHS_FILE.read_text(encoding='utf-8')))
-    taken = set(PATHS.values()) | RESERVED
+    cur = {p['slug'] for p in items}
+    owner = {seg: slug for slug, seg in PATHS.items()}
+    taken = {seg for slug, seg in PATHS.items() if slug in cur} | RESERVED
     for p in items:
         if p['slug'] in PATHS:
             continue
@@ -118,6 +121,8 @@ def assign_paths(items):
         while seg in taken:
             seg = f'{base}-{i}'
             i += 1
+        if owner.get(seg) not in (None, p['slug']) and owner[seg] not in cur:
+            del PATHS[owner[seg]]  # a retired listing's URL passes to the same product on the new store
         PATHS[p['slug']] = seg
         taken.add(seg)
     PATHS_FILE.write_text(json.dumps(dict(sorted(PATHS.items())), indent=1) + NL, encoding='utf-8', newline='')
