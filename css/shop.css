@@ -163,6 +163,11 @@ footer.sfoot{background:var(--ink);color:#cfcfcf;padding-top:64px;padding-bottom
   .shopbody{display:block}
   .filters{position:fixed;inset:auto 0 0 0;top:auto;max-height:78dvh;z-index:70;box-shadow:0 -8px 0 var(--ink);transform:translateY(105%);transition:transform .25s ease;border-width:3px 0 0}
   .filters.open{transform:none}
+  /* the sheet sits above the dock and the crew promo, and those step aside while it is open, so Clear everything can be tapped */
+  .filters{z-index:80;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+  body:has(.filters.open) .dock,body:has(.filters.open) .promo{display:none}
+  .filters #clear,.filters #cats button{min-height:44px}
+  .subnav a{padding:14px}
   .ftoggle{display:inline-flex}
   .scollage{height:470px}
   header.top{position:relative}
@@ -176,6 +181,16 @@ footer.sfoot{background:var(--ink);color:#cfcfcf;padding-top:64px;padding-bottom
   .pcard .sub{display:none}
   .pcard .go{display:none}
   .pd-main{padding:12px 14px 22px}
+  /* bigger small print, and the photo no longer pushes Add to cart a screen and a half down */
+  .pcard .strain{font-size:12px}
+  .pcard .blurb{font-size:14px}
+  .pd-big{aspect-ratio:auto;height:min(92vw,50dvh)}
+  /* staging test promo covers the hero and the grid on a phone */
+  body .promo{display:none}
+}
+@media (min-width:700px) and (max-width:900px){
+  .pd-gal{flex:1 1 44%}
+  .pd-info{flex:1 1 48%;min-width:0}
 }
 
 /* no crew stickers on the product boxes (the Worn by panel on the product page says who wears it); lighter frames */

@@ -81,7 +81,7 @@ def items_from(products):
                 val = v[3].get(o['name'])
                 if val and val not in vals:
                     vals.append(val)
-            if len(vals) > 1 or len(opts) > 1:
+            if len(vals) > 1:  # a one-value option ("One size", a single colour) is noise, not a choice
                 attrs.append(dict(name='Amount' if o['name'] == 'Title' else o['name'], src=o['name'], key='', terms=[[v, v.lower()] for v in vals]))
         it = dict(
             id=x['id'], name=scrub.prose(shopify.short_name(x['title'])), slug='shp-' + x['handle'], url=shopify.page_url(x, STORE),

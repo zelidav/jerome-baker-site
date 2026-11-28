@@ -24,6 +24,25 @@
     D.items = D.items.filter((p) => !isShop(p) || have.has(p.id)).filter((p) => !have.has(p.id)).concat(fresh);
   };
 
+  // shop-data.js can still hold older copies of products that live on www.jeromebaker.shop (tagged jeromebaker.com,
+  // at the old half prices, same slug). Show each product once, the .shop copy winning, whether or not the feed loads.
+  // Also drops the listings that have nothing behind them in Printify, for the case where the feed never arrives.
+  const NOT_SELLABLE = new Set(['womenssmoking-slacks', 'soho-baker-beach-towel', 'tote-bag-aop', 'smoking-dress',
+    'bed-time-baker-womens-satin-pajamas', 'jbd-jerome-baker-designs-small-cell-phone-wallet', 'bucket-hat-aop', 'mesh-cap', 'two-tier-bento-box'].map((h) => 'shp-' + h));
+  const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+  const dedupe = (D) => {
+    if (!D || !Array.isArray(D.items)) return;
+    const shop = D.items.filter(isShop);
+    const slugs = new Set(shop.map((p) => p.slug));
+    const names = new Set(shop.map((p) => norm(p.name)));
+    D.items = D.items.filter((p) => {
+      if (p.shop !== 'shopify') return true;
+      if (NOT_SELLABLE.has(p.slug)) return false;
+      if (isShop(p)) return true;
+      return !(slugs.has(p.slug) || names.has(norm(p.name)));
+    });
+  };
+
   const get = (url) => new Promise((done) => {
     try {
       const ac = window.AbortController ? new AbortController() : null;
@@ -34,7 +53,8 @@
         .catch(() => { clearTimeout(timer); done(null); });
     } catch (e) { done(null); }
   });
-  const ready = (!window.JBShop || !window.fetch) ? Promise.resolve() :
-    get(FEED + '?t=' + Math.floor(Date.now() / 300000)).then((f) => { try { if (f) merge(window.JBShop, f); } catch (e) { /* page stays as built */ } });
-  window.JBShopFeed = { ready, merge };
+  const tidy = () => { try { dedupe(window.JBShop); } catch (e) { /* page stays as built */ } };
+  const ready = (!window.JBShop || !window.fetch) ? Promise.resolve().then(tidy) :
+    get(FEED + '?t=' + Math.floor(Date.now() / 300000)).then((f) => { try { if (f) merge(window.JBShop, f); } catch (e) { /* page stays as built */ } tidy(); });
+  window.JBShopFeed = { ready, merge, dedupe };
 })();
