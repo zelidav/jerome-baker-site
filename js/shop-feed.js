@@ -28,7 +28,7 @@
   // at the old half prices, same slug). Show each product once, the .shop copy winning, whether or not the feed loads.
   // Also drops the listings that have nothing behind them in Printify, for the case where the feed never arrives.
   const NOT_SELLABLE = new Set(['womenssmoking-slacks', 'soho-baker-beach-towel', 'tote-bag-aop', 'smoking-dress',
-    'bed-time-baker-womens-satin-pajamas', 'jbd-jerome-baker-designs-small-cell-phone-wallet'].map((h) => 'shp-' + h));
+    'bed-time-baker-womens-satin-pajamas', 'jbd-jerome-baker-designs-small-cell-phone-wallet', 'bucket-hat-aop', 'mesh-cap', 'two-tier-bento-box'].map((h) => 'shp-' + h));
   const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
   const dedupe = (D) => {
     if (!D || !Array.isArray(D.items)) return;

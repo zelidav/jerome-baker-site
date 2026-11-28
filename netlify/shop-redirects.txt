@@ -24,11 +24,8 @@
 /products/jbd-honey-bear-jerome-baker-round-rug /shop/jbd-honey-bear-round-rug/ 302
 /products/jb-jerome-baker-kiss-cut-stickers /shop/jerome-baker-kiss-cut-stickers/ 302
 /products/planet-13-glassblowing-poster /shop/planet-13-glassblowing-poster/ 302
-/products/two-tier-bento-box /shop/two-tier-bento-box/ 302
 /products/unisex-hooded-sweatshirt /shop/unisex-hooded-sweatshirt/ 302
 /products/unisex-distressed-cap /shop/unisex-distressed-cap/ 302
-/products/mesh-cap /shop/mesh-cap/ 302
-/products/bucket-hat-aop /shop/bucket-hat/ 302
 /products/jbd-logo-kiss-cut-vinyl-decals /shop/jbd-logo-kiss-cut-vinyl-decals/ 302
 /products/adjustable-tote-bag-aop /shop/adjustable-tote-bag/ 302
 /products/stoned-by-jeromebaker-embroidered-snapback-cap-trendy-streetwear-hat-for-casual-style /shop/stoned-snapback-cap/ 302

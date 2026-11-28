@@ -31,7 +31,7 @@ ASSET_HOST = 'https://jeromebaker.cannacrypted.com'  # where site-hosted photos 
 FEED = 'https://raw.githubusercontent.com/zelidav/jerome-baker-site/shop-feed/shop-feed.json'
 SHOP_STORE = 'https://www.jeromebaker.shop'
 NOT_SELLABLE = {'shp-' + h for h in ('womenssmoking-slacks', 'soho-baker-beach-towel', 'tote-bag-aop', 'smoking-dress',
-                                     'bed-time-baker-womens-satin-pajamas', 'jbd-jerome-baker-designs-small-cell-phone-wallet')}
+                                     'bed-time-baker-womens-satin-pajamas', 'jbd-jerome-baker-designs-small-cell-phone-wallet', 'bucket-hat-aop', 'mesh-cap', 'two-tier-bento-box')}
 SIZE_ORDER = ['2XS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL', 'S/M', 'L/XL']
 RESERVED = {'index', 'css', 'js', 'assets'}
 CATPATH = {}  # category name -> URL segment (set in main, after product paths are known)
